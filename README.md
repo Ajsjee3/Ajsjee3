@@ -1,4 +1,7 @@
 ### Hi there 👋
+22110926 이호준
+영남대학교 컴퓨터공학과
+email:22110926@yu.ac.kr
 
 <!--
 **Ajsjee3/Ajsjee3** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
