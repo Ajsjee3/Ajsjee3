@@ -1,0 +1,258 @@
+{
+  "data_origin": "synthetic_demo_not_real_business_data",
+  "database": "temporary_sqlite",
+  "transport": "in_process_asgi_testclient",
+  "first_ingestion": {
+    "run_id": "1ca9b871-40fd-4044-b3eb-6eec56946d8e",
+    "accepted": 300,
+    "duplicates": 5,
+    "rejected": 4,
+    "row_count": 309,
+    "errors": [
+      {
+        "row_number": 306,
+        "code": "schema_error",
+        "issues": [
+          {
+            "field": "amount_krw",
+            "type": "greater_than_equal"
+          }
+        ]
+      },
+      {
+        "row_number": 307,
+        "code": "schema_error",
+        "issues": [
+          {
+            "field": "placed_at",
+            "type": "datetime_from_date_parsing"
+          }
+        ]
+      },
+      {
+        "row_number": 308,
+        "code": "schema_error",
+        "issues": [
+          {
+            "field": "updated_at",
+            "type": "timezone_aware"
+          }
+        ]
+      },
+      {
+        "row_number": 309,
+        "code": "revision_conflict",
+        "issues": [
+          {
+            "field": "revision",
+            "type": "same_version_different_content"
+          }
+        ]
+      }
+    ]
+  },
+  "replay": {
+    "run_id": "98584236-ef2c-4226-bbf8-3ac4698a0f7b",
+    "accepted": 0,
+    "duplicates": 305,
+    "rejected": 4,
+    "row_count": 309,
+    "errors": [
+      {
+        "row_number": 306,
+        "code": "schema_error",
+        "issues": [
+          {
+            "field": "amount_krw",
+            "type": "greater_than_equal"
+          }
+        ]
+      },
+      {
+        "row_number": 307,
+        "code": "schema_error",
+        "issues": [
+          {
+            "field": "placed_at",
+            "type": "datetime_from_date_parsing"
+          }
+        ]
+      },
+      {
+        "row_number": 308,
+        "code": "schema_error",
+        "issues": [
+          {
+            "field": "updated_at",
+            "type": "timezone_aware"
+          }
+        ]
+      },
+      {
+        "row_number": 309,
+        "code": "revision_conflict",
+        "issues": [
+          {
+            "field": "revision",
+            "type": "same_version_different_content"
+          }
+        ]
+      }
+    ]
+  },
+  "metrics_before_replay": {
+    "as_of": "2026-09-08T00:00:00+00:00",
+    "start_at": null,
+    "end_at_exclusive": null,
+    "currency": "KRW",
+    "summary": {
+      "total_orders": 120,
+      "active_orders": 40,
+      "delivered_orders": 40,
+      "cancelled_orders": 20,
+      "refunded_orders": 20,
+      "overdue_open_orders": 40,
+      "late_delivered_orders": 20,
+      "booked_amount_krw": 481000,
+      "late_delivery_rate": 0.5
+    },
+    "by_source": [
+      {
+        "source": "market_a",
+        "total_orders": 42,
+        "active_orders": 14,
+        "delivered_orders": 14,
+        "cancelled_orders": 7,
+        "refunded_orders": 7,
+        "overdue_open_orders": 14,
+        "late_delivered_orders": 7,
+        "booked_amount_krw": 163000,
+        "late_delivery_rate": 0.5
+      },
+      {
+        "source": "market_b",
+        "total_orders": 42,
+        "active_orders": 14,
+        "delivered_orders": 14,
+        "cancelled_orders": 7,
+        "refunded_orders": 7,
+        "overdue_open_orders": 14,
+        "late_delivered_orders": 7,
+        "booked_amount_krw": 177000,
+        "late_delivery_rate": 0.5
+      },
+      {
+        "source": "own_store",
+        "total_orders": 36,
+        "active_orders": 12,
+        "delivered_orders": 12,
+        "cancelled_orders": 6,
+        "refunded_orders": 6,
+        "overdue_open_orders": 12,
+        "late_delivered_orders": 6,
+        "booked_amount_krw": 141000,
+        "late_delivery_rate": 0.5
+      }
+    ]
+  },
+  "metrics": {
+    "as_of": "2026-09-08T00:00:00+00:00",
+    "start_at": null,
+    "end_at_exclusive": null,
+    "currency": "KRW",
+    "summary": {
+      "total_orders": 120,
+      "active_orders": 40,
+      "delivered_orders": 40,
+      "cancelled_orders": 20,
+      "refunded_orders": 20,
+      "overdue_open_orders": 40,
+      "late_delivered_orders": 20,
+      "booked_amount_krw": 481000,
+      "late_delivery_rate": 0.5
+    },
+    "by_source": [
+      {
+        "source": "market_a",
+        "total_orders": 42,
+        "active_orders": 14,
+        "delivered_orders": 14,
+        "cancelled_orders": 7,
+        "refunded_orders": 7,
+        "overdue_open_orders": 14,
+        "late_delivered_orders": 7,
+        "booked_amount_krw": 163000,
+        "late_delivery_rate": 0.5
+      },
+      {
+        "source": "market_b",
+        "total_orders": 42,
+        "active_orders": 14,
+        "delivered_orders": 14,
+        "cancelled_orders": 7,
+        "refunded_orders": 7,
+        "overdue_open_orders": 14,
+        "late_delivered_orders": 7,
+        "booked_amount_krw": 177000,
+        "late_delivery_rate": 0.5
+      },
+      {
+        "source": "own_store",
+        "total_orders": 36,
+        "active_orders": 12,
+        "delivered_orders": 12,
+        "cancelled_orders": 6,
+        "refunded_orders": 6,
+        "overdue_open_orders": 12,
+        "late_delivered_orders": 6,
+        "booked_amount_krw": 141000,
+        "late_delivery_rate": 0.5
+      }
+    ]
+  },
+  "metrics_unchanged_by_replay": true,
+  "quality": {
+    "scope": "ingestion_attempts_not_unique_bad_orders",
+    "runs": 2,
+    "accepted": 300,
+    "duplicates": 310,
+    "rejected": 8,
+    "rejections_by_code": [
+      {
+        "code": "revision_conflict",
+        "count": 2
+      },
+      {
+        "code": "schema_error",
+        "count": 6
+      }
+    ]
+  },
+  "brief": {
+    "mode": "rules_based_no_llm",
+    "as_of": "2026-09-08T00:00:00+00:00",
+    "text": "전체 120건 중 배송 예정 시각을 넘긴 미완료 주문은 40건입니다. 주문 상태와 배송 이력을 확인해 주세요.",
+    "metrics": {
+      "total_orders": 120,
+      "active_orders": 40,
+      "delivered_orders": 40,
+      "cancelled_orders": 20,
+      "refunded_orders": 20,
+      "overdue_open_orders": 40,
+      "late_delivered_orders": 20,
+      "booked_amount_krw": 481000,
+      "late_delivery_rate": 0.5
+    },
+    "evidence": [
+      {
+        "document_id": "late-delivery",
+        "title": "배송 지연과 미완료 주문 확인",
+        "score": 6.548934,
+        "excerpt": "학습용 운영 규칙입니다. 주문 상태가 paid 또는 shipped이고 배송 예정 시각 promised_by가 조회 기준 시각 as_of보다 빠르면 지연 미완료 주문입니다. 판매자는 배송 이력과 운송장 상태를 확인한 후 고객 안내 내용을 검토합니다. 시스템이 고객에게 메시지를 자동 발송하지는 않습니다.",
+        "source": "bundled_demo_policy",
+        "version": "1"
+      }
+    ],
+    "action_executed": false
+  }
+}

@@ -1,0 +1,139 @@
+{
+  "scope": "15 hand_written_demo_cases_not_independent_real_world_benchmark",
+  "document_count": 6,
+  "answerable_cases": 12,
+  "top1_accuracy": 1.0,
+  "recall_at_3": 1.0,
+  "mrr_at_3": 1.0,
+  "empty_result_rate_on_unrelated": 1.0,
+  "cases": [
+    {
+      "query": "배송 예정 시각을 넘긴 미완료 주문",
+      "expected": "late-delivery",
+      "retrieved": [
+        "late-delivery",
+        "delivery-rate",
+        "money"
+      ],
+      "rank": 1
+    },
+    {
+      "query": "지연 주문 운송장 상태 확인",
+      "expected": "late-delivery",
+      "retrieved": [
+        "late-delivery",
+        "delivery-rate",
+        "money"
+      ],
+      "rank": 1
+    },
+    {
+      "query": "중복 적재 버전 충돌",
+      "expected": "duplicates",
+      "retrieved": [
+        "duplicates",
+        "quality"
+      ],
+      "rank": 1
+    },
+    {
+      "query": "revision 같은 내용 저장 생략",
+      "expected": "duplicates",
+      "retrieved": [
+        "duplicates",
+        "money",
+        "late-delivery"
+      ],
+      "rank": 1
+    },
+    {
+      "query": "유효 주문 금액 취소 환불",
+      "expected": "money",
+      "retrieved": [
+        "money",
+        "delivery-rate",
+        "quality"
+      ],
+      "rank": 1
+    },
+    {
+      "query": "booked_amount_krw 회계 매출",
+      "expected": "money",
+      "retrieved": [
+        "money"
+      ],
+      "rank": 1
+    },
+    {
+      "query": "음수 금액 오류 행 수정",
+      "expected": "quality",
+      "retrieved": [
+        "quality",
+        "money"
+      ],
+      "rank": 1
+    },
+    {
+      "query": "schema_error row_number",
+      "expected": "quality",
+      "retrieved": [
+        "quality"
+      ],
+      "rank": 1
+    },
+    {
+      "query": "UTC 시간대 조회 기간",
+      "expected": "time-window",
+      "retrieved": [
+        "time-window",
+        "quality",
+        "late-delivery"
+      ],
+      "rank": 1
+    },
+    {
+      "query": "start_at end_at 포함 제외",
+      "expected": "time-window",
+      "retrieved": [
+        "time-window",
+        "delivery-rate",
+        "money"
+      ],
+      "rank": 1
+    },
+    {
+      "query": "배송 지연율 분모",
+      "expected": "delivery-rate",
+      "retrieved": [
+        "delivery-rate",
+        "late-delivery",
+        "quality"
+      ],
+      "rank": 1
+    },
+    {
+      "query": "late_delivery_rate 배송 완료 없으면",
+      "expected": "delivery-rate",
+      "retrieved": [
+        "delivery-rate",
+        "late-delivery",
+        "duplicates"
+      ],
+      "rank": 1
+    }
+  ],
+  "unrelated_cases": [
+    {
+      "query": "블랙홀 은하 천체",
+      "returned_count": 0
+    },
+    {
+      "query": "피아노 바이올린",
+      "returned_count": 0
+    },
+    {
+      "query": "야구 축구 배구",
+      "returned_count": 0
+    }
+  ]
+}

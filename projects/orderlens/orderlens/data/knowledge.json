@@ -1,0 +1,8 @@
+[
+  {"id":"late-delivery","version":"1","title":"배송 지연과 미완료 주문 확인","text":"학습용 운영 규칙입니다. 주문 상태가 paid 또는 shipped이고 배송 예정 시각 promised_by가 조회 기준 시각 as_of보다 빠르면 지연 미완료 주문입니다. 판매자는 배송 이력과 운송장 상태를 확인한 후 고객 안내 내용을 검토합니다. 시스템이 고객에게 메시지를 자동 발송하지는 않습니다."},
+  {"id":"duplicates","version":"1","title":"중복 적재와 주문 버전 충돌","text":"학습용 데이터 규칙입니다. source, order_id, revision 조합과 내용이 모두 같으면 중복으로 집계하고 저장을 생략합니다. 같은 버전인데 내용이 다르면 revision_conflict로 기록합니다. 주문 상태를 갱신할 때는 revision을 증가시켜야 합니다. 새로운 버전이 먼저 도착해도 가장 큰 버전을 조회합니다."},
+  {"id":"money","version":"1","title":"유효 주문 금액과 취소 환불 처리","text":"학습용 지표 정의입니다. booked_amount_krw는 최신 상태가 paid, shipped, delivered인 주문 금액의 합입니다. cancelled와 refunded 주문은 제외합니다. 이 값은 유효 주문 금액이며 회계상 매출이나 이익이 아닙니다. 원화는 정수로 저장하고 배송비, 수수료, 부분 환불은 이 예제에서 계산하지 않습니다."},
+  {"id":"quality","version":"1","title":"데이터 검증 오류와 실패 행 수정","text":"학습용 데이터 규칙입니다. 음수 금액, 소수 금액, 빠진 필수 항목, 시간대가 없는 날짜, 모순된 배송 시각은 schema_error로 기록합니다. errors의 row_number와 issues.field를 보고 원본 행을 수정한 뒤 다시 제출합니다. 정상 행은 적재하고 오류 행은 적재하지 않습니다."},
+  {"id":"time-window","version":"1","title":"UTC 시간대와 조회 기간","text":"학습용 시간 규칙입니다. 입력 날짜는 ISO 8601 형식에 +09:00 또는 Z처럼 시간대를 포함해야 합니다. 내부 시각은 UTC로 통일합니다. start_at은 포함하고 end_at은 제외합니다. as_of는 원천 데이터의 updated_at 기준이며 시스템이 당시 알고 있던 정보의 완전한 복원 시각은 아닙니다."},
+  {"id":"delivery-rate","version":"1","title":"배송 지연율의 분모와 빈 데이터","text":"학습용 지표 정의입니다. late_delivery_rate는 배송 완료 주문 중 delivered_at이 promised_by보다 늦은 주문의 비율입니다. 분모는 최신 상태가 delivered인 주문 수입니다. 아직 배송 중인 주문이나 취소 및 환불 주문은 이 분모에서 제외합니다. 배송 완료 주문이 없으면 0퍼센트 대신 null을 반환합니다."}
+]

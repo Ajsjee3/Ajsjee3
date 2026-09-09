@@ -1,0 +1,31 @@
+name: OrderLens checks
+on:
+  push:
+    paths:
+      - 'projects/orderlens/**'
+      - '.github/workflows/orderlens-ci.yml'
+  pull_request:
+    paths:
+      - 'projects/orderlens/**'
+      - '.github/workflows/orderlens-ci.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: projects/orderlens
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: projects/orderlens/requirements.lock
+      - run: python -m pip install -r requirements.lock
+      - run: python -m scripts.check

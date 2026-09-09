@@ -1,0 +1,18 @@
+{
+  "transport": "real_loopback_http_to_uvicorn",
+  "database": "temporary_sqlite",
+  "health": 200,
+  "ingest": 200,
+  "metrics": 200,
+  "unauthenticated": 401,
+  "request_id_present": true,
+  "accepted_versions": 300,
+  "orders": 120,
+  "attention_filter": {
+    "status": 200,
+    "source": "market_a",
+    "limit": 3,
+    "returned": 3,
+    "only_requested_source": true
+  }
+}
