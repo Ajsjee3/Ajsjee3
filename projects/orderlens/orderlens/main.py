@@ -17,13 +17,13 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session
 
 from orderlens import __version__
-from orderlens.analytics import attention_orders, metrics, quality_summary
+from orderlens.analytics import attention_orders, metrics, order_page, quality_summary
 from orderlens.config import Settings
 from orderlens.db import Base, make_engine
 from orderlens.ingestion import ingest, run_summary
 from orderlens.models import IngestionRun
 from orderlens.retrieval import BM25Index
-from orderlens.schemas import IngestRequest, OrderSource, SearchRequest
+from orderlens.schemas import IngestRequest, OrderPage, OrderSource, OrderStatus, SearchRequest
 
 logger = logging.getLogger("orderlens")
 key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
@@ -131,6 +131,19 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             utc(as_of),
             utc(start_at) if start_at else None,
             utc(end_at) if end_at else None,
+        )
+
+    @router.get("/orders", tags=["analytics"], response_model=OrderPage)
+    def get_orders(
+        session: Db,
+        as_of: AwareDatetime | None = None,
+        source: OrderSource | None = None,
+        status: OrderStatus | None = None,
+        limit: int = Query(20, ge=1, le=100),
+        offset: int = Query(0, ge=0, le=9_223_372_036_854_775_807),
+    ):
+        return order_page(
+            session, utc(as_of), source=source, status=status, limit=limit, offset=offset
         )
 
     @router.get("/orders/attention", tags=["analytics"])

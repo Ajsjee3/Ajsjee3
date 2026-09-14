@@ -1,63 +1,22 @@
-All checks passed!
-................................                                         [100%]
-=============================== warnings summary ===============================
-../../../portfolio-env/lib/python3.12/site-packages/fastapi/testclient.py:1
-  /workspace/scratch/339040e0e773/portfolio-env/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
-    from starlette.testclient import TestClient as TestClient  # noqa
+OrderLens 0.2.0 검증 요약 — 2026-09-14
+환경: Linux x86_64, Python 3.12.14, SQLite 3.53.1
+의존성: requirements.lock을 새 가상환경에 설치
+실행 위치: projects/orderlens
+명령: python -m scripts.check
+종료 코드: 0
 
-../../../portfolio-env/lib/python3.12/site-packages/starlette/testclient.py:53
-  /workspace/scratch/339040e0e773/portfolio-env/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
-    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+python -m ruff check .: All checks passed!
+python -m pytest -q: 59 passed, 2 warnings in 1.90s
+python -m scripts.generate_demo: 합성 데이터 309행
+python -m scripts.demo: 저장 300, 중복 5, 오류 4; 재전송 새 버전 0, 지표 동일
+python -m scripts.evaluate_retrieval: 예제 문서 6개·관련 질문 12개·무관 질문 3개
+  Top-1 / Recall@3 / MRR@3 = 1.0; 실제 사용자 질의의 독립 평가가 아님
+python -m scripts.smoke_http: 실제 임시 Uvicorn 서버에 HTTP 요청
+  주문 목록: limit=17, 8페이지, 반환 120, 고유 주문 120; 페이지 사이 적재 없음
+  경로·상태 필터: market_a + paid, 2건 모두 일치
+  지연 주문 필터: market_a, 3건 모두 일치
+  주문 목록 API 키 누락: 401
 
--- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
-32 passed, 2 warnings in 0.88s
-합성 데이터 309행: data/demo_batch.json
-{
-  "first_ingestion": {
-    "accepted": 300,
-    "duplicates": 5,
-    "rejected": 4
-  },
-  "replay_accepted": 0,
-  "metrics": {
-    "total_orders": 120,
-    "active_orders": 40,
-    "delivered_orders": 40,
-    "cancelled_orders": 20,
-    "refunded_orders": 20,
-    "overdue_open_orders": 40,
-    "late_delivered_orders": 20,
-    "booked_amount_krw": 481000,
-    "late_delivery_rate": 0.5
-  },
-  "report": "artifacts/demo_report.json"
-}
-{
-  "scope": "15 hand_written_demo_cases_not_independent_real_world_benchmark",
-  "document_count": 6,
-  "answerable_cases": 12,
-  "top1_accuracy": 1.0,
-  "recall_at_3": 1.0,
-  "mrr_at_3": 1.0,
-  "empty_result_rate_on_unrelated": 1.0
-}
-{
-  "transport": "real_loopback_http_to_uvicorn",
-  "database": "temporary_sqlite",
-  "health": 200,
-  "ingest": 200,
-  "metrics": 200,
-  "unauthenticated": 401,
-  "request_id_present": true,
-  "accepted_versions": 300,
-  "orders": 120,
-  "attention_filter": {
-    "status": 200,
-    "source": "market_a",
-    "limit": 3,
-    "returned": 3,
-    "only_requested_source": true
-  }
-}
-/workspace/scratch/339040e0e773/portfolio-env/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
-  from starlette.testclient import TestClient as TestClient  # noqa
+경고: httpx 기반 Starlette TestClient 지원 중단 예정, anyio BlockingPortal 별칭 지원 중단 예정
+미검증: PostgreSQL 실서버, Docker 실행, 동시성 부하, 대용량 성능
+이 파일은 실행 결과 요약이며 전체 원격 로그는 PR의 Checks에 기록됩니다.

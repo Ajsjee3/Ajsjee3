@@ -1,6 +1,6 @@
 # 참고 저장소와 적용한 부분
 
-확인일: 2026-09-09. 공개 README, 디렉터리 구조와 아래 코드 파일을 직접 읽고 정리했습니다. 프로젝트 전체를 실행하거나 성능 수치를 재검증한 것은 아닙니다.
+기존 참고 확인일: 2026-09-09. 공개 README, 디렉터리 구조와 아래 코드 파일을 직접 읽고 정리했습니다. 프로젝트 전체를 실행하거나 성능 수치를 재검증한 것은 아닙니다. 2026-09-14에 새로 읽은 페이지 조회 코드는 아래에 구분했습니다.
 
 | 저장소 | 확인한 구성 | OrderLens에 적용한 부분 |
 |---|---|---|
@@ -17,3 +17,16 @@ sixat의 [DAG](https://github.com/6mini/sixat/blob/main/airflow/taxi-price-pipel
 Solar-See의 한국어 실행 안내에는 서버 중단과 데모 영상 이용이 명시돼 있습니다. OrderLens도 현재 실행 가능한 범위와 후속 작업을 구분해 적었습니다.
 
 참고한 것은 문제를 설명하고 구현을 확인할 수 있게 연결하는 방식입니다. 각 저장소의 코드·이미지·소개 문구는 가져오지 않았습니다. 적용 내용은 OrderLens의 규모와 데이터 계약을 기준으로 정했습니다.
+
+## 2026-09-14 · 페이지 조회 코드
+
+[uriyyo/fastapi-pagination](https://github.com/uriyyo/fastapi-pagination)의 다음 파일을 직접 읽었습니다. 이 저장소는 페이지 조회 구현의 참고이며, 저자의 취업 여부나 채용 성과를 확인한 자료는 아닙니다.
+
+| 확인한 파일 | 코드에서 확인한 점 | 이번 변경에 적용한 부분 |
+|---|---|---|
+| [limit_offset.py](https://github.com/uriyyo/fastapi-pagination/blob/main/fastapi_pagination/limit_offset.py) | limit의 1~100 제한과 음수 offset 거부, 페이지 응답의 조회 위치 | API 입력 경계를 명시하고 잘못된 값의 422 응답을 테스트 |
+| [ext/sqlalchemy.py](https://github.com/uriyyo/fastapi-pagination/blob/main/fastapi_pagination/ext/sqlalchemy.py) | create_paginate_query와 _limit_offset_flow에서 SQL에 페이지 범위를 적용, 별도 count 쿼리 구성 | 전체 결과를 Python으로 가져와 자르지 않고 DB에서 OFFSET·LIMIT 적용 |
+
+확인한 파일의 Git blob SHA는 각각 `f136c2fbb1d8f8e1864a81f194e1983721963c03`, `7f5301d86136ebb8e26380fa9dfdb4c72dfc08bb`입니다. README만 읽고 동작을 추정한 것이 아니라 해당 파라미터와 SQL 생성 경로를 확인했습니다. 외부 프로젝트의 테스트 실행이나 성능 검증은 하지 않았습니다.
+
+OrderLens의 기본 limit=20, 최신 주문 선택 후 필터, 정렬 키, `limit + 1`로 다음 페이지를 판단하고 total을 생략하는 응답은 이 프로젝트의 요구에 맞춰 별도로 정했습니다. fastapi-pagination 의존성이나 소스 코드는 가져오지 않았습니다. 코드와 테스트의 연결은 [페이지 조회 설계](decisions/order_pagination.md)에서 확인할 수 있습니다.

@@ -68,11 +68,29 @@ curl -X POST http://127.0.0.1:8000/v1/knowledge/search \
 | GET /v1/runs/{run_id} | 한 번의 적재 결과와 오류 행 위치 조회 |
 | GET /v1/quality | 적재 시도 기준 오류·중복 통계 |
 | GET /v1/metrics | 최신 버전 기반 전체·판매 경로별 주문 지표 |
+| GET /v1/orders | 판매 경로·상태별 최신 주문 목록과 페이지 조회 |
 | GET /v1/orders/attention | 배송 예정 시각이 지난 미완료 주문 조회 |
 | POST /v1/knowledge/search | 업무 문서 검색 및 문서 ID·버전·근거 반환 |
 | GET /v1/brief | 운영 지표와 관련 문서를 연결한 규칙 기반 요약 |
 
 health와 API 문서를 제외한 /v1 API는 X-API-Key를 확인합니다. 고객에게 연락하거나 주문을 변경하는 동작은 구현하지 않았습니다.
+
+### 주문 목록의 다음 페이지
+
+```bash
+curl 'http://127.0.0.1:8000/v1/orders?source=market_a&status=paid&limit=2&offset=0&as_of=2026-09-08T00%3A00%3A00Z' \
+  -H 'X-API-Key: orderlens-local-demo-key'
+
+# 예제 데이터의 첫 응답은 next_offset=2입니다. 필터와 기준 시각은 유지합니다.
+curl 'http://127.0.0.1:8000/v1/orders?source=market_a&status=paid&limit=2&offset=2&as_of=2026-09-08T00%3A00%3A00Z' \
+  -H 'X-API-Key: orderlens-local-demo-key'
+```
+
+`source`는 `market_a`, `market_b`, `own_store`, `status`는 `paid`, `shipped`, `delivered`, `cancelled`, `refunded` 중 하나입니다. 생략한 필터는 전체 대상을 포함합니다. 주문 시각 내림차순으로 읽고, 시각이 같으면 판매 경로와 주문 번호 오름차순입니다.
+
+`limit`은 기본 20, 최대 100이며 `offset`은 기본 0입니다. 마지막 페이지의 `has_more`는 false, `next_offset`은 null입니다. 빈 목록도 정상 응답입니다. `as_of`를 생략하면 응답에 첫 요청의 기준 시각을 돌려주므로 다음 요청부터 그 값을 넣습니다.
+
+페이지 사이에 과거 자료를 새로 적재하면 같은 `as_of`에서도 중복·누락이 생길 수 있습니다. 재현 조건과 선택 이유는 [페이지 조회 설계](decisions/order_pagination.md)를 확인해 주세요.
 
 ## 4. 코드 읽는 순서
 
@@ -109,7 +127,7 @@ docker compose up --build
 
 Windows에서는 `Copy-Item .env.example .env`를 사용하실 수 있습니다. Compose는 PostgreSQL에 연결하고 API를 내 컴퓨터의 8000번 포트에 제공합니다. 데이터 볼륨은 컨테이너를 내려도 유지됩니다.
 
-**이 작성 환경에서는 SQLite로 검증했습니다. Docker 이미지 실행, PostgreSQL 실서버 통합, GitHub Actions 원격 실행은 별도 검증 항목입니다.** 실행 환경과 검증 범위는 [검증 기록](validation.md)을 확인해 주세요.
+**로컬에서는 SQLite로 검증했습니다. Docker 이미지 실행과 PostgreSQL 실서버 통합은 아직 검증하지 않았습니다.** 로컬·원격 실행 근거와 검증 범위는 [검증 기록](validation.md)을 확인해 주세요.
 
 ## 7. 다음 문서
 

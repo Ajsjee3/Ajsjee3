@@ -8,6 +8,24 @@
   "request_id_present": true,
   "accepted_versions": 300,
   "orders": 120,
+  "order_pages": {
+    "status": 200,
+    "as_of": "2026-09-08T00:00:00Z",
+    "limit": 17,
+    "pages": 8,
+    "returned": 120,
+    "unique_orders": 120,
+    "data_changed_between_pages": false
+  },
+  "order_page_filter": {
+    "status": 200,
+    "source": "market_a",
+    "order_status": "paid",
+    "limit": 2,
+    "returned": 2,
+    "only_requested_source_and_status": true
+  },
+  "orders_unauthenticated": 401,
   "attention_filter": {
     "status": 200,
     "source": "market_a",
