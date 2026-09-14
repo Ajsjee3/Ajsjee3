@@ -10,6 +10,8 @@
 
 참고: fastapi-pagination의 파라미터 검증과 SQLAlchemy 페이지 쿼리 코드를 읽었습니다. 라이브러리를 추가하거나 코드를 복사하지 않았으며, 확인한 파일과 적용 범위는 [references.md](references.md)에 남겼습니다.
 
+[PR #2](https://github.com/Ajsjee3/Ajsjee3/pull/2)에서 변경을 설명하고 [원격 검사](https://github.com/Ajsjee3/Ajsjee3/actions/runs/34834324632)의 성공과 동일한 테스트·HTTP 결과를 확인했습니다.
+
 다음: PostgreSQL 초기 마이그레이션과 실제 DB 통합 검증. 대용량 offset 성능, 동시 적재 중 페이지 일관성, 사용자별 권한은 이번 변경의 완료 범위가 아닙니다.
 
 ## 2026-09-09 · 0.1.1

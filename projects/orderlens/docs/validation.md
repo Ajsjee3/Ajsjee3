@@ -8,7 +8,7 @@
 |---|---|
 | Ruff 코드 검사 | 통과 |
 | pytest | 59개 통과, 실패 0개; 페이지 조회 관련 27개 포함 |
-| GitHub Actions | 이번 변경의 결과는 PR의 Checks와 실행 기록에서 확인; 이전 성공 근거는 아래에 별도 기록 |
+| GitHub Actions | 0.2.0 코드 커밋 e75ae24에서 PR 검사 성공; 실행 링크는 아래 기록 |
 | 합성 데이터 처리 | 입력 309행: 저장 300개, 중복 5개, 오류 4개 |
 | 동일 데이터 재전송 | 새 버전 0개, 기존 버전 중복 305개, 오류 4개 |
 | 재전송 전후 운영 지표 | 동일함을 비교·확인 |
@@ -49,8 +49,14 @@
 
 테스트 중 의존성에서 deprecation 경고 2종(httpx 기반 TestClient, anyio BlockingPortal 별칭)이 발생했습니다. 테스트 실패는 없었습니다. 현재 고정 버전에서는 동작을 확인했으며 이후 의존성 갱신 때 함께 정리할 항목입니다.
 
+## 0.2.0 원격 실행 근거
+
+2026-09-14에 [PR #2](https://github.com/Ajsjee3/Ajsjee3/pull/2)의 코드 커밋 `e75ae24200aa8bdaab16fcf9658d152e5134b408`을 검사한 [GitHub Actions 실행](https://github.com/Ajsjee3/Ajsjee3/actions/runs/34834324632)이 success로 완료됐습니다. 고정 의존성 설치와 `python -m scripts.check` 단계의 성공을 확인했습니다.
+
+원격 로그에도 Ruff 통과, pytest 59개 통과, 실제 HTTP 8페이지·반환 120건·고유 주문 120건, 주문 목록 인증 누락 401이 기록됐습니다. 이후 검증 링크를 정리한 문서 변경의 상태는 [PR Checks](https://github.com/Ajsjee3/Ajsjee3/pull/2/checks)에서 확인할 수 있습니다.
+
 ## 이전 버전의 원격 실행 근거
 
 2026-09-09에 코드 커밋 `7d840f6b4eb6941e7997074a0ff25983061b00dd`의 [GitHub Actions 실행](https://github.com/Ajsjee3/Ajsjee3/actions/runs/34298134180)이 success로 완료됐습니다. 저장소의 `projects/orderlens`에서 고정 의존성을 설치하고 `python -m scripts.check`를 실행한 결과입니다.
 
-위 링크는 0.1.1의 기록이며 이번 0.2.0 변경의 성공 근거로 사용하지 않습니다. 0.2.0의 원격 실행은 작업 PR에서 별도로 확인합니다.
+위 링크는 0.1.1의 기록이며 이번 0.2.0 변경의 성공 근거와 구분합니다.
