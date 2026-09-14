@@ -3,7 +3,7 @@
   "database": "temporary_sqlite",
   "transport": "in_process_asgi_testclient",
   "first_ingestion": {
-    "run_id": "1ca9b871-40fd-4044-b3eb-6eec56946d8e",
+    "run_id": "01e74649-bbd4-44eb-8107-366ce3e2a1e5",
     "accepted": 300,
     "duplicates": 5,
     "rejected": 4,
@@ -52,7 +52,7 @@
     ]
   },
   "replay": {
-    "run_id": "98584236-ef2c-4226-bbf8-3ac4698a0f7b",
+    "run_id": "1e9417e1-2b10-4a66-8be3-019a74dda721",
     "accepted": 0,
     "duplicates": 305,
     "rejected": 4,

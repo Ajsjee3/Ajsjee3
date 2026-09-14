@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "orderlens-portfolio"
-version = "0.1.1"
+version = "0.2.0"
 description = "Order data quality, analytics APIs, and a retrieval baseline"
 readme = "README.md"
 requires-python = ">=3.12"

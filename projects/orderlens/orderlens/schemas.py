@@ -12,6 +12,7 @@ from pydantic import (
 )
 
 OrderSource = Literal["market_a", "market_b", "own_store"]
+OrderStatus = Literal["paid", "shipped", "delivered", "cancelled", "refunded"]
 
 
 class OrderInput(BaseModel):
@@ -25,7 +26,7 @@ class OrderInput(BaseModel):
     updated_at: AwareDatetime
     promised_by: AwareDatetime
     delivered_at: AwareDatetime | None = None
-    status: Literal["paid", "shipped", "delivered", "cancelled", "refunded"]
+    status: OrderStatus
     amount_krw: Annotated[StrictInt, Field(ge=0, le=1_000_000_000_000)]
 
     @field_validator("placed_at", "updated_at", "promised_by", "delivered_at", mode="before")
@@ -54,6 +55,19 @@ class OrderInput(BaseModel):
             if not self.placed_at <= self.delivered_at <= self.updated_at:
                 raise ValueError("배송 시각은 주문 시각과 갱신 시각 사이여야 합니다.")
         return self
+
+
+class OrderPage(BaseModel):
+    """최신 주문 목록과 다음 조회 위치. as_of는 다음 페이지에서도 재사용합니다."""
+
+    orders: list[OrderInput]
+    as_of: AwareDatetime
+    source: OrderSource | None
+    status: OrderStatus | None
+    limit: int
+    offset: int
+    has_more: bool
+    next_offset: int | None
 
 
 class IngestRequest(BaseModel):

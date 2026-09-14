@@ -6,7 +6,7 @@ from sqlalchemy import case, func, select
 from sqlalchemy.orm import Session
 
 from orderlens.models import IngestionRun, OrderSnapshot, RejectedRow
-from orderlens.schemas import OrderSource
+from orderlens.schemas import OrderInput, OrderSource, OrderStatus
 
 
 def latest_orders(as_of: datetime, start_at=None, end_at=None):
@@ -113,6 +113,45 @@ def attention_orders(
         query.order_by(current.c.promised_by, current.c.source, current.c.order_id).limit(limit)
     ).mappings()
     return [dict(row) for row in rows]
+
+
+def order_page(
+    session: Session,
+    as_of: datetime,
+    *,
+    source: OrderSource | None = None,
+    status: OrderStatus | None = None,
+    limit: int = 20,
+    offset: int = 0,
+) -> dict:
+    current = latest_orders(as_of)
+    # 공개 주문 필드만 선택하고 DB 내부 ID와 해시는 제외합니다.
+    query = select(*(current.c[name] for name in OrderInput.model_fields))
+    if source is not None:
+        query = query.where(current.c.source == source)
+    if status is not None:
+        # 최신 버전 선택 전에 상태를 거르면 취소된 주문의 옛 상태가 남습니다.
+        query = query.where(current.c.status == status)
+    rows = (
+        session.execute(
+            query.order_by(current.c.placed_at.desc(), current.c.source, current.c.order_id)
+            .offset(offset)
+            .limit(limit + 1)
+        )
+        .mappings()
+        .all()
+    )
+    has_more = len(rows) > limit
+    return {
+        "orders": [dict(row) for row in rows[:limit]],
+        "as_of": as_of,
+        "source": source,
+        "status": status,
+        "limit": limit,
+        "offset": offset,
+        "has_more": has_more,
+        "next_offset": offset + limit if has_more else None,
+    }
 
 
 def quality_summary(session: Session) -> dict:
