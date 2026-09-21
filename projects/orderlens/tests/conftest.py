@@ -3,13 +3,14 @@ from fastapi.testclient import TestClient
 
 from orderlens.config import Settings
 from orderlens.main import create_app
+from orderlens.migrations import upgrade_database
 
 
 @pytest.fixture
 def client(tmp_path):
-    app = create_app(
-        Settings(database_url=f"sqlite:///{tmp_path / 'test.db'}", api_key="test-orderlens-api-key")
-    )
+    database_url = f"sqlite:///{tmp_path / 'test.db'}"
+    upgrade_database(database_url)
+    app = create_app(Settings(database_url=database_url, api_key="test-orderlens-api-key"))
     with TestClient(app, headers={"X-API-Key": "test-orderlens-api-key"}) as api:
         yield api
 

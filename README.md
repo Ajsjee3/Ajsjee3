@@ -10,10 +10,10 @@ Python과 FastAPI를 배우며 주문 데이터 처리 프로젝트를 만들고
 
 중복 전송과 주문 상태 변경을 처리하고, 판매 경로·상태별 주문 목록과 배송 지연 주문을 조회합니다.
 
-- **구현:** FastAPI, SQLAlchemy, 입력 검증, 버전별 적재, SQL 집계, 운영 문서 검색
+- **구현:** FastAPI, SQLAlchemy, Alembic, PostgreSQL·SQLite, 입력 검증, 버전별 적재, SQL 집계, 운영 문서 검색
 - **재현:** 합성 데이터 309행을 다시 보내도 새 주문 버전은 0개, 집계 결과는 동일
-- **이번 변경:** 상태별 주문 목록·페이지 조회. 고정된 주문 120건을 8페이지로 나눠 중복·누락 없이 조회
-- **다음 작업:** PostgreSQL 통합 검증과 마이그레이션
+- **이번 변경:** 초기 DB 마이그레이션과 PostgreSQL 16 통합 검사. 309행 적재·재전송, 지표와 120건 페이지 조회 확인
+- **다음 작업:** 출처와 이용 조건이 분명한 공개 데이터 변환
 
 [코드와 실행 방법](https://github.com/Ajsjee3/Ajsjee3/blob/main/projects/orderlens/README.md) · [설계](https://github.com/Ajsjee3/Ajsjee3/blob/main/projects/orderlens/docs/design.md) · [검증 결과](https://github.com/Ajsjee3/Ajsjee3/blob/main/projects/orderlens/docs/validation.md) · [개발 기록](https://github.com/Ajsjee3/Ajsjee3/blob/main/projects/orderlens/docs/progress.md)
 

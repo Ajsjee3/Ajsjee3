@@ -8,12 +8,15 @@ from fastapi.testclient import TestClient
 
 from orderlens.config import Settings
 from orderlens.main import create_app
+from orderlens.migrations import upgrade_database
 from scripts.generate_demo import AS_OF, generate_rows
 
 
 def main():
     with TemporaryDirectory(prefix="orderlens-demo-") as directory:
-        app = create_app(Settings(database_url=f"sqlite:///{directory}/demo.db"))
+        database_url = f"sqlite:///{directory}/demo.db"
+        upgrade_database(database_url)
+        app = create_app(Settings(database_url=database_url))
         with TestClient(app, headers={"X-API-Key": "orderlens-local-demo-key"}) as client:
             payload = {"rows": generate_rows()}
             first = client.post("/v1/ingestions", json=payload)

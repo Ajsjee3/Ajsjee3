@@ -29,3 +29,36 @@ jobs:
           cache-dependency-path: projects/orderlens/requirements.lock
       - run: python -m pip install -r requirements.lock
       - run: python -m scripts.check
+  postgres-integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: orderlens_test
+          POSTGRES_USER: orderlens
+          POSTGRES_PASSWORD: orderlens-ci-password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U orderlens -d orderlens_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      ORDERLENS_POSTGRES_TEST_URL: postgresql+psycopg://orderlens:orderlens-ci-password@127.0.0.1:5432/orderlens_test
+    defaults:
+      run:
+        working-directory: projects/orderlens
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: projects/orderlens/requirements.lock
+      - run: python -m pip install -r requirements.lock
+      - run: python -m scripts.check_postgres

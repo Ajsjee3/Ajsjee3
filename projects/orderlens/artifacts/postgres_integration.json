@@ -1,0 +1,34 @@
+{
+  "source": "github_actions_log",
+  "run_url": "https://github.com/Ajsjee3/Ajsjee3/actions/runs/35590864397",
+  "commit": "414ed01b6a38e0a71c4f6d75855753dfe2c90493",
+  "database": "ephemeral_postgresql_service",
+  "postgresql_version": "16.15",
+  "head_revision": "20260921_01",
+  "revision_after_upgrade": "20260921_01",
+  "created_tables": [
+    "ingestion_runs",
+    "order_snapshots",
+    "rejected_rows"
+  ],
+  "timestamp_with_timezone": true,
+  "model_matches_migration": true,
+  "first_ingestion": {
+    "accepted": 300,
+    "duplicates": 5,
+    "rejected": 4
+  },
+  "replay": {
+    "accepted": 0,
+    "duplicates": 305,
+    "rejected": 4
+  },
+  "metrics_unchanged_by_replay": true,
+  "total_orders": 120,
+  "page_limit": 17,
+  "page_count": 8,
+  "returned_orders": 120,
+  "unique_orders": 120,
+  "business_tables_removed_after_downgrade": true,
+  "revision_after_reupgrade": "20260921_01"
+}

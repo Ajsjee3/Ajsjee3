@@ -1,6 +1,6 @@
 # 참고 저장소와 적용한 부분
 
-기존 참고 확인일: 2026-09-09. 공개 README, 디렉터리 구조와 아래 코드 파일을 직접 읽고 정리했습니다. 프로젝트 전체를 실행하거나 성능 수치를 재검증한 것은 아닙니다. 2026-09-14에 새로 읽은 페이지 조회 코드는 아래에 구분했습니다.
+기존 참고 확인일: 2026-09-09. 공개 README, 디렉터리 구조와 아래 코드 파일을 직접 읽고 정리했습니다. 프로젝트 전체를 실행하거나 성능 수치를 재검증한 것은 아닙니다. 이후 새로 읽은 코드는 날짜별로 구분했습니다.
 
 | 저장소 | 확인한 구성 | OrderLens에 적용한 부분 |
 |---|---|---|
@@ -30,3 +30,18 @@ Solar-See의 한국어 실행 안내에는 서버 중단과 데모 영상 이용
 확인한 파일의 Git blob SHA는 각각 `f136c2fbb1d8f8e1864a81f194e1983721963c03`, `7f5301d86136ebb8e26380fa9dfdb4c72dfc08bb`입니다. README만 읽고 동작을 추정한 것이 아니라 해당 파라미터와 SQL 생성 경로를 확인했습니다. 외부 프로젝트의 테스트 실행이나 성능 검증은 하지 않았습니다.
 
 OrderLens의 기본 limit=20, 최신 주문 선택 후 필터, 정렬 키, `limit + 1`로 다음 페이지를 판단하고 total을 생략하는 응답은 이 프로젝트의 요구에 맞춰 별도로 정했습니다. fastapi-pagination 의존성이나 소스 코드는 가져오지 않았습니다. 코드와 테스트의 연결은 [페이지 조회 설계](decisions/order_pagination.md)에서 확인할 수 있습니다.
+
+## 2026-09-21 · PostgreSQL과 마이그레이션
+
+[fastapi/full-stack-fastapi-template](https://github.com/fastapi/full-stack-fastapi-template)의 실제 마이그레이션·실행·검사 파일을 읽었습니다. 확인 당시 저장소의 마지막 push는 2026-09-18이었습니다.
+
+| 확인한 파일 | 코드에서 확인한 점 | 이번 변경에 적용한 부분 |
+|---|---|---|
+| [alembic/env.py](https://github.com/fastapi/full-stack-fastapi-template/blob/master/backend/app/alembic/env.py) | 앱 설정의 DB URL과 모델 metadata를 Alembic 실행 환경에 연결 | OrderLens 환경 변수·SQLAlchemy metadata를 연결하고 타입 비교 활성화 |
+| [초기 리비전](https://github.com/fastapi/full-stack-fastapi-template/blob/master/backend/app/alembic/versions/e2412789c190_initialize_models.py) | upgrade에서 테이블·인덱스를 만들고 downgrade에서 역순 제거 | 현재 세 테이블·제약·인덱스를 첫 리비전에 명시하고 양방향 검사 |
+| [prestart.sh](https://github.com/fastapi/full-stack-fastapi-template/blob/master/backend/scripts/prestart.sh) | 앱의 초기 데이터 작업 전에 `alembic upgrade head` 실행 | Compose에서 migrate 성공 후 API 시작 |
+| [test-backend.yml](https://github.com/fastapi/full-stack-fastapi-template/blob/master/.github/workflows/test-backend.yml) | DB 컨테이너를 준비하고 마이그레이션한 뒤 백엔드 테스트 실행 | 별도 PostgreSQL 서비스에서 마이그레이션과 핵심 데이터 흐름 검사 |
+
+확인한 Git blob SHA는 차례로 `919eebf5de6ea6717c99bf61affd0571e7ea2468`, `7529ea91fa7ceb3d0b3b1a4c4769565dea1d3af9`, `e67852ba079343c58e48935ed607e07880c9bab8`, `300386a790433a7b93ee5517792cd68babe38304`입니다.
+
+참고 저장소의 현재 설정은 Python 3.14, PostgreSQL 18과 더 큰 서비스 구성을 사용합니다. OrderLens에는 그 버전이나 구조를 그대로 옮기지 않고 기존 Python 3.12·PostgreSQL 16 범위와 세 테이블에 맞췄습니다. 테스트 DB 이름을 검사하는 보호 장치, 시작 시 리비전 불일치 거부, SQLite 왕복 검사와 309행 재전송 검증은 OrderLens의 조건으로 추가했습니다. 외부 코드나 문구를 복사하지 않았습니다.

@@ -1,4 +1,4 @@
-OrderLens 0.2.0 검증 요약 — 2026-09-14
+OrderLens 0.3.0 로컬 검증 요약 — 2026-09-21
 환경: Linux x86_64, Python 3.12.14, SQLite 3.53.1
 의존성: requirements.lock을 새 가상환경에 설치
 실행 위치: projects/orderlens
@@ -6,7 +6,11 @@ OrderLens 0.2.0 검증 요약 — 2026-09-14
 종료 코드: 0
 
 python -m ruff check .: All checks passed!
-python -m pytest -q: 59 passed, 2 warnings in 1.90s
+python -m pytest -q: 61 passed, 2 warnings in 2.16s
+python -m scripts.check_migrations:
+  revision 20260921_01 upgrade, downgrade, reupgrade 성공
+  ingestion_runs, order_snapshots, rejected_rows 생성 및 제거 확인
+  SQLAlchemy 모델과 마이그레이션 차이 없음
 python -m scripts.generate_demo: 합성 데이터 309행
 python -m scripts.demo: 저장 300, 중복 5, 오류 4; 재전송 새 버전 0, 지표 동일
 python -m scripts.evaluate_retrieval: 예제 문서 6개·관련 질문 12개·무관 질문 3개
@@ -18,5 +22,11 @@ python -m scripts.smoke_http: 실제 임시 Uvicorn 서버에 HTTP 요청
   주문 목록 API 키 누락: 401
 
 경고: httpx 기반 Starlette TestClient 지원 중단 예정, anyio BlockingPortal 별칭 지원 중단 예정
-미검증: PostgreSQL 실서버, Docker 실행, 동시성 부하, 대용량 성능
-이 파일은 실행 결과 요약이며 전체 원격 로그는 PR의 Checks에 기록됩니다.
+GitHub Actions 35590864397 (2026-09-21): success
+  checks: 고정 의존성 설치, python -m scripts.check 성공
+  postgres-integration: PostgreSQL 16.15, revision 20260921_01
+  최초 적재 300/중복 5/오류 4, 재전송 저장 0/중복 305/오류 4
+  지표 동일, 17건씩 8페이지, 반환 120·고유 주문 120
+  TIMESTAMP WITH TIME ZONE, 모델 차이 없음, downgrade 및 reupgrade 성공
+
+미검증: 로컬 Docker Compose, 기존 DB 전환, 두 번째 리비전, 동시성 부하, 대용량 성능

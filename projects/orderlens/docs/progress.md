@@ -1,5 +1,19 @@
 # 개발 기록
 
+## 2026-09-21 · 0.3.0
+
+Alembic 초기 리비전 `20260921_01`을 추가했습니다. 앱 시작 시 실행하던 `create_all`을 제거하고 DB의 현재 리비전이 코드의 head와 같은지 확인합니다. 마이그레이션하지 않은 DB에서는 필요한 명령을 안내하며 시작을 중단합니다.
+
+테스트·데모·실제 HTTP 시연은 각 임시 DB에 마이그레이션을 먼저 적용합니다. Docker Compose는 PostgreSQL의 준비 상태를 기다린 뒤 일회성 migrate 서비스가 성공해야 API를 시작합니다. PostgreSQL 전용 검사는 `_test` DB만 허용하며 적재·재전송·지표·페이지 조회와 downgrade·재upgrade를 실행합니다.
+
+로컬 검증: Linux x86_64, Python 3.12.14, SQLite 3.53.1에서 `python -m scripts.check` 종료 코드 0. Ruff 통과, pytest 61개 통과, 의존성 경고 2종. 초기 스키마의 upgrade·downgrade·재upgrade와 미적용 DB의 앱 시작 거부를 확인했습니다. 합성 데이터와 실제 HTTP 결과는 0.2.0과 같았습니다.
+
+작업 [PR #3](https://github.com/Ajsjee3/Ajsjee3/pull/3)의 [원격 실행](https://github.com/Ajsjee3/Ajsjee3/actions/runs/35590864397)에서 PostgreSQL 16.15 통합 검사가 통과했습니다. 첫 309행은 저장 300·중복 5·오류 4, 재전송은 새 버전 0·중복 305·오류 4였고 지표가 같았습니다. 120건을 17건씩 8페이지로 읽어 고유 주문 수도 120건인지 확인했습니다. TIMESTAMP WITH TIME ZONE, 모델과 리비전 일치, downgrade 후 업무 테이블 제거와 재upgrade도 확인했습니다.
+
+로컬 Docker와 기존 운영 DB 전환, 두 번째 스키마 변경, 병렬 요청은 아직 확인하지 않았습니다.
+
+다음: 출처와 이용 조건이 분명한 공개 데이터 변환기를 작은 범위로 시작합니다.
+
 ## 2026-09-14 · 0.2.0
 
 `GET /v1/orders`에 판매 경로·상태 필터와 LIMIT·OFFSET 페이지 조회를 추가했습니다. 최신 버전을 고른 뒤 상태를 거르므로 취소된 주문의 이전 결제 상태가 목록에 남지 않습니다. 주문 시각 내림차순, 판매 경로·주문 번호 오름차순으로 정렬하며 응답에 `as_of`, `has_more`, `next_offset`을 포함합니다.
