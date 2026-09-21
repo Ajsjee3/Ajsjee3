@@ -57,8 +57,9 @@ curl 'http://127.0.0.1:8000/v1/orders?source=market_a&status=paid&limit=2&offset
 | 재전송 전후 지표 | 동일 |
 | 고정된 주문 목록을 17건씩 실제 HTTP 조회 | 8페이지 · 120건 · 중복·누락 0건 |
 | 임시 SQLite 초기 마이그레이션 | upgrade · downgrade · 재upgrade 성공 |
+| PostgreSQL 16.15 통합 검사 | 저장 300개 · 재전송 새 버전 0개 · 지표 동일 · 고유 주문 120건 |
 
-명령 한 번으로 임시 DB 마이그레이션, 적재, 재전송, 지표 비교, 검색 평가, 실제 HTTP 요청까지 재실행합니다. 원본 결과는 [migration_check.json](artifacts/migration_check.json), [demo_report.json](artifacts/demo_report.json), [HTTP 결과](artifacts/http_smoke.json), [검증 기록](docs/validation.md)에 남깁니다.
+명령 한 번으로 임시 DB 마이그레이션, 적재, 재전송, 지표 비교, 검색 평가, 실제 HTTP 요청까지 재실행합니다. 원본 결과는 [SQLite 마이그레이션](artifacts/migration_check.json), [PostgreSQL 통합 검사](artifacts/postgres_integration.json), [demo_report.json](artifacts/demo_report.json), [HTTP 결과](artifacts/http_smoke.json), [검증 기록](docs/validation.md)에 남깁니다.
 
 ## 설계에서 정한 기준
 
@@ -73,6 +74,6 @@ curl 'http://127.0.0.1:8000/v1/orders?source=market_a&status=paid&limit=2&offset
 
 ## 다음 작업
 
-현재 버전은 **0.3.0**입니다. 초기 마이그레이션과 PostgreSQL 전용 통합 검사 코드를 추가했습니다. 로컬에서는 SQLite 마이그레이션과 기존 기능을 검증했으며, PostgreSQL 16의 실제 결과는 작업 PR의 원격 검사가 끝난 뒤 확정합니다. 실제 고객 데이터, 외부 배포, LLM 답변 생성은 아직 포함하지 않았습니다.
+현재 버전은 **0.3.0**입니다. 초기 마이그레이션을 추가하고 PostgreSQL 16.15에서 적재·재전송·지표·페이지 조회와 마이그레이션 왕복을 실행했습니다. 실제 고객 데이터, 외부 배포, LLM 답변 생성은 아직 포함하지 않았습니다.
 
-원격 PostgreSQL 검증이 통과하면 다음 변경은 출처와 이용 조건이 분명한 공개 데이터 변환입니다. [작업 목록](docs/automation_and_backlog.md) · [개발 기록](docs/progress.md) · [참고 저장소](docs/references.md) · [기여 안내](CONTRIBUTING.md)
+다음 변경은 출처와 이용 조건이 분명한 공개 데이터 변환입니다. [작업 목록](docs/automation_and_backlog.md) · [개발 기록](docs/progress.md) · [참고 저장소](docs/references.md) · [기여 안내](CONTRIBUTING.md)

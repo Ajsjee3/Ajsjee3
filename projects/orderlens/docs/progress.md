@@ -8,9 +8,11 @@ Alembic 초기 리비전 `20260921_01`을 추가했습니다. 앱 시작 시 실
 
 로컬 검증: Linux x86_64, Python 3.12.14, SQLite 3.53.1에서 `python -m scripts.check` 종료 코드 0. Ruff 통과, pytest 61개 통과, 의존성 경고 2종. 초기 스키마의 upgrade·downgrade·재upgrade와 미적용 DB의 앱 시작 거부를 확인했습니다. 합성 데이터와 실제 HTTP 결과는 0.2.0과 같았습니다.
 
-PostgreSQL 16의 실제 실행 결과는 작업 PR의 원격 검사가 완료된 뒤 추가합니다. 로컬 Docker와 기존 운영 DB 전환, 두 번째 스키마 변경, 병렬 요청은 아직 확인하지 않았습니다.
+작업 [PR #3](https://github.com/Ajsjee3/Ajsjee3/pull/3)의 [원격 실행](https://github.com/Ajsjee3/Ajsjee3/actions/runs/35590864397)에서 PostgreSQL 16.15 통합 검사가 통과했습니다. 첫 309행은 저장 300·중복 5·오류 4, 재전송은 새 버전 0·중복 305·오류 4였고 지표가 같았습니다. 120건을 17건씩 8페이지로 읽어 고유 주문 수도 120건인지 확인했습니다. TIMESTAMP WITH TIME ZONE, 모델과 리비전 일치, downgrade 후 업무 테이블 제거와 재upgrade도 확인했습니다.
 
-다음: 원격 PostgreSQL 검증이 통과하면 출처와 이용 조건이 분명한 공개 데이터 변환기를 작은 범위로 시작합니다.
+로컬 Docker와 기존 운영 DB 전환, 두 번째 스키마 변경, 병렬 요청은 아직 확인하지 않았습니다.
+
+다음: 출처와 이용 조건이 분명한 공개 데이터 변환기를 작은 범위로 시작합니다.
 
 ## 2026-09-14 · 0.2.0
 

@@ -10,7 +10,10 @@
 | pytest | 61개 통과, 실패 0개; 마이그레이션 테스트 2개 포함 |
 | SQLite 마이그레이션 | `20260921_01` upgrade·downgrade·재upgrade 통과 |
 | 미적용 DB에서 앱 시작 | 스키마를 자동 생성하지 않고 안내 오류로 중단 |
-| PostgreSQL 16 | 전용 원격 검사 구성 완료; 실제 결과는 PR 검사 후 기록 |
+| PostgreSQL 16.15 | GitHub Actions 임시 서비스에서 통합 검사 통과 |
+| PostgreSQL 적재·재전송 | 최초 저장 300·중복 5·오류 4; 재전송 저장 0·중복 305·오류 4 |
+| PostgreSQL 지표·페이지 | 재전송 전후 지표 동일; 17건씩 8페이지, 반환·고유 주문 120건 |
+| PostgreSQL 스키마 | TIMESTAMP WITH TIME ZONE, 모델 차이 없음, downgrade·재upgrade 통과 |
 | 합성 데이터 처리 | 입력 309행: 저장 300개, 중복 5개, 오류 4개 |
 | 동일 데이터 재전송 | 새 버전 0개, 기존 버전 중복 305개, 오류 4개 |
 | 재전송 전후 운영 지표 | 동일함을 비교·확인 |
@@ -44,13 +47,20 @@
 - artifacts/retrieval_evaluation.json: 질문별 검색 결과와 순위
 - artifacts/http_smoke.json: 실제 HTTP 응답 상태
 - artifacts/migration_check.json: SQLite 마이그레이션 왕복 결과
+- artifacts/postgres_integration.json: PostgreSQL 원격 검사 결과와 실행 링크
 - artifacts/checks.log: 실행 명령과 결과 요약; 전체 원격 로그는 PR의 Checks에서 확인
 
 ## 확인하지 않은 범위
 
-이 환경에는 Docker 실행 파일이 없어 컨테이너 기동을 검증하지 않았습니다. 현재 문서를 작성한 시점에는 PostgreSQL 16 원격 검사도 아직 실행 전이므로 성공으로 적지 않습니다. 기존 DB를 첫 리비전에 연결하는 절차, 두 번째 스키마 변경, 클라우드 배포, 사용자별 데이터 분리, 병렬 부하, 대용량 성능, 실제 업무 데이터, LLM 응답 품질은 아직 검증하지 않았습니다.
+이 환경에는 Docker 실행 파일이 없어 로컬 Compose 기동을 검증하지 않았습니다. PostgreSQL은 GitHub Actions의 새 임시 DB 한 개에서 순차 실행했으므로 기존 DB를 첫 리비전에 연결하는 절차, 두 번째 스키마 변경, 병렬 부하와 여러 앱 인스턴스의 배포 순서는 확인하지 않았습니다. 클라우드 배포, 사용자별 데이터 분리, 대용량 성능, 실제 업무 데이터, LLM 응답 품질도 아직 검증하지 않았습니다.
 
 테스트 중 의존성에서 deprecation 경고 2종(httpx 기반 TestClient, anyio BlockingPortal 별칭)이 발생했습니다. 테스트 실패는 없었습니다. 현재 고정 버전에서는 동작을 확인했으며 이후 의존성 갱신 때 함께 정리할 항목입니다.
+
+## 0.3.0 원격 실행 근거
+
+2026-09-21에 [PR #3](https://github.com/Ajsjee3/Ajsjee3/pull/3)의 코드 커밋 `414ed01b6a38e0a71c4f6d75855753dfe2c90493`을 검사한 [GitHub Actions 실행](https://github.com/Ajsjee3/Ajsjee3/actions/runs/35590864397)이 success로 완료됐습니다.
+
+`checks` job에서 고정 의존성을 새로 설치하고 `python -m scripts.check`를 실행해 Ruff와 테스트 61개, SQLite 마이그레이션 왕복, 기존 데모와 실제 HTTP 검사를 통과했습니다. 별도 `postgres-integration` job은 공식 `postgres:16` 이미지의 16.15 서버에서 `python -m scripts.check_postgres`를 실행했습니다. 원격 로그에서 리비전 `20260921_01`, 모델 차이 없음, 시간대 보존, 적재·재전송·지표·페이지 결과와 복구를 확인했습니다.
 
 ## 0.2.0 원격 실행 근거
 

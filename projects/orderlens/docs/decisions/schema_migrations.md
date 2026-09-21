@@ -31,7 +31,7 @@ Docker Compose에서는 `db`가 준비된 뒤 일회성 `migrate` 서비스가 u
 3. 다시 head까지 올리고 앱이 현재 스키마로 판단하는지 확인합니다.
 4. 마이그레이션하지 않은 DB에서는 앱이 시작을 거부하는지 테스트합니다.
 
-PostgreSQL 검증은 이름이 `_test`로 끝나는 전용 DB만 허용합니다. GitHub Actions의 임시 PostgreSQL 16 서비스에서 마이그레이션을 적용한 뒤 합성 데이터 309행을 적재·재전송하고, 지표와 8페이지 주문 목록을 비교하도록 구성했습니다. 마지막에는 downgrade와 재upgrade도 실행합니다. 실제 원격 결과는 PR 검사가 끝난 뒤 [검증 기록](../validation.md)에 추가합니다.
+PostgreSQL 검증은 이름이 `_test`로 끝나는 전용 DB만 허용합니다. GitHub Actions의 임시 PostgreSQL 16 서비스에서 마이그레이션을 적용한 뒤 합성 데이터 309행을 적재·재전송하고, 지표와 8페이지 주문 목록을 비교합니다. 마지막에는 downgrade와 재upgrade도 실행합니다. [실제 원격 실행](https://github.com/Ajsjee3/Ajsjee3/actions/runs/35590864397)은 PostgreSQL 16.15에서 통과했으며 상세 값은 [검증 기록](../validation.md)에 남겼습니다.
 
 ## 선택과 남은 범위
 

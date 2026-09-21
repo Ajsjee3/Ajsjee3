@@ -22,5 +22,11 @@ python -m scripts.smoke_http: 실제 임시 Uvicorn 서버에 HTTP 요청
   주문 목록 API 키 누락: 401
 
 경고: httpx 기반 Starlette TestClient 지원 중단 예정, anyio BlockingPortal 별칭 지원 중단 예정
-미검증: PostgreSQL 16 원격 검사(작업 PR에서 실행 예정), 로컬 Docker 실행, 기존 DB 전환, 동시성 부하, 대용량 성능
-이 파일은 로컬 실행 결과 요약이며 PostgreSQL 결과는 성공한 원격 로그를 확인한 뒤 기록합니다.
+GitHub Actions 35590864397 (2026-09-21): success
+  checks: 고정 의존성 설치, python -m scripts.check 성공
+  postgres-integration: PostgreSQL 16.15, revision 20260921_01
+  최초 적재 300/중복 5/오류 4, 재전송 저장 0/중복 305/오류 4
+  지표 동일, 17건씩 8페이지, 반환 120·고유 주문 120
+  TIMESTAMP WITH TIME ZONE, 모델 차이 없음, downgrade 및 reupgrade 성공
+
+미검증: 로컬 Docker Compose, 기존 DB 전환, 두 번째 리비전, 동시성 부하, 대용량 성능
