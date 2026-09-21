@@ -19,8 +19,9 @@ from sqlalchemy.orm import Session
 from orderlens import __version__
 from orderlens.analytics import attention_orders, metrics, order_page, quality_summary
 from orderlens.config import Settings
-from orderlens.db import Base, make_engine
+from orderlens.db import make_engine
 from orderlens.ingestion import ingest, run_summary
+from orderlens.migrations import require_current_schema
 from orderlens.models import IngestionRun
 from orderlens.retrieval import BM25Index
 from orderlens.schemas import IngestRequest, OrderPage, OrderSource, OrderStatus, SearchRequest
@@ -54,7 +55,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     async def lifespan(app):
         engine = make_engine(settings.database_url)
         try:
-            Base.metadata.create_all(engine)
+            require_current_schema(engine)
             app.state.engine = engine
             knowledge = json.loads(
                 files("orderlens.data").joinpath("knowledge.json").read_text("utf-8")

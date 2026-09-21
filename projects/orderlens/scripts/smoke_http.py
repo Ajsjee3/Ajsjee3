@@ -11,6 +11,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from urllib.parse import urlencode
 
+from orderlens.migrations import upgrade_database
 from scripts.generate_demo import AS_OF, generate_rows
 
 
@@ -73,6 +74,7 @@ def main():
         environment = os.environ.copy()
         environment["ORDERLENS_DATABASE_URL"] = f"sqlite:///{directory}/http.db"
         environment["ORDERLENS_API_KEY"] = "orderlens-http-smoke-key"
+        upgrade_database(environment["ORDERLENS_DATABASE_URL"])
         process = subprocess.Popen(
             [
                 sys.executable,

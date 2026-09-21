@@ -21,13 +21,14 @@ py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m scripts.check
 ```
 
-마지막 명령은 코드 검사, 핵심 테스트, 예제 데이터 생성, API 데모, 문서 검색 평가, 실제 HTTP 시연을 순서대로 실행합니다. 기존 주문 DB를 덮어쓰지 않고 임시 DB를 사용하며 시연 서버는 자동 종료됩니다.
+마지막 명령은 코드 검사, 핵심 테스트, 마이그레이션 왕복 검사, 예제 데이터 생성, API 데모, 문서 검색 평가, 실제 HTTP 시연을 순서대로 실행합니다. 기존 주문 DB를 덮어쓰지 않고 임시 DB를 사용하며 시연 서버는 자동 종료됩니다.
 
 | 산출물 | 내용 |
 |---|---|
 | artifacts/demo_report.json | 적재 결과, 재전송 결과, 주문 지표, 근거 문서 |
 | artifacts/retrieval_evaluation.json | 작은 예제 집합에 대한 검색 평가 |
 | artifacts/http_smoke.json | 실제 HTTP 요청과 인증 검사 결과 |
+| artifacts/migration_check.json | 초기 스키마 upgrade·downgrade·재upgrade 결과 |
 | data/demo_batch.json | 중복·오류가 섞인 재현 가능한 합성 주문 309행 |
 
 데모의 기준 시각은 **2026-09-08 00:00 UTC**로 고정됩니다. 처음 적재하면 정상 버전 300개, 중복 5개, 오류 4개가 나옵니다. 최신 주문은 120건이며, 배송 지연 미완료 주문은 40건입니다. 재전송 때 새로 저장되는 주문 버전은 0개입니다. 이 수치는 실제 사업 성과가 아닌 합성 데이터 검증 결과입니다.
@@ -35,6 +36,7 @@ py -3.12 -m venv .venv
 ## 2. API 서버 실행
 
 ```bash
+python -m alembic upgrade head
 python -m uvicorn orderlens.main:app --host 127.0.0.1 --port 8000
 ```
 
@@ -57,7 +59,7 @@ curl -X POST http://127.0.0.1:8000/v1/knowledge/search \
   -d '{"query":"중복 적재 버전 충돌","top_k":3}'
 ```
 
-서버에서 저장한 내용은 현재 폴더의 orderlens.db에 남습니다. `scripts.demo`가 사용하는 임시 DB와 별개입니다. 로컬 키는 예제에 공개되어 있으므로 외부 공개 전에 환경 변수 ORDERLENS_API_KEY를 고유한 키로 설정해야 합니다.
+첫 명령은 현재 폴더의 `orderlens.db`를 최신 스키마로 올립니다. 앱은 테이블을 자동 생성하지 않으며 적용된 리비전이 코드와 다르면 시작하지 않습니다. `scripts.demo`가 사용하는 임시 DB와 별개입니다. 로컬 키는 예제에 공개되어 있으므로 외부 공개 전에 환경 변수 ORDERLENS_API_KEY를 고유한 키로 설정해야 합니다.
 
 ## 3. 구현된 API
 
@@ -125,9 +127,18 @@ cp .env.example .env
 docker compose up --build
 ```
 
-Windows에서는 `Copy-Item .env.example .env`를 사용하실 수 있습니다. Compose는 PostgreSQL에 연결하고 API를 내 컴퓨터의 8000번 포트에 제공합니다. 데이터 볼륨은 컨테이너를 내려도 유지됩니다.
+Windows에서는 `Copy-Item .env.example .env`를 사용하실 수 있습니다. Compose는 PostgreSQL이 준비되면 일회성 `migrate` 서비스로 `alembic upgrade head`를 실행하고, 성공한 뒤 API를 내 컴퓨터의 8000번 포트에 제공합니다. 데이터 볼륨은 컨테이너를 내려도 유지됩니다.
 
-**로컬에서는 SQLite로 검증했습니다. Docker 이미지 실행과 PostgreSQL 실서버 통합은 아직 검증하지 않았습니다.** 로컬·원격 실행 근거와 검증 범위는 [검증 기록](validation.md)을 확인해 주세요.
+마이그레이션 상태는 다음 명령으로 확인할 수 있습니다.
+
+```bash
+python -m alembic current
+python -m alembic history
+```
+
+`python -m alembic downgrade base`는 업무 테이블과 데이터를 지우므로 학습용 임시 DB에서만 실행합니다. 자동 PostgreSQL 검사는 `_test`로 끝나는 별도 DB만 허용합니다.
+
+**이 작성 환경에는 Docker 실행 파일이 없어 로컬 컨테이너를 실행하지 못했습니다.** PostgreSQL 16 통합은 작업 PR의 GitHub Actions 서비스 컨테이너에서 검증하도록 구성했으며, 실제 결과와 링크는 [검증 기록](validation.md)에 구분해 남깁니다.
 
 ## 7. 다음 문서
 

@@ -12,11 +12,22 @@ services:
       interval: 5s
       timeout: 5s
       retries: 12
+  migrate:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ORDERLENS_DATABASE_URL: postgresql+psycopg://orderlens:${ORDERLENS_DB_PASSWORD}@db:5432/orderlens
+    command: ["python", "-m", "alembic", "upgrade", "head"]
+    restart: "no"
   api:
     build: .
     depends_on:
       db:
         condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
     environment:
       ORDERLENS_API_KEY: ${ORDERLENS_API_KEY:?Copy .env.example to .env first}
       ORDERLENS_DATABASE_URL: postgresql+psycopg://orderlens:${ORDERLENS_DB_PASSWORD}@db:5432/orderlens

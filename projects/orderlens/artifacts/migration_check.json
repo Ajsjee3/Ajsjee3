@@ -1,0 +1,13 @@
+{
+  "database": "temporary_sqlite",
+  "head_revision": "20260921_01",
+  "revision_after_upgrade": "20260921_01",
+  "created_tables": [
+    "ingestion_runs",
+    "order_snapshots",
+    "rejected_rows"
+  ],
+  "model_matches_migration": true,
+  "business_tables_removed_after_downgrade": true,
+  "revision_after_reupgrade": "20260921_01"
+}
