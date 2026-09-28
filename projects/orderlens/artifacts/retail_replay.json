@@ -1,0 +1,13 @@
+{
+  "verified_on": "2026-09-28",
+  "python": "3.12.14",
+  "platform": "Linux x86_64",
+  "sqlite": "3.53.1",
+  "runs": 2,
+  "reports_identical": true,
+  "outputs_sha256": {
+    "accepted.jsonl": "ccc8d01bdf251f1c91902cff33e3f0366701233c141837460141f898f5af1283",
+    "rejected.jsonl": "2019881a845f2539d2fe23e5bbd93d6b9a6c80ef797ccaca9b8be26eba3aaeb0"
+  },
+  "input_sha256": "a2f79bbdd4463df6db8a3f5a50b9c980ae8f645a370bf5e2c0d6097f9e817b05"
+}

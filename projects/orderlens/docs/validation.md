@@ -1,4 +1,22 @@
-# 검증 기록 — 2026-09-21 · 0.3.0
+# 검증 기록
+
+## 2026-09-28 · 0.4.0 로컬 검증
+
+Linux x86_64, Python 3.12.14, SQLite 3.53.1에서 기존 requirements.lock 환경으로 `python -m scripts.check`를 실행했습니다. 종료 코드 0, Ruff 통과, pytest 80개 통과, 의존성 경고 2종입니다. SQLite 마이그레이션 왕복·합성 주문 재전송·실제 HTTP 120건 페이지 조회도 통과했습니다.
+
+추가 검증은 실제 UCI CSV 541,909행을 두 출력 디렉터리로 정제하는 명령입니다. 541,907행 통과, 음수 단가 2행 격리, 취소 표시 9,288행이며 두 보고서와 accepted/rejected JSONL의 SHA-256이 같았습니다. [품질 보고서](../artifacts/retail_quality.json), [반복 실행 비교](../artifacts/retail_replay.json), [재현 절차·데이터 해석](public_retail.md)을 함께 확인합니다.
+
+추가 테스트는 소수 금액·취소·원본 행 구분, 오류 사유·필수 헤더, CSV 인용 줄바꿈, CLI, 기존 파일·결과 보존, 깨진 CSV와 보고서 쓰기 실패, 호출자의 Decimal 정밀도에 영향받지 않는 처리를 확인합니다. 외부 다운로드는 기본 CI에 포함하지 않으며 테스트 입력은 합성 자료입니다.
+
+실제 자료의 DB 적재·API 조회·회계상 매출 해석·배송 지연 계산·처리 속도 벤치마크는 이번 검증 범위가 아닙니다. 로컬 Docker Compose도 실행하지 않았습니다. 아래 0.3.0의 PostgreSQL 실행 링크는 이전 버전의 근거입니다.
+
+## 0.4.0 원격 실행 근거
+
+[PR #4](https://github.com/Ajsjee3/Ajsjee3/pull/4)의 코드 커밋 `331cfadc111c076b3846c4594c0f36e4b767a3a2`을 검사한 [GitHub Actions 실행](https://github.com/Ajsjee3/Ajsjee3/actions/runs/36410453056)에서 두 job이 success로 완료됐습니다. 원격 로그의 Ruff 통과·pytest 80개 통과·경고 2종과 실제 HTTP 8페이지·고유 주문 120건을 확인했습니다.
+
+별도 PostgreSQL 16.15 서비스에서 `python -m scripts.check_postgres`도 통과했습니다. 초기 저장 300·중복 5·오류 4, 재전송 저장 0·중복 305·오류 4, 지표 동일, 고유 주문 120건, 시간대 컬럼·모델 일치, downgrade·재upgrade를 확인했습니다. 공개 거래 전체 정제는 위 로컬 실행 근거이며 이 PostgreSQL 검사는 기존 주문 기능의 회귀 검증입니다.
+
+## 2026-09-21 · 0.3.0 기록
 
 로컬 실행 환경: Linux x86_64, Python 3.12.14, SQLite 3.53.1. 의존성 버전은 requirements.lock에 기록했습니다.
 
