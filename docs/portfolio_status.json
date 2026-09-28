@@ -2,5 +2,8 @@
   "employment_status": "preparing",
   "primary_project": "projects/orderlens",
   "workflow": "one_coherent_change_per_iteration",
-  "last_updated": "2026-09-21"
+  "last_updated": "2026-09-28",
+  "learning_status": "not_assessed",
+  "review_budget_hours_per_week": [6, 10],
+  "curriculum_review_date": "2026-09-22"
 }

@@ -1,5 +1,18 @@
 # 참고 저장소와 적용한 부분
 
+## 2026-09-22 · 거래 행의 단위와 정제 경계
+
+[dbt-labs/jaffle-shop](https://github.com/dbt-labs/jaffle-shop)의 다음 파일을 직접 읽었습니다. 가상의 식당 데이터를 사용하는 교육용 프로젝트이며 실제 거래 자료나 저자의 채용 성과를 보여 주는 저장소로 취급하지 않았습니다.
+
+| 파일 | 확인한 내용 | 적용한 부분 |
+|---|---|---|
+| [README.md](https://github.com/dbt-labs/jaffle-shop/blob/main/README.md) | 가상 데이터와 실행 단계 안내 | 실제 자료·합성 예제의 용도를 구분하고 재현 명령 제공 |
+| [stg_order_items.sql](https://github.com/dbt-labs/jaffle-shop/blob/main/models/staging/stg_order_items.sql) | 상품 거래 행 ID와 주문 ID를 분리 | UCI의 한 행을 주문 한 건으로 세지 않고 원본 행 ID를 부여 |
+| [stg_order_items.yml](https://github.com/dbt-labs/jaffle-shop/blob/main/models/staging/stg_order_items.yml) | 행 단위, 고유·필수 키, 주문 참조 관계의 검증 정의 | 변환 후 고유 행 ID·원본 위치 보존을 테스트 |
+| [stg_orders.sql](https://github.com/dbt-labs/jaffle-shop/blob/main/models/staging/stg_orders.sql) | 원본 금액 단위와 환산 값을 명시 | GBP 단위와 Decimal 문자열을 명시하고 원화로 임의 환산하지 않음 |
+
+확인한 Git blob SHA는 순서대로 `7f8e41f725957f2ab8db264614a7d8d3787504af`, `5459a84b0b8561550c2d39be159519c3b78ef82d`, `89086233858e1ac1787e24efd09f8b0480b2ef7d`, `61408c082bf7ea43d542aff34c24e57aaa4075f7`입니다. 외부 코드를 복사하거나 dbt 의존성을 추가하지 않았고 외부 프로젝트의 테스트도 실행하지 않았습니다. 실제 데이터의 출처와 변환 계약은 [UCI 자료 안내](public_retail.md)에 별도로 기록했습니다.
+
 기존 참고 확인일: 2026-09-09. 공개 README, 디렉터리 구조와 아래 코드 파일을 직접 읽고 정리했습니다. 프로젝트 전체를 실행하거나 성능 수치를 재검증한 것은 아닙니다. 이후 새로 읽은 코드는 날짜별로 구분했습니다.
 
 | 저장소 | 확인한 구성 | OrderLens에 적용한 부분 |

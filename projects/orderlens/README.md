@@ -20,6 +20,7 @@ OrderLens는 판매 경로와 주문 번호를 묶어 주문을 구분하고, �
 | 특정 판매 경로의 지연 주문이 필요함 | 최신 상태와 경로를 고른 후 정렬·조회 한도 적용 | [필터 설계](docs/decisions/source_filter.md) |
 | 주문 목록을 나눠 읽어야 함 | 최신 상태를 필터링하고 고정 정렬 후 SQL LIMIT·OFFSET 적용 | [페이지 조회 설계](docs/decisions/order_pagination.md) |
 | DB 구조 변경 이력이 필요함 | Alembic 리비전을 적용하고 앱 시작 전에 스키마 버전 확인 | [마이그레이션 설계](docs/decisions/schema_migrations.md) |
+| 공개 거래의 단위와 품질을 확인해야 함 | GBP Decimal·취소 표시를 보존하고 오류 행·출처·해시를 기록 | [공개 데이터 정제](docs/public_retail.md) |
 | 운영 기준을 찾아야 함 | BM25 검색으로 문서 ID와 버전을 함께 반환 | [retrieval.py](orderlens/retrieval.py) |
 
 ## 실행
@@ -74,6 +75,8 @@ curl 'http://127.0.0.1:8000/v1/orders?source=market_a&status=paid&limit=2&offset
 
 ## 다음 작업
 
-현재 버전은 **0.3.0**입니다. 초기 마이그레이션을 추가하고 PostgreSQL 16.15에서 적재·재전송·지표·페이지 조회와 마이그레이션 왕복을 실행했습니다. 실제 고객 데이터, 외부 배포, LLM 답변 생성은 아직 포함하지 않았습니다.
+현재 버전은 **0.4.0**입니다. UCI Online Retail의 실제 공개 거래 CSV 541,909행을 정제해 541,907행을 통과시키고 음수 단가 2행을 격리했습니다. 같은 원본을 두 번 처리한 결과와 출력 해시가 같았습니다. 출처·이용 조건·명령은 [공개 데이터 재현 안내](docs/public_retail.md)에 있습니다.
 
-다음 변경은 출처와 이용 조건이 분명한 공개 데이터 변환입니다. [작업 목록](docs/automation_and_backlog.md) · [개발 기록](docs/progress.md) · [참고 저장소](docs/references.md) · [기여 안내](CONTRIBUTING.md)
+공개 거래 자료는 GBP 금액이고 배송 시각이 없어 기존 원화 배송 주문과 별도로 정제합니다. 아직 DB·API에 연결하지 않았으며, 다음 변경은 전용 테이블과 파일 재적재 방지입니다. 외부 배포와 LLM 답변 생성도 후속 작업입니다.
+
+[작업 목록](docs/automation_and_backlog.md) · [개발 기록](docs/progress.md) · [참고 저장소](docs/references.md) · [기여 안내](CONTRIBUTING.md)

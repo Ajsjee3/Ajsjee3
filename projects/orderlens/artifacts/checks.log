@@ -1,4 +1,17 @@
-OrderLens 0.3.0 로컬 검증 요약 — 2026-09-21
+OrderLens 0.4.0 로컬 검증 요약 — 2026-09-28
+환경: Linux x86_64, Python 3.12.14, SQLite 3.53.1, 기존 requirements.lock 가상환경
+실행 위치: projects/orderlens
+명령: python -m scripts.check
+종료 코드: 0
+Ruff: All checks passed!
+pytest: 80 passed, 2 warnings
+SQLite 마이그레이션, 합성 309행 적재·재전송, HTTP 8페이지·120개 고유 주문 통과
+실제 데이터: UCI CSV 541909행, 통과 541907, 음수 단가 격리 2
+최종 코드로 2회 정제: report 동일, accepted/rejected JSONL SHA-256 동일
+명령과 해시: docs/public_retail.md, artifacts/retail_quality.json, artifacts/retail_replay.json
+미검증: 공개 거래 DB·API 연결, 회계상 매출, 처리 속도 벤치마크, 로컬 Compose
+
+OrderLens 0.3.0 로컬 검증 요약 — 2026-09-21 (이전 기록)
 환경: Linux x86_64, Python 3.12.14, SQLite 3.53.1
 의존성: requirements.lock을 새 가상환경에 설치
 실행 위치: projects/orderlens
