@@ -10,6 +10,11 @@ SQLite 마이그레이션, 합성 309행 적재·재전송, HTTP 8페이지·120
 최종 코드로 2회 정제: report 동일, accepted/rejected JSONL SHA-256 동일
 명령과 해시: docs/public_retail.md, artifacts/retail_quality.json, artifacts/retail_replay.json
 미검증: 공개 거래 DB·API 연결, 회계상 매출, 처리 속도 벤치마크, 로컬 Compose
+GitHub Actions 36410453056: checks 및 postgres-integration success
+코드 커밋: 331cfadc111c076b3846c4594c0f36e4b767a3a2
+원격 로그: Ruff 통과, 80 passed / 2 warnings, HTTP 8페이지·고유 주문 120
+PostgreSQL 16.15: 최초 300/5/4, 재전송 0/305/4, 지표 동일, 고유 주문 120
+TIMESTAMP WITH TIME ZONE, 모델 일치, downgrade·재upgrade 성공
 
 OrderLens 0.3.0 로컬 검증 요약 — 2026-09-21 (이전 기록)
 환경: Linux x86_64, Python 3.12.14, SQLite 3.53.1

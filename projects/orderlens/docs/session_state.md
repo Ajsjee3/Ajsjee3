@@ -4,6 +4,8 @@
 
 UCI 공개 거래 CSV의 다운로드·출처 해시 확인·정제·품질 보고서를 구현했습니다. 같은 값의 행도 원본 위치를 보존하고, GBP 소수 금액과 취소 표시를 유지합니다. 정제한 거래를 기존 원화 주문 DB에 넣지는 않았습니다. 다음 구현은 공개 거래 전용 테이블과 동일 파일 재적재 방지입니다.
 
+변경은 [PR #4](https://github.com/Ajsjee3/Ajsjee3/pull/4)에 있습니다. 로컬·원격 테스트 80개, 실제 CSV 두 번 정제, PostgreSQL 16.15 회귀 검사를 확인했습니다. 최종 반영 상태는 PR과 최신 main을 다시 읽어 판단합니다.
+
 2026-09-22 대화와의 비교는 저장소 루트 docs/curriculum_alignment.md에 반영했습니다. 주 6~10시간, 첫 프로젝트를 직접 설명한 뒤 두 번째 프로젝트 선택, 금융 IT는 Java/Spring 별도 분기입니다. `learning_status=not_assessed`이므로 코드가 있다는 이유로 학습 완료로 처리하지 않습니다.
 
 미완료 PR을 먼저 확인하며 개발 계획과 실행 상태는 저장소 루트 docs/development_plan.md, docs/portfolio_status.json에서 읽습니다. 사용자가 취업 완료·중단을 알리거나 employment_status가 employed/paused이면 코드를 변경하지 않고 반복 작업을 중지합니다.
