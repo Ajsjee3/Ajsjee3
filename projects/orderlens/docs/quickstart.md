@@ -28,10 +28,23 @@ py -3.12 -m venv .venv
 | artifacts/demo_report.json | 적재 결과, 재전송 결과, 주문 지표, 근거 문서 |
 | artifacts/retrieval_evaluation.json | 작은 예제 집합에 대한 검색 평가 |
 | artifacts/http_smoke.json | 실제 HTTP 요청과 인증 검사 결과 |
-| artifacts/migration_check.json | 초기 스키마 upgrade·downgrade·재upgrade 결과 |
+| artifacts/migration_check.json | 두 리비전의 upgrade·downgrade·재upgrade 결과 |
+| artifacts/retail_db_check.json | UCI 전체 정제 행의 DB 적재·재실행 결과 |
 | data/demo_batch.json | 중복·오류가 섞인 재현 가능한 합성 주문 309행 |
 
 데모의 기준 시각은 **2026-09-08 00:00 UTC**로 고정됩니다. 처음 적재하면 정상 버전 300개, 중복 5개, 오류 4개가 나옵니다. 최신 주문은 120건이며, 배송 지연 미완료 주문은 40건입니다. 재전송 때 새로 저장되는 주문 버전은 0개입니다. 이 수치는 실제 사업 성과가 아닌 합성 데이터 검증 결과입니다.
+
+### 공개 거래 파일을 DB에 적재
+
+[공개 데이터 안내](public_retail.md)에 따라 CSV를 정제한 뒤 최신 스키마를 적용하고 적재합니다. 아래 SQLite 파일은 학습용 예시이며 기존 DB와 다른 경로를 사용합니다.
+
+```bash
+ORDERLENS_DATABASE_URL=sqlite:///retail.db python -m alembic upgrade head
+python -m scripts.load_retail data/processed/retail-a --database-url sqlite:///retail.db
+python -m scripts.load_retail data/processed/retail-a --database-url sqlite:///retail.db
+```
+
+첫 실행은 정제 통과 행을 저장하고, 두 번째 실행은 같은 파일 해시와 출력 해시를 확인한 뒤 새 행을 만들지 않습니다. 기존 주문 API에 공개 거래가 나타나는 기능은 아직 없습니다.
 
 ## 2. API 서버 실행
 
@@ -105,7 +118,8 @@ curl 'http://127.0.0.1:8000/v1/orders?source=market_a&status=paid&limit=2&offset
 | 5 | orderlens/ingestion.py | 중복과 충돌은 어떻게 구분할까요? |
 | 6 | orderlens/analytics.py | 같은 주문의 여러 버전 중 어느 것을 집계할까요? |
 | 7 | orderlens/retrieval.py | 검색 점수와 답변의 정확성은 왜 다를까요? |
-| 8 | tests/ | 어떤 입력을 넣었을 때 어떤 결과를 기대할까요? |
+| 8 | orderlens/retail.py, retail_db.py | 파일 출처·Decimal·재실행은 어떻게 보존할까요? |
+| 9 | tests/ | 어떤 입력을 넣었을 때 어떤 결과를 기대할까요? |
 
 ## 5. 데이터 흐름
 

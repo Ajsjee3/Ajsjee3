@@ -1,11 +1,16 @@
-"""비어 있는 테스트용 PostgreSQL에서 마이그레이션과 핵심 API 흐름을 검증합니다."""
+"""비어 있는 PostgreSQL에서 마이그레이션, 주문 API와 공개 거래 적재를 검증합니다."""
 
+import csv
 import json
 import os
+from decimal import Decimal
+from pathlib import Path
+from tempfile import TemporaryDirectory
 
 from fastapi.testclient import TestClient
-from sqlalchemy import inspect
+from sqlalchemy import func, inspect, select
 from sqlalchemy.engine import make_url
+from sqlalchemy.orm import Session
 
 import orderlens.models  # noqa: F401
 from orderlens.config import Settings
@@ -19,6 +24,9 @@ from orderlens.migrations import (
     require_current_schema,
     upgrade_database,
 )
+from orderlens.models import RetailImport, RetailLine
+from orderlens.retail import COLUMNS, transform_file
+from orderlens.retail_db import load_retail_output
 from scripts.generate_demo import AS_OF, generate_rows
 
 
@@ -78,6 +86,24 @@ def main() -> None:
         }
         if not timestamp_columns["updated_at"]["type"].timezone:
             raise AssertionError("PostgreSQL updated_at이 time zone 정보를 보존하지 않습니다.")
+        retail_columns = {
+            column["name"]: column for column in inspector.get_columns("retail_lines")
+        }
+        if (
+            retail_columns["unit_price"]["type"].precision,
+            retail_columns["unit_price"]["type"].scale,
+        ) != (16, 6):
+            raise AssertionError("PostgreSQL 공개 거래 단가가 NUMERIC(16, 6)이 아닙니다.")
+        if (
+            retail_columns["line_amount"]["type"].precision,
+            retail_columns["line_amount"]["type"].scale,
+        ) != (26, 6):
+            raise AssertionError("PostgreSQL 공개 거래 금액이 NUMERIC(26, 6)이 아닙니다.")
+        if retail_columns["invoice_at_local"]["type"].timezone:
+            raise AssertionError("원천에 없는 공개 거래 시간대가 추가됐습니다.")
+        retail_constraints = inspector.get_unique_constraints("retail_lines")
+        if not any(item["name"] == "uq_retail_source_record" for item in retail_constraints):
+            raise AssertionError("공개 거래의 파일 해시·레코드 번호 UNIQUE 제약이 없습니다.")
         server_version = ".".join(map(str, engine.dialect.server_version_info))
     finally:
         engine.dispose()
@@ -117,6 +143,61 @@ def main() -> None:
     if len(seen) != 120 or len(set(seen)) != 120:
         raise AssertionError("PostgreSQL 페이지 조회에 중복 또는 누락이 있습니다.")
 
+    with TemporaryDirectory(prefix="orderlens-retail-postgres-") as directory:
+        source = Path(directory) / "retail.csv"
+        with source.open("w", encoding="utf-8", newline="") as stream:
+            writer = csv.DictWriter(stream, fieldnames=COLUMNS)
+            writer.writeheader()
+            writer.writerows([
+                {
+                    "InvoiceNo": "C123456",
+                    "StockCode": "ITEM_A",
+                    "Description": "demo cancellation",
+                    "Quantity": "-3",
+                    "InvoiceDate": "12/1/2010 8:26",
+                    "UnitPrice": "0.001",
+                    "CustomerID": "",
+                    "Country": "United Kingdom",
+                },
+                {
+                    "InvoiceNo": "123457",
+                    "StockCode": "ITEM_B",
+                    "Description": "demo sale",
+                    "Quantity": "2",
+                    "InvoiceDate": "12/1/2010 8:27",
+                    "UnitPrice": "1.25",
+                    "CustomerID": "",
+                    "Country": "United Kingdom",
+                },
+            ])
+        output = Path(directory) / "processed"
+        transform_file(source, output)
+        engine = make_engine(database_url)
+        try:
+            with Session(engine) as session:
+                retail_first = load_retail_output(session, output, batch_size=1)
+                retail_replay = load_retail_output(session, output, batch_size=1)
+                retail_imports = session.scalar(select(func.count()).select_from(RetailImport))
+                retail_lines = session.scalar(select(func.count()).select_from(RetailLine))
+                cancellation = session.scalar(
+                    select(RetailLine).where(RetailLine.invoice_no == "C123456")
+                )
+        finally:
+            engine.dispose()
+
+    if (retail_first["inserted"], retail_first["duplicates"]) != (2, 0):
+        raise AssertionError("PostgreSQL 공개 거래 최초 적재 결과가 다릅니다.")
+    if (retail_replay["inserted"], retail_replay["duplicates"]) != (0, 2):
+        raise AssertionError("PostgreSQL 공개 거래 재적재 결과가 다릅니다.")
+    if (retail_imports, retail_lines) != (1, 2):
+        raise AssertionError("PostgreSQL 공개 거래 행 수가 다릅니다.")
+    if (
+        cancellation.unit_price != Decimal("0.001000")
+        or cancellation.line_amount != Decimal("-0.003000")
+        or cancellation.invoice_at_local.tzinfo is not None
+    ):
+        raise AssertionError("PostgreSQL이 GBP 소수 금액·지역 시각을 보존하지 못했습니다.")
+
     downgrade_database(database_url)
     engine = make_engine(database_url)
     try:
@@ -150,6 +231,15 @@ def main() -> None:
         "page_count": 8,
         "returned_orders": len(seen),
         "unique_orders": len(set(seen)),
+        "retail_import": {
+            "first_inserted": retail_first["inserted"],
+            "replay_duplicates": retail_replay["duplicates"],
+            "imports_in_database": retail_imports,
+            "lines_in_database": retail_lines,
+            "unit_price": str(cancellation.unit_price),
+            "line_amount": str(cancellation.line_amount),
+            "invoice_timezone": cancellation.invoice_timezone,
+        },
         "business_tables_removed_after_downgrade": True,
         "revision_after_reupgrade": revision_after_reupgrade,
     }

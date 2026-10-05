@@ -15,7 +15,7 @@ from orderlens.migrations import (
 )
 
 
-def test_initial_migration_can_upgrade_downgrade_and_upgrade_again(tmp_path):
+def test_migrations_can_upgrade_downgrade_and_upgrade_again(tmp_path):
     database_url = f"sqlite:///{tmp_path / 'migration.db'}"
     upgrade_database(database_url)
     engine = make_engine(database_url)
@@ -27,6 +27,16 @@ def test_initial_migration_can_upgrade_downgrade_and_upgrade_again(tmp_path):
         assert any(item["name"] == "uq_order_revision" for item in constraints)
         indexes = inspect(engine).get_indexes("order_snapshots")
         assert any(item["name"] == "ix_snapshot_updated" for item in indexes)
+
+        retail_constraints = inspect(engine).get_unique_constraints("retail_lines")
+        assert any(item["name"] == "uq_retail_source_record" for item in retail_constraints)
+        retail_columns = {
+            item["name"]: item for item in inspect(engine).get_columns("retail_lines")
+        }
+        assert retail_columns["unit_price"]["type"].precision == 16
+        assert retail_columns["unit_price"]["type"].scale == 6
+        assert retail_columns["line_amount"]["type"].precision == 26
+        assert retail_columns["line_amount"]["type"].scale == 6
 
         downgrade_database(database_url)
         assert not (set(inspect(engine).get_table_names()) & set(Base.metadata.tables))
