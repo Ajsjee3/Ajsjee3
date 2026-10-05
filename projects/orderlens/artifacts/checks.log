@@ -11,6 +11,11 @@ UCI 전체 임시 SQLite 적재: 541907행, 고유 원본 위치 541907개
 DB GBP 합계 9769872.054, 취소 표시 9288행
 근거: artifacts/retail_db_check.json, docs/decisions/retail_db_ingestion.md
 미검증: 전체 PostgreSQL 적재, 동시 최초 적재, 속도·인덱스 효과, 로컬 Compose
+GitHub Actions 37301674282: checks 및 postgres-integration success
+코드 커밋: 29399421f947cc4ce7d9c015a2a3ad02ec5db378
+원격 로그: Ruff 통과, 84 passed / 2 warnings
+PostgreSQL 16.15: revision 20261005_02, 공개 거래 최초 2·재적재 중복 2
+NUMERIC 0.001000 × -3 = -0.003000, 시간대 null, downgrade·재upgrade 성공
 
 OrderLens 0.4.0 로컬 검증 요약 — 2026-09-28 (이전 기록)
 환경: Linux x86_64, Python 3.12.14, SQLite 3.53.1, 기존 requirements.lock 가상환경

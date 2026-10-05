@@ -1,15 +1,17 @@
 {
   "source": "github_actions_log",
-  "run_url": "https://github.com/Ajsjee3/Ajsjee3/actions/runs/35590864397",
-  "commit": "414ed01b6a38e0a71c4f6d75855753dfe2c90493",
+  "run_url": "https://github.com/Ajsjee3/Ajsjee3/actions/runs/37301674282",
+  "commit": "29399421f947cc4ce7d9c015a2a3ad02ec5db378",
   "database": "ephemeral_postgresql_service",
   "postgresql_version": "16.15",
-  "head_revision": "20260921_01",
-  "revision_after_upgrade": "20260921_01",
+  "head_revision": "20261005_02",
+  "revision_after_upgrade": "20261005_02",
   "created_tables": [
     "ingestion_runs",
     "order_snapshots",
-    "rejected_rows"
+    "rejected_rows",
+    "retail_imports",
+    "retail_lines"
   ],
   "timestamp_with_timezone": true,
   "model_matches_migration": true,
@@ -29,6 +31,15 @@
   "page_count": 8,
   "returned_orders": 120,
   "unique_orders": 120,
+  "retail_import": {
+    "first_inserted": 2,
+    "replay_duplicates": 2,
+    "imports_in_database": 1,
+    "lines_in_database": 2,
+    "unit_price": "0.001000",
+    "line_amount": "-0.003000",
+    "invoice_timezone": null
+  },
   "business_tables_removed_after_downgrade": true,
-  "revision_after_reupgrade": "20260921_01"
+  "revision_after_reupgrade": "20261005_02"
 }

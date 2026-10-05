@@ -1,6 +1,6 @@
 # PostgreSQL 통합과 스키마 마이그레이션
 
-작성: 2026-09-21 · 버전: 0.3.0
+작성: 2026-09-21 · 갱신: 2026-10-05 · 버전: 0.5.0
 
 ## 해결하려는 문제
 
@@ -36,7 +36,7 @@ Docker Compose에서는 `db`가 준비된 뒤 일회성 `migrate` 서비스가 u
 3. 다시 head까지 올리고 앱이 현재 스키마로 판단하는지 확인합니다.
 4. 마이그레이션하지 않은 DB에서는 앱이 시작을 거부하는지 테스트합니다.
 
-PostgreSQL 검증은 이름이 `_test`로 끝나는 전용 DB만 허용합니다. GitHub Actions의 임시 PostgreSQL 16 서비스에서 마이그레이션을 적용한 뒤 합성 데이터 309행을 적재·재전송하고, 지표와 8페이지 주문 목록을 비교합니다. 마지막에는 downgrade와 재upgrade도 실행합니다. [실제 원격 실행](https://github.com/Ajsjee3/Ajsjee3/actions/runs/35590864397)은 PostgreSQL 16.15에서 통과했으며 상세 값은 [검증 기록](../validation.md)에 남겼습니다.
+PostgreSQL 검증은 이름이 `_test`로 끝나는 전용 DB만 허용합니다. GitHub Actions의 임시 PostgreSQL 16 서비스에서 마이그레이션을 적용한 뒤 합성 주문 309행과 공개 거래 2행을 적재·재전송하고, 지표와 8페이지 주문 목록을 비교합니다. 마지막에는 downgrade와 재upgrade도 실행합니다. [실제 원격 실행](https://github.com/Ajsjee3/Ajsjee3/actions/runs/37301674282)은 PostgreSQL 16.15에서 통과했으며 상세 값은 [검증 기록](../validation.md)에 남겼습니다.
 
 ## 선택과 남은 범위
 
@@ -44,4 +44,4 @@ PostgreSQL 검증은 이름이 `_test`로 끝나는 전용 DB만 허용합니다
 
 테스트용 스크립트는 테이블을 내리므로 일반 `ORDERLENS_DATABASE_URL` 대신 `ORDERLENS_POSTGRES_TEST_URL`만 읽고 DB 이름의 `_test` 접미사를 검사합니다. 이 문자열 검사는 마지막 안전장치일 뿐이며, 실제 환경에서는 별도 계정·DB와 최소 권한도 함께 사용해야 합니다.
 
-직접 확인할 작은 과제: 새 빈 DB에서 `alembic current`, `alembic upgrade head`, `alembic current`를 차례로 실행하고 `없음 → 20260921_01`로 바뀌는 이유를 설명해 보세요.
+직접 확인할 작은 과제: 새 빈 DB에서 `alembic current`, `alembic upgrade head`, `alembic current`를 차례로 실행하고 `없음 → 20261005_02`로 바뀌는 동안 두 리비전이 순서대로 적용되는 이유를 설명해 보세요.

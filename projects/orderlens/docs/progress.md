@@ -8,7 +8,7 @@
 
 Linux x86_64, Python 3.12.14, SQLite 3.53.1에서 `python -m scripts.check` 종료 코드 0, Ruff 통과, pytest 84개 통과, 기존 의존성 경고 2종이었습니다. 전체 UCI 정제 결과 541,907행을 임시 SQLite에 적재했고 고유 원본 위치도 541,907개였습니다. 같은 파일의 두 번째 실행은 새 행 0개·중복 541,907개였으며 DB 금액 합은 정제 보고서와 같은 GBP 9,769,872.054였습니다.
 
-새 참고는 SQLAlchemy 공개 저장소의 bulk INSERT 예제와 실행 안내입니다. 매핑 기반 INSERT와 제한된 배치라는 방식만 적용했고 외부 성능 수치나 코드를 가져오지 않았습니다. PostgreSQL의 금액 정밀도·UNIQUE·합성 2행 재적재 검증은 PR CI에서 확인합니다.
+새 참고는 SQLAlchemy 공개 저장소의 bulk INSERT 예제와 실행 안내입니다. 매핑 기반 INSERT와 제한된 배치라는 방식만 적용했고 외부 성능 수치나 코드를 가져오지 않았습니다. [PR #5](https://github.com/Ajsjee3/Ajsjee3/pull/5)의 [원격 검사](https://github.com/Ajsjee3/Ajsjee3/actions/runs/37301674282)에서 테스트 84개와 PostgreSQL 16.15의 금액 정밀도·UNIQUE·합성 2행 재적재·마이그레이션 왕복이 통과했습니다.
 
 남은 한계는 동시 프로세스의 첫 적재 경합, 공개 거래 조회 API, 취소와 원거래 연결, 회계상 매출 정의, 전체 데이터의 PostgreSQL 적재입니다. 다음 작업은 전체 규모 집계 SQL의 실행계획과 인덱스 전후 측정입니다.
 

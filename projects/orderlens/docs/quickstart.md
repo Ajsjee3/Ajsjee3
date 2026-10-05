@@ -152,7 +152,7 @@ python -m alembic history
 
 `python -m alembic downgrade base`는 업무 테이블과 데이터를 지우므로 학습용 임시 DB에서만 실행합니다. 자동 PostgreSQL 검사는 `_test`로 끝나는 별도 DB만 허용합니다.
 
-**이 작성 환경에는 Docker 실행 파일이 없어 로컬 컨테이너를 실행하지 못했습니다.** 대신 [GitHub Actions](https://github.com/Ajsjee3/Ajsjee3/actions/runs/35590864397)의 임시 PostgreSQL 16.15 서비스에서 마이그레이션과 핵심 데이터 흐름을 실제 실행했습니다. 범위와 남은 한계는 [검증 기록](validation.md)에 구분했습니다.
+**이 작성 환경에는 Docker 실행 파일이 없어 로컬 컨테이너를 실행하지 못했습니다.** 대신 [GitHub Actions](https://github.com/Ajsjee3/Ajsjee3/actions/runs/37301674282)의 임시 PostgreSQL 16.15 서비스에서 두 리비전, 기존 주문 흐름과 공개 거래 합성 입력을 실제 실행했습니다. 범위와 남은 한계는 [검증 기록](validation.md)에 구분했습니다.
 
 ## 7. 다음 문서
 
