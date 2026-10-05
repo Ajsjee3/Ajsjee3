@@ -15,6 +15,17 @@
 
 기존 참고 확인일: 2026-09-09. 공개 README, 디렉터리 구조와 아래 코드 파일을 직접 읽고 정리했습니다. 프로젝트 전체를 실행하거나 성능 수치를 재검증한 것은 아닙니다. 이후 새로 읽은 코드는 날짜별로 구분했습니다.
 
+## 2026-10-05 · 대량 행을 DB에 전달하는 경계
+
+[sqlalchemy/sqlalchemy](https://github.com/sqlalchemy/sqlalchemy)의 성능 예제 두 파일을 직접 읽었습니다. OrderLens가 사용하는 라이브러리의 공개 저장소이며, 특정 지원자의 취업 성과와는 관계가 없습니다.
+
+| 확인한 파일 | 코드·안내에서 확인한 점 | 이번 변경에 적용한 부분 |
+|---|---|---|
+| [bulk_inserts.py](https://github.com/sqlalchemy/sqlalchemy/blob/main/examples/performance/bulk_inserts.py) | ORM flush 예제는 1,000행 단위로 나누고, Core 예제는 매핑 목록을 INSERT에 전달 | `RetailLine` 객체 541,907개를 한꺼번에 만들지 않고 최대 1,000개 매핑을 `insert()`에 전달 |
+| [performance/__init__.py](https://github.com/sqlalchemy/sqlalchemy/blob/main/examples/performance/__init__.py) | Core·ORM 등 여러 접근을 동일 개수와 DB URL로 실행·프로파일링하는 방법 | 현재 변경에서는 처리 속도를 주장하지 않고, 다음 SQL 실험에서 데이터·DB·명령 조건을 고정하도록 계획 |
+
+확인한 Git blob SHA는 각각 `9172ab3eb398fe03c5e06cf8949f23abb0205b3c`, `3854fdbea52448debc07bd08a52d26c2af1c69c6`입니다. 참고 예제의 모델·코드·측정값은 복사하지 않았고 해당 저장소의 성능 suite도 실행하지 않았습니다. 예제의 Core INSERT는 전체 입력 목록을 만들지만, OrderLens는 실제 541,907행 입력 때문에 JSONL을 읽으며 1,000행씩 비우는 방식으로 범위를 더 작게 정했습니다. 이 배치 크기가 최적이라는 성능 결론은 아직 내리지 않았습니다.
+
 | 저장소 | 확인한 구성 | OrderLens에 적용한 부분 |
 |---|---|---|
 | [Solar-See](https://github.com/techforimpact-archive/TFI_CAMPUS_KAIST_24fall_Solar-See) | 문제 정의, 데모, 실행 안내, 데이터 출처와 팀 역할 | README 앞부분에 다루는 문제를 쓰고 실행 결과·설계 링크를 연결 |

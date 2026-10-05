@@ -1,6 +1,6 @@
 # 공개 거래 CSV 정제
 
-출처 확인·다운로드: 2026-09-22. 최종 코드 재현: 2026-09-28. 실제 자료의 통화와 취소 행을 보존하면서 정상 행과 계약에 맞지 않는 행을 분리하는 첫 단계입니다. 기존 원화 배송 주문 API에 적재하는 기능은 다음 작업과 구분합니다.
+출처 확인·다운로드: 2026-09-22. 변환 재현: 2026-09-28. DB 적재 검증: 2026-10-05. 실제 자료의 통화와 취소 행을 보존하면서 정상 행과 계약에 맞지 않는 행을 분리하고 전용 테이블에 저장합니다. 기존 원화 배송 주문 API와는 구분합니다.
 
 ## 출처와 이용 조건
 
@@ -20,6 +20,9 @@ python -m scripts.fetch_retail
 python -m scripts.transform_retail data/raw/online_retail.csv --output data/processed/retail-a
 python -m scripts.transform_retail data/raw/online_retail.csv --output data/processed/retail-b
 diff data/processed/retail-a/report.json data/processed/retail-b/report.json
+python -m alembic upgrade head
+python -m scripts.load_retail data/processed/retail-a --database-url sqlite:///retail.db
+python -m scripts.load_retail data/processed/retail-a --database-url sqlite:///retail.db
 ```
 
 다운로더는 원본 해시를 확인합니다. 이미 같은 파일이 있으면 재사용하고, 다른 내용의 파일이 있으면 덮어쓰지 않습니다. 제공처가 CSV를 바꾸면 출처와 변경 내용을 검토해 고정 해시를 갱신해야 합니다.
@@ -27,6 +30,8 @@ diff data/processed/retail-a/report.json data/processed/retail-b/report.json
 출력 디렉터리는 새 경로여야 합니다. `accepted.jsonl`은 정제 행, `rejected.jsonl`은 원본 위치·오류 코드·필드, `report.json`은 건수·금액·입출력 해시를 담습니다. CSV 파싱·입출력 실패 시 부분 JSONL이 남을 수 있지만 성공 보고서는 쓰지 않습니다. 성공 보고서가 있는 실행만 완료로 취급합니다. 다운로드 도중 디스크 쓰기가 실패한 파일은 다음 실행에서 해시 불일치로 거부되므로 별도 경로로 다시 받아야 합니다.
 
 동일한 열을 가진 다른 CSV도 변환할 수 있습니다. 다만 입력 해시가 위 원본과 다르면 출처는 `unverified`, 다운로드 URL과 라이선스는 `null`로 기록합니다. 형식이 같다는 이유로 UCI 자료나 CC BY 자료로 단정하지 않습니다.
+
+적재 명령은 먼저 DB가 Alembic head인지 확인합니다. 첫 실행은 `status=loaded`, 두 번째 실행은 `status=already_loaded`를 반환합니다. 파일 해시는 같지만 정제 JSONL 해시나 보고서 내용이 달라지면 기존 행을 덮어쓰지 않고 중단합니다. 자세한 키·트랜잭션·금액 타입은 [DB 적재 결정 기록](decisions/retail_db_ingestion.md)에 있습니다.
 
 ## 변환 계약
 
@@ -67,4 +72,20 @@ Linux x86_64, Python 3.12.14에서 전체 파일을 두 번 정제했습니다. 
 
 원본 실행 근거: [품질 보고서](../artifacts/retail_quality.json), [반복 실행 비교](../artifacts/retail_replay.json). 계약과 예외 사례는 [test_retail.py](../tests/test_retail.py), 구현은 [retail.py](../orderlens/retail.py)에 있습니다.
 
-다음은 공개 거래 전용 테이블과 파일 해시 기준 재적재 방지입니다. 기존 주문 버전·원화·배송 계약은 그대로 두고, 거래 행의 통화와 정밀도에 맞는 DB 구조를 별도로 검증합니다.
+## DB 적재 결과
+
+Linux x86_64, Python 3.12.14, SQLite 3.53.1의 임시 DB에 전체 정제 결과를 넣었습니다. 두 번째 Alembic 리비전은 `retail_imports`, `retail_lines`를 만들며 기존 주문 테이블은 바꾸지 않습니다.
+
+| 확인 항목 | 결과 |
+|---|---:|
+| 첫 적재 | 541,907행 삽입 |
+| 파일 출처 행 | 1개 |
+| 고유 `(파일 해시, 원본 위치)` | 541,907개 |
+| 같은 파일 재적재 | 새 행 0개 · 중복 541,907개 |
+| DB의 부호 있는 금액 합 | GBP 9,769,872.054 |
+| DB의 취소 표시 행 | 9,288개 |
+| Alembic head | `20261005_02` |
+
+[전체 적재 근거](../artifacts/retail_db_check.json)는 임시 SQLite 결과입니다. PostgreSQL에서는 PR의 합성 2행으로 NUMERIC 정밀도, 지역 시각, UNIQUE 제약, 최초·재적재와 마이그레이션 왕복을 확인합니다. 전체 541,907행을 PostgreSQL에 적재하거나 처리 시간을 비교한 결과는 아닙니다.
+
+적재 구현은 [retail_db.py](../orderlens/retail_db.py), 예외·롤백 테스트는 [test_retail_db.py](../tests/test_retail_db.py)에 있습니다. 다음은 실제 규모에서 국가·기간·취소별 집계 SQL의 실행계획을 측정하고, 인덱스 전후를 같은 조건으로 비교하는 작업입니다. 취소와 원거래 연결 및 회계상 매출 계산은 아직 하지 않습니다.

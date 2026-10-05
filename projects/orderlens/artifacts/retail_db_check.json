@@ -1,0 +1,19 @@
+{
+  "database": "temporary_sqlite_full_uci",
+  "revision": "20261005_02",
+  "source_sha256": "a2f79bbdd4463df6db8a3f5a50b9c980ae8f645a370bf5e2c0d6097f9e817b05",
+  "source_rows": 541909,
+  "accepted_rows": 541907,
+  "rejected_rows": 2,
+  "imports_in_database": 1,
+  "lines_in_database": 541907,
+  "distinct_source_records": 541907,
+  "signed_line_amount_gbp": "9769872.054",
+  "cancellation_rows": 9288,
+  "cancellation_signed_line_amount_gbp": "-896812.49",
+  "replay": {
+    "inserted": 0,
+    "duplicates": 541907,
+    "rows_in_database": 541907
+  }
+}

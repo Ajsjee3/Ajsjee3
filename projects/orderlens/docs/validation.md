@@ -1,5 +1,23 @@
 # 검증 기록
 
+## 2026-10-05 · 0.5.0 로컬 검증
+
+Linux x86_64, Python 3.12.14, SQLite 3.53.1의 기존 requirements.lock 환경에서 `python -m scripts.check`를 실행했습니다. 종료 코드 0, Ruff 통과, pytest 84개 통과, 의존성 경고 2종입니다. Alembic `20260921_01 → 20261005_02` 적용, base까지 downgrade, 재upgrade, 모델 차이 없음도 통과했습니다. 기존 주문 309행 재전송과 실제 HTTP 8페이지·고유 주문 120건 결과도 유지됐습니다.
+
+새 테스트는 다음을 확인합니다.
+
+- 파일 SHA-256과 CSV 레코드 번호로 공개 거래의 원본 위치를 고유하게 보존
+- `0.001 GBP × -3 = -0.003 GBP`, 지역 시각과 `timezone=null` 유지
+- 같은 파일 재실행은 새 행 0개, 보고서가 달라지면 충돌로 중단
+- 두 번째 행 오류 시 먼저 INSERT한 배치와 import 행까지 트랜잭션 롤백
+- CLI가 최신 마이그레이션을 요구하고 첫 실행·재실행 결과를 JSON으로 반환
+
+UCI 전체 정제 결과는 임시 SQLite에 실제 적재했습니다. 541,907행과 541,907개의 고유 원본 위치가 저장됐고 같은 파일을 다시 실행한 뒤에도 행 수가 같았습니다. 부호 있는 금액 합 GBP 9,769,872.054와 취소 표시 9,288행도 정제 보고서와 일치했습니다. 근거는 [retail_db_check.json](../artifacts/retail_db_check.json)입니다.
+
+PostgreSQL 전용 스크립트에는 두 번째 리비전, `NUMERIC(16,6)`·`NUMERIC(26,6)`, timezone 없는 거래 시각, UNIQUE 제약, 합성 2행의 첫 적재·재적재를 추가했습니다. [PR #5](https://github.com/Ajsjee3/Ajsjee3/pull/5)의 [GitHub Actions 실행](https://github.com/Ajsjee3/Ajsjee3/actions/runs/37301674282)에서 두 job이 통과했습니다. 로그에서 PostgreSQL 16.15, 리비전 `20261005_02`, 최초 2행·재실행 중복 2행, `0.001000 × -3 = -0.003000`, 시간대 `null`, downgrade·재upgrade를 확인했습니다. 원격 근거는 [postgres_integration.json](../artifacts/postgres_integration.json)에 옮겼습니다.
+
+전체 541,907행을 PostgreSQL에 적재한 것은 아니며 처리 시간·메모리·인덱스 효과도 측정하지 않았습니다. 로컬 Docker Compose와 동시 프로세스 경합도 미검증입니다.
+
 ## 2026-09-28 · 0.4.0 로컬 검증
 
 Linux x86_64, Python 3.12.14, SQLite 3.53.1에서 기존 requirements.lock 환경으로 `python -m scripts.check`를 실행했습니다. 종료 코드 0, Ruff 통과, pytest 80개 통과, 의존성 경고 2종입니다. SQLite 마이그레이션 왕복·합성 주문 재전송·실제 HTTP 120건 페이지 조회도 통과했습니다.
@@ -70,7 +88,7 @@ Linux x86_64, Python 3.12.14, SQLite 3.53.1에서 기존 requirements.lock 환�
 
 ## 확인하지 않은 범위
 
-이 환경에는 Docker 실행 파일이 없어 로컬 Compose 기동을 검증하지 않았습니다. PostgreSQL은 GitHub Actions의 새 임시 DB 한 개에서 순차 실행했으므로 기존 DB를 첫 리비전에 연결하는 절차, 두 번째 스키마 변경, 병렬 부하와 여러 앱 인스턴스의 배포 순서는 확인하지 않았습니다. 클라우드 배포, 사용자별 데이터 분리, 대용량 성능, 실제 업무 데이터, LLM 응답 품질도 아직 검증하지 않았습니다.
+이 환경에는 Docker 실행 파일이 없어 로컬 Compose 기동을 검증하지 않았습니다. PostgreSQL은 GitHub Actions의 새 임시 DB 한 개에서 순차 실행했으므로 기존 DB를 첫 리비전에 연결하는 절차, 병렬 부하와 여러 앱 인스턴스의 배포 순서는 확인하지 않았습니다. 클라우드 배포, 사용자별 데이터 분리, 대용량 성능, 실제 업무 데이터, LLM 응답 품질도 아직 검증하지 않았습니다.
 
 테스트 중 의존성에서 deprecation 경고 2종(httpx 기반 TestClient, anyio BlockingPortal 별칭)이 발생했습니다. 테스트 실패는 없었습니다. 현재 고정 버전에서는 동작을 확인했으며 이후 의존성 갱신 때 함께 정리할 항목입니다.
 
