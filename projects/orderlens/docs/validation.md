@@ -16,7 +16,7 @@ Linux x86_64, Python 3.12.14, SQLite 3.53.1의 기존 requirements.lock 환경�
 
 인덱스 저장 공간은 27,430,912바이트이며 SQLite 파일은 140,288,000바이트에서 167,718,912바이트로 늘었습니다. [원본 JSON](../artifacts/retail_query_benchmark.json)에 환경·쿼리·계획·최소/중앙/p95/최대·한계를 함께 기록했습니다. 이는 한 로컬 warm-cache SQLite와 한 국가·기간 조건의 결과이며, 운영 성능이나 PostgreSQL 향상으로 일반화하지 않습니다.
 
-PostgreSQL 전용 검사는 10만 합성 행 중 Germany 1,000행을 같은 조건으로 집계하고 `ANALYZE` 뒤 기본 planner가 `ix_retail_country_cancelled_time`을 사용하는지 확인하도록 작성했습니다. 인덱스 scan을 끈 sequential 계획도 `EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)`으로 기록합니다. 원격 PostgreSQL 실행 전이므로 이 문단은 구현 범위이며 통과 결과가 아닙니다.
+[PR #6](https://github.com/Ajsjee3/Ajsjee3/pull/6)의 [GitHub Actions 실행](https://github.com/Ajsjee3/Ajsjee3/actions/runs/38237841801)에서 두 job이 통과했습니다. PostgreSQL 16.15의 10만 합성 행 중 Germany 1,000행을 같은 조건으로 집계한 결과는 1,000행·수량 1,000·GBP 1,000.000000이었습니다. `ANALYZE` 뒤 기본 계획은 `ix_retail_country_cancelled_time`의 `Index Scan`, 인덱스 계열 scan을 끈 기준 계획은 `Seq Scan`이었습니다. `EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)`의 계획·버퍼·한 번의 시간은 [원격 근거 JSON](../artifacts/postgres_integration.json)에 기록했습니다. CI 한 번의 실행 시간은 성능 비교 주장으로 사용하지 않습니다.
 
 미검증 범위는 전체 541,907행의 PostgreSQL 적재·비교, cold-cache, 동시 쓰기 지연, 다른 선택도의 국가·기간, 실제 업무 부하입니다. 로컬 Docker Compose도 실행하지 않았습니다.
 

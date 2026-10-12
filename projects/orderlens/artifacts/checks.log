@@ -11,7 +11,12 @@ UCI 전체 임시 SQLite: 541907행, Germany 비취소 2011년 8529행, 수량 1
 인덱스 공간: 27430912바이트; 한 로컬 warm-cache SQLite·한 조건의 결과
 근거: artifacts/retail_query_benchmark.json, docs/decisions/retail_query_index.md
 미검증: 전체 PostgreSQL 적재, cold-cache, 다른 선택도, 동시 쓰기 비용, 로컬 Compose
-원격 PostgreSQL 10만 행 실행계획: PR 검사 전
+GitHub Actions 38237841801: checks 및 postgres-integration success
+원격 환경: Python 3.12.15, PostgreSQL 16.15, pytest 89 passed / 2 warnings
+PostgreSQL 10만 행: Germany 1000행·수량 1000·GBP 1000.000000
+기본 계획: ix_retail_country_cancelled_time Index Scan; 강제 기준: Seq Scan
+세 리비전 upgrade·downgrade·재upgrade 성공
+코드 커밋: 349c1ad8d750b915b8d1fe7cd113f88cf3caedd7
 
 OrderLens 0.5.0 로컬 검증 요약 — 2026-10-05
 환경: Linux x86_64, Python 3.12.14, SQLite 3.53.1, 기존 requirements.lock 가상환경

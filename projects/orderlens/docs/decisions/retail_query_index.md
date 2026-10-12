@@ -49,7 +49,7 @@ python -m scripts.benchmark_retail_sql \
   --warmups 5 --runs 31
 ```
 
-PostgreSQL 통합 검사는 10만 합성 행 중 Germany 1,000행을 같은 조건으로 집계합니다. `ANALYZE` 뒤 기본 planner가 이 인덱스를 선택하는지 확인하고, 인덱스 계열 scan을 끈 계획도 기록합니다. 한 번의 CI 실행 시간은 성능 주장으로 사용하지 않습니다.
+PostgreSQL 16.15 통합 검사는 10만 합성 행 중 Germany 1,000행을 같은 조건으로 집계했습니다. `ANALYZE` 뒤 기본 planner는 이 인덱스의 `Index Scan`을 선택했고, 인덱스 계열 scan을 끈 계획은 `Seq Scan`이었습니다. [원격 실행](https://github.com/Ajsjee3/Ajsjee3/actions/runs/38237841801)의 한 번의 시간은 성능 주장으로 사용하지 않습니다.
 
 ## 참고와 남은 범위
 

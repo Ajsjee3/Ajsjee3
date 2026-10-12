@@ -4,7 +4,7 @@
 
 UCI 공개 거래 541,907행의 전용 DB 적재에 이어 국가·취소 여부·기간 집계와 복합 인덱스를 구현했습니다. Germany 2011년 조건을 강제 전체 스캔과 강제 인덱스로 31회씩 측정했고, 같은 결과와 실행계획·환경·저장 공간을 기록했습니다. 기존 원화 주문 API와는 계속 분리합니다.
 
-이전 DB 적재 변경은 [PR #5](https://github.com/Ajsjee3/Ajsjee3/pull/5)에 있습니다. 이번 0.6.0의 로컬 테스트는 89개가 통과했고 PostgreSQL 계획 검사는 PR에서 실행할 예정입니다. 다음 구현은 배치 실패 상태·재시도·중복 없는 복구 기록입니다.
+이전 DB 적재 변경은 [PR #5](https://github.com/Ajsjee3/Ajsjee3/pull/5)에 있습니다. 이번 0.6.0은 [PR #6](https://github.com/Ajsjee3/Ajsjee3/pull/6)에서 로컬·원격 테스트 89개와 PostgreSQL 16.15의 10만 행 실행계획 검사를 통과했습니다. 다음 구현은 배치 실패 상태·재시도·중복 없는 복구 기록입니다.
 
 2026-09-22 대화와의 비교는 저장소 루트 docs/curriculum_alignment.md에 반영했습니다. 주 6~10시간, 첫 프로젝트를 직접 설명한 뒤 두 번째 프로젝트 선택, 금융 IT는 Java/Spring 별도 분기입니다. `learning_status=not_assessed`이므로 코드가 있다는 이유로 학습 완료로 처리하지 않습니다.
 

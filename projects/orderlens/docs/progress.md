@@ -6,7 +6,7 @@
 
 전체 UCI 정제 행 541,907개를 임시 SQLite에 넣고 Germany의 비취소 2011년 거래를 같은 DB에서 비교했습니다. 전체 스캔과 인덱스 계획의 결과는 모두 8,529행·수량 112,385·부호 있는 금액 GBP 213,626.000000이었습니다. warm-cache에서 5회 예열 뒤 실행 순서를 바꾸며 31회씩 측정한 중앙값은 각각 41.062ms와 1.917ms였습니다. 이 21.42배 비율은 한 로컬 SQLite·한 조건의 결과이며 운영 성능이나 PostgreSQL 향상으로 일반화하지 않습니다. 인덱스 저장 공간은 27,430,912바이트였습니다.
 
-Linux x86_64, Python 3.12.14, SQLite 3.53.1에서 `python -m scripts.check` 종료 코드 0, Ruff 통과, pytest 89개 통과, 기존 의존성 경고 2종이었습니다. PostgreSQL 전용 검사는 10만 합성 행에서 같은 집계와 기본 planner의 인덱스 선택, 강제 sequential 기준 계획을 기록하도록 확장했습니다. 원격 실행 결과는 PR 검사 뒤 [검증 기록](validation.md)에 추가합니다.
+Linux x86_64, Python 3.12.14, SQLite 3.53.1에서 `python -m scripts.check` 종료 코드 0, Ruff 통과, pytest 89개 통과, 기존 의존성 경고 2종이었습니다. [PR #6](https://github.com/Ajsjee3/Ajsjee3/pull/6)의 [원격 검사](https://github.com/Ajsjee3/Ajsjee3/actions/runs/38237841801)도 두 job이 통과했습니다. PostgreSQL 16.15의 10만 합성 행에서 같은 집계 결과와 기본 `Index Scan`, 인덱스 scan을 끈 `Seq Scan`, 세 리비전 왕복을 확인했습니다.
 
 새 참고는 `eugene-khyst/postgresql-performance-essentials`의 README와 `data.sql`입니다. 실행계획을 실제로 측정하고 복합 인덱스의 선두 컬럼과 저장·쓰기 비용을 함께 확인하는 기준만 적용했으며 예제 코드와 오래된 PostgreSQL 설정은 복사하지 않았습니다.
 
