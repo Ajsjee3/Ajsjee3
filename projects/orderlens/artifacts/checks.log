@@ -1,3 +1,18 @@
+OrderLens 0.6.0 로컬 검증 요약 — 2026-10-12
+환경: Linux x86_64, Python 3.12.14, SQLite 3.53.1, 기존 requirements.lock 가상환경
+실행 위치: projects/orderlens
+명령: python -m scripts.check
+종료 코드: 0
+Ruff: All checks passed!
+pytest: 89 passed, 2 warnings
+마이그레이션: 20260921_01 → 20261005_02 → 20261012_03, 모델 일치, downgrade·재upgrade 성공
+UCI 전체 임시 SQLite: 541907행, Germany 비취소 2011년 8529행, 수량 112385, GBP 213626.000000
+성능 비교: 5회 예열 후 각 31회, 전체 스캔 중앙값 41.062ms, 복합 인덱스 1.917ms
+인덱스 공간: 27430912바이트; 한 로컬 warm-cache SQLite·한 조건의 결과
+근거: artifacts/retail_query_benchmark.json, docs/decisions/retail_query_index.md
+미검증: 전체 PostgreSQL 적재, cold-cache, 다른 선택도, 동시 쓰기 비용, 로컬 Compose
+원격 PostgreSQL 10만 행 실행계획: PR 검사 전
+
 OrderLens 0.5.0 로컬 검증 요약 — 2026-10-05
 환경: Linux x86_64, Python 3.12.14, SQLite 3.53.1, 기존 requirements.lock 가상환경
 실행 위치: projects/orderlens

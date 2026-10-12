@@ -28,8 +28,9 @@ py -3.12 -m venv .venv
 | artifacts/demo_report.json | 적재 결과, 재전송 결과, 주문 지표, 근거 문서 |
 | artifacts/retrieval_evaluation.json | 작은 예제 집합에 대한 검색 평가 |
 | artifacts/http_smoke.json | 실제 HTTP 요청과 인증 검사 결과 |
-| artifacts/migration_check.json | 두 리비전의 upgrade·downgrade·재upgrade 결과 |
+| artifacts/migration_check.json | 세 리비전의 upgrade·downgrade·재upgrade 결과 |
 | artifacts/retail_db_check.json | UCI 전체 정제 행의 DB 적재·재실행 결과 |
+| artifacts/retail_query_benchmark.json | 전체 공개 거래의 SQLite 전체 스캔·복합 인덱스 계획 비교 |
 | data/demo_batch.json | 중복·오류가 섞인 재현 가능한 합성 주문 309행 |
 
 데모의 기준 시각은 **2026-09-08 00:00 UTC**로 고정됩니다. 처음 적재하면 정상 버전 300개, 중복 5개, 오류 4개가 나옵니다. 최신 주문은 120건이며, 배송 지연 미완료 주문은 40건입니다. 재전송 때 새로 저장되는 주문 버전은 0개입니다. 이 수치는 실제 사업 성과가 아닌 합성 데이터 검증 결과입니다.
@@ -45,6 +46,23 @@ python -m scripts.load_retail data/processed/retail-a --database-url sqlite:///r
 ```
 
 첫 실행은 정제 통과 행을 저장하고, 두 번째 실행은 같은 파일 해시와 출력 해시를 확인한 뒤 새 행을 만들지 않습니다. 기존 주문 API에 공개 거래가 나타나는 기능은 아직 없습니다.
+
+### 공개 거래 집계 계획 비교
+
+전체 자료가 든 `retail.db`에 최신 마이그레이션을 적용한 뒤 같은 국가·기간 집계를 비교합니다. 스크립트는 SQLite 전용이며 전체 스캔과 인덱스 결과가 다르면 실패합니다.
+
+```bash
+python -m scripts.benchmark_retail_sql \
+  --database-url sqlite:///retail.db \
+  --country Germany \
+  --start 2011-01-01T00:00:00 \
+  --end 2012-01-01T00:00:00 \
+  --warmups 5 \
+  --runs 31 \
+  --output artifacts/retail_query_benchmark.json
+```
+
+원천 거래 시각에는 시간대가 없으므로 `--start`, `--end`에도 `Z`나 UTC 오프셋을 붙이지 않습니다. 출력 시간은 한 환경의 warm-cache 비교일 뿐 운영 성능 보장이 아닙니다. 컬럼 순서와 저장 공간을 함께 해석하는 방법은 [인덱스 결정 기록](decisions/retail_query_index.md)에 있습니다.
 
 ## 2. API 서버 실행
 
@@ -119,7 +137,8 @@ curl 'http://127.0.0.1:8000/v1/orders?source=market_a&status=paid&limit=2&offset
 | 6 | orderlens/analytics.py | 같은 주문의 여러 버전 중 어느 것을 집계할까요? |
 | 7 | orderlens/retrieval.py | 검색 점수와 답변의 정확성은 왜 다를까요? |
 | 8 | orderlens/retail.py, retail_db.py | 파일 출처·Decimal·재실행은 어떻게 보존할까요? |
-| 9 | tests/ | 어떤 입력을 넣었을 때 어떤 결과를 기대할까요? |
+| 9 | orderlens/retail_analytics.py, scripts/benchmark_retail_sql.py | 조회 조건과 인덱스 계획을 어떻게 같은 결과로 비교할까요? |
+| 10 | tests/ | 어떤 입력을 넣었을 때 어떤 결과를 기대할까요? |
 
 ## 5. 데이터 흐름
 
@@ -152,7 +171,7 @@ python -m alembic history
 
 `python -m alembic downgrade base`는 업무 테이블과 데이터를 지우므로 학습용 임시 DB에서만 실행합니다. 자동 PostgreSQL 검사는 `_test`로 끝나는 별도 DB만 허용합니다.
 
-**이 작성 환경에는 Docker 실행 파일이 없어 로컬 컨테이너를 실행하지 못했습니다.** 대신 [GitHub Actions](https://github.com/Ajsjee3/Ajsjee3/actions/runs/37301674282)의 임시 PostgreSQL 16.15 서비스에서 두 리비전, 기존 주문 흐름과 공개 거래 합성 입력을 실제 실행했습니다. 범위와 남은 한계는 [검증 기록](validation.md)에 구분했습니다.
+**이 작성 환경에는 Docker 실행 파일이 없어 로컬 컨테이너를 실행하지 못했습니다.** 최근 완료된 [GitHub Actions](https://github.com/Ajsjee3/Ajsjee3/actions/runs/37301674282)의 임시 PostgreSQL 16.15 서비스에서는 두 리비전, 기존 주문 흐름과 공개 거래 합성 입력을 실제 실행했습니다. 세 번째 리비전과 10만 행 실행계획 검사는 이번 PR에서 확인합니다. 범위와 남은 한계는 [검증 기록](validation.md)에 구분했습니다.
 
 ## 7. 다음 문서
 

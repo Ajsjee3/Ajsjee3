@@ -26,6 +26,17 @@
 
 확인한 Git blob SHA는 각각 `9172ab3eb398fe03c5e06cf8949f23abb0205b3c`, `3854fdbea52448debc07bd08a52d26c2af1c69c6`입니다. 참고 예제의 모델·코드·측정값은 복사하지 않았고 해당 저장소의 성능 suite도 실행하지 않았습니다. 예제의 Core INSERT는 전체 입력 목록을 만들지만, OrderLens는 실제 541,907행 입력 때문에 JSONL을 읽으며 1,000행씩 비우는 방식으로 범위를 더 작게 정했습니다. 이 배치 크기가 최적이라는 성능 결론은 아직 내리지 않았습니다.
 
+## 2026-10-12 · 실행계획과 복합 인덱스
+
+[eugene-khyst/postgresql-performance-essentials](https://github.com/eugene-khyst/postgresql-performance-essentials/tree/8a9eaddaeee2917ddd72587f4cad6044d6d2b566)의 실제 파일을 읽었습니다. SQL 실행계획을 설명하는 공개 학습 저장소이며, 저자의 채용 여부나 성과는 판단하지 않았습니다.
+
+| 확인한 파일 | 코드·안내에서 확인한 점 | 이번 변경에 적용한 부분 |
+|---|---|---|
+| [README.md](https://github.com/eugene-khyst/postgresql-performance-essentials/blob/8a9eaddaeee2917ddd72587f4cad6044d6d2b566/README.md) | `EXPLAIN ANALYZE`와 BUFFERS, Seq/Bitmap/Index Scan 구분, 복합 인덱스의 선두 컬럼, 인덱스 과다 생성 비용 | 고정 SQL의 실제 계획과 실행을 함께 기록하고 동등 조건 뒤에 범위 컬럼 배치, 저장 공간도 함께 측정 |
+| [data.sql](https://github.com/eugene-khyst/postgresql-performance-essentials/blob/8a9eaddaeee2917ddd72587f4cad6044d6d2b566/data.sql) | `generate_series`로 planner가 구분할 수 있는 규모의 반복 자료 생성 | PostgreSQL CI에서 10만 행·Germany 1%의 고정 fixture를 SQL로 만들고 `ANALYZE` 뒤 계획 확인 |
+
+확인한 Git blob SHA는 각각 `f1ee6381aa61637a594aab0c03d1db62fbf09a50`, `ca5e2dbf5a27dfd413a0b213470306d0ae09118f`입니다. 외부 SQL이나 측정값을 복사하지 않았고, 참고 저장소의 PostgreSQL 13 구성도 현재 PostgreSQL 16 검사에 사용하지 않았습니다. OrderLens의 컬럼·분포·기간 조건으로 별도 구현했으며 한 번의 CI 실행 시간은 성능 수치로 해석하지 않습니다.
+
 | 저장소 | 확인한 구성 | OrderLens에 적용한 부분 |
 |---|---|---|
 | [Solar-See](https://github.com/techforimpact-archive/TFI_CAMPUS_KAIST_24fall_Solar-See) | 문제 정의, 데모, 실행 안내, 데이터 출처와 팀 역할 | README 앞부분에 다루는 문제를 쓰고 실행 결과·설계 링크를 연결 |

@@ -92,6 +92,12 @@ class RetailLine(Base):
             "source_record",
             name="uq_retail_source_record",
         ),
+        Index(
+            "ix_retail_country_cancelled_time",
+            "country",
+            "is_cancellation",
+            "invoice_at_local",
+        ),
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)

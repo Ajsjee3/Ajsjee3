@@ -1,5 +1,25 @@
 # 검증 기록
 
+## 2026-10-12 · 0.6.0 로컬 검증
+
+Linux x86_64, Python 3.12.14, SQLite 3.53.1의 기존 requirements.lock 환경에서 `python -m scripts.check`를 실행했습니다. 종료 코드 0, Ruff 통과, pytest 89개 통과, 의존성 경고 2종입니다. Alembic head `20261012_03` 적용, base까지 downgrade, 재upgrade, 모델 차이 없음과 복합 인덱스 컬럼 순서도 통과했습니다. 기존 합성 주문 309행 재전송, 실제 HTTP 8페이지·고유 주문 120건, 검색 평가 결과도 유지됐습니다.
+
+새 테스트는 공개 거래 집계의 정확한 국가, 시작 포함·종료 제외 기간, 취소 표시 제외, timezone 없는 지역 시각과 GBP Decimal을 확인합니다. SQLite 비교 스크립트는 강제 전체 스캔과 강제 인덱스의 집계 결과가 다르면 중단하고 두 실행계획을 함께 기록합니다.
+
+실제 UCI 정제 행 541,907개로 Germany의 비취소 2011년 거래를 측정했습니다. 5회 예열 뒤 순서를 번갈아 31회씩 실행했습니다.
+
+| 항목 | 전체 스캔 | 복합 인덱스 |
+|---|---:|---:|
+| 결과 | 8,529행 · 수량 112,385 · GBP 213,626.000000 | 왼쪽과 동일 |
+| 중앙값 | 41.062 ms | 1.917 ms |
+| p95 | 46.255 ms | 2.731 ms |
+
+인덱스 저장 공간은 27,430,912바이트이며 SQLite 파일은 140,288,000바이트에서 167,718,912바이트로 늘었습니다. [원본 JSON](../artifacts/retail_query_benchmark.json)에 환경·쿼리·계획·최소/중앙/p95/최대·한계를 함께 기록했습니다. 이는 한 로컬 warm-cache SQLite와 한 국가·기간 조건의 결과이며, 운영 성능이나 PostgreSQL 향상으로 일반화하지 않습니다.
+
+PostgreSQL 전용 검사는 10만 합성 행 중 Germany 1,000행을 같은 조건으로 집계하고 `ANALYZE` 뒤 기본 planner가 `ix_retail_country_cancelled_time`을 사용하는지 확인하도록 작성했습니다. 인덱스 scan을 끈 sequential 계획도 `EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)`으로 기록합니다. 원격 PostgreSQL 실행 전이므로 이 문단은 구현 범위이며 통과 결과가 아닙니다.
+
+미검증 범위는 전체 541,907행의 PostgreSQL 적재·비교, cold-cache, 동시 쓰기 지연, 다른 선택도의 국가·기간, 실제 업무 부하입니다. 로컬 Docker Compose도 실행하지 않았습니다.
+
 ## 2026-10-05 · 0.5.0 로컬 검증
 
 Linux x86_64, Python 3.12.14, SQLite 3.53.1의 기존 requirements.lock 환경에서 `python -m scripts.check`를 실행했습니다. 종료 코드 0, Ruff 통과, pytest 84개 통과, 의존성 경고 2종입니다. Alembic `20260921_01 → 20261005_02` 적용, base까지 downgrade, 재upgrade, 모델 차이 없음도 통과했습니다. 기존 주문 309행 재전송과 실제 HTTP 8페이지·고유 주문 120건 결과도 유지됐습니다.
@@ -83,6 +103,8 @@ Linux x86_64, Python 3.12.14, SQLite 3.53.1에서 기존 requirements.lock 환�
 - artifacts/retrieval_evaluation.json: 질문별 검색 결과와 순위
 - artifacts/http_smoke.json: 실제 HTTP 응답 상태
 - artifacts/migration_check.json: SQLite 마이그레이션 왕복 결과
+- artifacts/retail_db_check.json: UCI 전체 정제 행의 DB 적재·재실행 결과
+- artifacts/retail_query_benchmark.json: UCI 541,907행의 SQLite 전체 스캔·인덱스 계획과 반복 측정
 - artifacts/postgres_integration.json: PostgreSQL 원격 검사 결과와 실행 링크
 - artifacts/checks.log: 실행 명령과 결과 요약; 전체 원격 로그는 PR의 Checks에서 확인
 

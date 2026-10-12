@@ -1,5 +1,17 @@
 # 개발 기록
 
+## 2026-10-12 · 0.6.0
+
+공개 거래의 국가·취소 여부·지역 시각을 조건으로 하는 기간 집계와 Alembic 리비전 `20261012_03`을 추가했습니다. `(country, is_cancellation, invoice_at_local)` 순서로 동등 조건을 먼저, 범위 조건을 뒤에 두었습니다. 작은 테스트는 국가·기간 경계·취소 제외·GBP Decimal 합계를 확인하고, 마이그레이션은 인덱스 컬럼 순서와 upgrade·downgrade·재upgrade를 확인합니다.
+
+전체 UCI 정제 행 541,907개를 임시 SQLite에 넣고 Germany의 비취소 2011년 거래를 같은 DB에서 비교했습니다. 전체 스캔과 인덱스 계획의 결과는 모두 8,529행·수량 112,385·부호 있는 금액 GBP 213,626.000000이었습니다. warm-cache에서 5회 예열 뒤 실행 순서를 바꾸며 31회씩 측정한 중앙값은 각각 41.062ms와 1.917ms였습니다. 이 21.42배 비율은 한 로컬 SQLite·한 조건의 결과이며 운영 성능이나 PostgreSQL 향상으로 일반화하지 않습니다. 인덱스 저장 공간은 27,430,912바이트였습니다.
+
+Linux x86_64, Python 3.12.14, SQLite 3.53.1에서 `python -m scripts.check` 종료 코드 0, Ruff 통과, pytest 89개 통과, 기존 의존성 경고 2종이었습니다. PostgreSQL 전용 검사는 10만 합성 행에서 같은 집계와 기본 planner의 인덱스 선택, 강제 sequential 기준 계획을 기록하도록 확장했습니다. 원격 실행 결과는 PR 검사 뒤 [검증 기록](validation.md)에 추가합니다.
+
+새 참고는 `eugene-khyst/postgresql-performance-essentials`의 README와 `data.sql`입니다. 실행계획을 실제로 측정하고 복합 인덱스의 선두 컬럼과 저장·쓰기 비용을 함께 확인하는 기준만 적용했으며 예제 코드와 오래된 PostgreSQL 설정은 복사하지 않았습니다.
+
+전체 UCI 자료의 PostgreSQL 적재, cold-cache, 여러 국가·기간의 선택도, 동시 쓰기 비용은 아직 확인하지 않았습니다. 다음 작업은 적재 배치의 실패 상태·재시도·복구 관측입니다.
+
 ## 2026-10-05 · 0.5.0
 
 공개 거래 정제 결과를 기존 원화 배송 주문과 분리해 저장하는 `retail_imports`, `retail_lines` 모델과 Alembic 리비전 `20261005_02`를 추가했습니다. 단가는 `NUMERIC(16,6)`, 행 금액은 `NUMERIC(26,6)`, 거래 시각은 원천에 시간대가 없으므로 timezone 없는 값으로 저장합니다. `(source_sha256, source_record)` UNIQUE 제약이 파일과 원본 행 위치를 함께 식별합니다.

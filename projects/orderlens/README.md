@@ -22,6 +22,7 @@ OrderLens는 판매 경로와 주문 번호를 묶어 주문을 구분하고, �
 | DB 구조 변경 이력이 필요함 | Alembic 리비전을 적용하고 앱 시작 전에 스키마 버전 확인 | [마이그레이션 설계](docs/decisions/schema_migrations.md) |
 | 공개 거래의 단위와 품질을 확인해야 함 | GBP Decimal·취소 표시를 보존하고 오류 행·출처·해시를 기록 | [공개 데이터 정제](docs/public_retail.md) |
 | 같은 공개 파일이 다시 들어옴 | 파일 해시와 CSV 레코드 번호를 고유 키로 두고 한 트랜잭션에 분할 적재 | [DB 적재 설계](docs/decisions/retail_db_ingestion.md) |
+| 실제 규모의 국가·기간 집계가 전체 행을 읽음 | 같은 조건의 실행계획을 비교하고 동등 조건 뒤에 시각 범위를 둔 복합 인덱스 적용 | [인덱스 비교](docs/decisions/retail_query_index.md) |
 | 운영 기준을 찾아야 함 | BM25 검색으로 문서 ID와 버전을 함께 반환 | [retrieval.py](orderlens/retrieval.py) |
 
 ## 실행
@@ -59,11 +60,13 @@ curl 'http://127.0.0.1:8000/v1/orders?source=market_a&status=paid&limit=2&offset
 | 재전송 전후 지표 | 동일 |
 | 고정된 주문 목록을 17건씩 실제 HTTP 조회 | 8페이지 · 120건 · 중복·누락 0건 |
 | 임시 SQLite 초기 마이그레이션 | upgrade · downgrade · 재upgrade 성공 |
-| PostgreSQL 16.15 통합 검사 | 주문 재전송·120건 페이지 유지 · 공개 거래 2행 최초·재적재 · 두 리비전 왕복 |
+| PostgreSQL 16.15 통합 검사 | 주문 재전송·120건 페이지 유지 · 공개 거래 2행 최초·재적재 · 세 리비전 왕복 |
 | UCI 공개 거래의 임시 SQLite 적재 | 541,907행 · 고유 원본 위치 541,907개 · GBP 합계 9,769,872.054 |
 | 같은 공개 파일 재적재 | 새 행 0개 · 중복 541,907개 · DB 행 수 유지 |
+| Germany 비취소 2011년 집계 | 8,529행 · 수량 112,385 · 부호 있는 금액 GBP 213,626.000000 |
+| 같은 DB의 강제 계획 비교 | 전체 스캔 중앙값 41.062 ms · 복합 인덱스 1.917 ms · 각 31회 |
 
-명령 한 번으로 임시 DB 마이그레이션, 적재, 재전송, 지표 비교, 검색 평가, 실제 HTTP 요청까지 재실행합니다. 원본 결과는 [SQLite 마이그레이션](artifacts/migration_check.json), [공개 거래 DB 적재](artifacts/retail_db_check.json), [PostgreSQL 통합 검사](artifacts/postgres_integration.json), [demo_report.json](artifacts/demo_report.json), [HTTP 결과](artifacts/http_smoke.json), [검증 기록](docs/validation.md)에 남깁니다.
+명령 한 번으로 임시 DB 마이그레이션, 적재, 재전송, 지표 비교, 검색 평가, 실제 HTTP 요청까지 재실행합니다. 원본 결과는 [SQLite 마이그레이션](artifacts/migration_check.json), [공개 거래 DB 적재](artifacts/retail_db_check.json), [SQL 계획 비교](artifacts/retail_query_benchmark.json), [PostgreSQL 통합 검사](artifacts/postgres_integration.json), [demo_report.json](artifacts/demo_report.json), [HTTP 결과](artifacts/http_smoke.json), [검증 기록](docs/validation.md)에 남깁니다.
 
 ## 설계에서 정한 기준
 
@@ -72,6 +75,7 @@ curl 'http://127.0.0.1:8000/v1/orders?source=market_a&status=paid&limit=2&offset
 - 목록은 주문 시각 내림차순, 판매 경로·주문 번호 오름차순입니다. `as_of`를 고정해도 과거 자료가 새로 적재되면 페이지 경계가 달라질 수 있습니다.
 - 앱은 DB 테이블을 자동 생성하지 않습니다. 서버 시작 전에 Alembic head를 적용하고, 코드와 DB의 리비전이 다르면 시작을 중단합니다.
 - 공개 거래 단가는 `NUMERIC(16,6)`, 행 금액은 `NUMERIC(26,6)`으로 저장합니다. 원천에 없는 시간대와 원화 금액을 만들지 않습니다.
+- 공개 거래 기간은 시작을 포함하고 종료를 제외합니다. `(country, is_cancellation, invoice_at_local)` 인덱스의 조회 이득과 저장 공간 비용을 함께 기록합니다.
 - 취소·환불 주문은 유효 주문 금액에서 제외합니다. 배송 완료 주문이 없으면 지연율은 `null`입니다.
 - 검색 점수는 확률이 아닙니다. 현재 검색은 BM25이며 요약은 규칙 기반입니다.
 
@@ -79,8 +83,8 @@ curl 'http://127.0.0.1:8000/v1/orders?source=market_a&status=paid&limit=2&offset
 
 ## 다음 작업
 
-현재 버전은 **0.5.0**입니다. 두 번째 Alembic 리비전으로 공개 거래 출처와 행을 분리해 저장합니다. UCI Online Retail 정제 결과 541,907행을 임시 SQLite에 넣었고, 같은 파일을 다시 실행했을 때 새 행은 0개였습니다. 출처·이용 조건·명령은 [공개 데이터 재현 안내](docs/public_retail.md)에 있습니다.
+현재 버전은 **0.6.0**입니다. 세 번째 Alembic 리비전으로 공개 거래 국가·취소 여부·지역 시각 복합 인덱스를 추가했습니다. UCI Online Retail 정제 결과 541,907행에서 같은 집계를 강제 전체 스캔과 강제 인덱스로 각각 31회 비교했습니다. 환경과 한계를 포함한 결과는 [인덱스 비교](docs/decisions/retail_query_index.md)에 있습니다.
 
-공개 거래 자료는 GBP 금액이고 배송 시각이 없어 기존 원화 배송 주문 API와 분리했습니다. 아직 공개 거래 조회 API나 화면은 없습니다. 다음 변경은 실제 541,907행에서 집계 SQL의 실행계획을 측정하고 필요한 인덱스를 비교하는 작업입니다. 외부 배포와 LLM 답변 생성도 후속 작업입니다.
+공개 거래 자료는 GBP 금액이고 배송 시각이 없어 기존 원화 배송 주문 API와 분리했습니다. 아직 공개 거래 조회 API나 화면은 없습니다. 다음 변경은 적재 배치에 실패 상태와 재시도 이력을 남기고, 중복 없이 복구되는 과정을 검증하는 작업입니다. 외부 배포와 LLM 답변 생성도 후속 작업입니다.
 
 [작업 목록](docs/automation_and_backlog.md) · [개발 기록](docs/progress.md) · [참고 저장소](docs/references.md) · [기여 안내](CONTRIBUTING.md)

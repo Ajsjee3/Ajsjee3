@@ -1,6 +1,6 @@
 # PostgreSQL 통합과 스키마 마이그레이션
 
-작성: 2026-09-21 · 갱신: 2026-10-05 · 버전: 0.5.0
+작성: 2026-09-21 · 갱신: 2026-10-12 · 버전: 0.6.0
 
 ## 해결하려는 문제
 
@@ -17,6 +17,8 @@
 - `retail_imports`: 원본·정제 파일 해시와 행 수
 - `retail_lines`: GBP Decimal, 지역 시각, 파일 안 레코드 위치
 
+2026-10-12의 세 번째 리비전 `20261012_03`은 기존 행을 바꾸지 않고 공개 거래에 `(country, is_cancellation, invoice_at_local)` 복합 인덱스를 추가합니다. downgrade에서는 인덱스만 제거하고, 다음 리비전이 두 공개 거래 테이블을 제거합니다.
+
 ## 실행 순서
 
 ```text
@@ -31,17 +33,17 @@ Docker Compose에서는 `db`가 준비된 뒤 일회성 `migrate` 서비스가 u
 
 기본 검증의 `scripts.check_migrations`는 임시 SQLite DB에서 다음 순서를 확인합니다.
 
-1. head까지 올린 뒤 다섯 업무 테이블, UNIQUE 제약과 금액 정밀도, 기존 인덱스를 확인하고 모델과 리비전 사이의 차이가 없는지 검사합니다.
+1. head까지 올린 뒤 다섯 업무 테이블, UNIQUE 제약과 금액 정밀도, 복합 인덱스의 컬럼 순서를 확인하고 모델과 리비전 사이의 차이가 없는지 검사합니다.
 2. base로 내린 뒤 업무 테이블과 현재 리비전이 남지 않았는지 확인합니다.
 3. 다시 head까지 올리고 앱이 현재 스키마로 판단하는지 확인합니다.
 4. 마이그레이션하지 않은 DB에서는 앱이 시작을 거부하는지 테스트합니다.
 
-PostgreSQL 검증은 이름이 `_test`로 끝나는 전용 DB만 허용합니다. GitHub Actions의 임시 PostgreSQL 16 서비스에서 마이그레이션을 적용한 뒤 합성 주문 309행과 공개 거래 2행을 적재·재전송하고, 지표와 8페이지 주문 목록을 비교합니다. 마지막에는 downgrade와 재upgrade도 실행합니다. [실제 원격 실행](https://github.com/Ajsjee3/Ajsjee3/actions/runs/37301674282)은 PostgreSQL 16.15에서 통과했으며 상세 값은 [검증 기록](../validation.md)에 남겼습니다.
+PostgreSQL 검증은 이름이 `_test`로 끝나는 전용 DB만 허용합니다. GitHub Actions의 임시 PostgreSQL 16 서비스에서 마이그레이션을 적용한 뒤 합성 주문 309행과 공개 거래 2행을 적재·재전송하고, 지표와 8페이지 주문 목록을 비교합니다. 10만 공개 거래 fixture를 추가해 `ANALYZE` 뒤 복합 인덱스가 선택되는지도 확인합니다. 마지막에는 downgrade와 재upgrade를 실행합니다. 최근 완료된 0.5.0 [원격 실행](https://github.com/Ajsjee3/Ajsjee3/actions/runs/37301674282)의 상세 값은 [검증 기록](../validation.md)에 남겼습니다.
 
 ## 선택과 남은 범위
 
-첫 리비전은 초기 SQLAlchemy 모델을 옮긴 기준점이며 두 번째 리비전으로 새 테이블을 추가하는 경로를 검증했습니다. 실제 운영 데이터가 이미 있는 DB를 첫 리비전에 연결하는 절차, 여러 앱 인스턴스의 배포 순서와 장시간 잠금은 아직 검증하지 않았습니다.
+첫 리비전은 초기 SQLAlchemy 모델을 옮긴 기준점이며 두 번째 리비전으로 새 테이블, 세 번째 리비전으로 기존 테이블의 인덱스를 추가하는 경로를 검증했습니다. SQLite 541,907행에서 인덱스 생성은 실행했지만 시간은 성능 결과로 기록하지 않았습니다. 실제 운영 데이터가 이미 있는 DB를 첫 리비전에 연결하는 절차, PostgreSQL 대량 테이블의 인덱스 생성 잠금과 `CREATE INDEX CONCURRENTLY`, 여러 앱 인스턴스의 배포 순서는 아직 검증하지 않았습니다.
 
 테스트용 스크립트는 테이블을 내리므로 일반 `ORDERLENS_DATABASE_URL` 대신 `ORDERLENS_POSTGRES_TEST_URL`만 읽고 DB 이름의 `_test` 접미사를 검사합니다. 이 문자열 검사는 마지막 안전장치일 뿐이며, 실제 환경에서는 별도 계정·DB와 최소 권한도 함께 사용해야 합니다.
 
-직접 확인할 작은 과제: 새 빈 DB에서 `alembic current`, `alembic upgrade head`, `alembic current`를 차례로 실행하고 `없음 → 20261005_02`로 바뀌는 동안 두 리비전이 순서대로 적용되는 이유를 설명해 보세요.
+직접 확인할 작은 과제: 새 빈 DB에서 `alembic current`, `alembic upgrade head`, `alembic current`를 차례로 실행하고 `없음 → 20261012_03`으로 바뀌는 동안 세 리비전이 순서대로 적용되는 이유를 설명해 보세요.
