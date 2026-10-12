@@ -1,11 +1,11 @@
 {
   "source": "github_actions_log",
-  "run_url": "https://github.com/Ajsjee3/Ajsjee3/actions/runs/37301674282",
-  "commit": "29399421f947cc4ce7d9c015a2a3ad02ec5db378",
+  "run_url": "https://github.com/Ajsjee3/Ajsjee3/actions/runs/38237841801",
+  "commit": "349c1ad8d750b915b8d1fe7cd113f88cf3caedd7",
   "database": "ephemeral_postgresql_service",
   "postgresql_version": "16.15",
-  "head_revision": "20261005_02",
-  "revision_after_upgrade": "20261005_02",
+  "head_revision": "20261012_03",
+  "revision_after_upgrade": "20261012_03",
   "created_tables": [
     "ingestion_runs",
     "order_snapshots",
@@ -40,6 +40,46 @@
     "line_amount": "-0.003000",
     "invoice_timezone": null
   },
+  "retail_query_plan": {
+    "fixture_rows": 100000,
+    "target_country_rows": 1000,
+    "query": {
+      "country": "Germany",
+      "is_cancellation": false,
+      "start_at_local_inclusive": "2011-01-01T00:00:00",
+      "end_at_local_exclusive": "2012-01-01T00:00:00"
+    },
+    "result": {
+      "line_count": 1000,
+      "quantity": 1000,
+      "signed_line_amount_gbp": "1000.000000"
+    },
+    "default_plan": {
+      "nodes": [
+        "Aggregate",
+        "Index Scan"
+      ],
+      "indexes": [
+        "ix_retail_country_cancelled_time"
+      ],
+      "planning_ms": 0.046,
+      "execution_ms": 0.338,
+      "shared_hit_blocks": 1003,
+      "shared_read_blocks": 0
+    },
+    "forced_sequential_plan": {
+      "nodes": [
+        "Aggregate",
+        "Seq Scan"
+      ],
+      "indexes": [],
+      "planning_ms": 0.041,
+      "execution_ms": 14.671,
+      "shared_hit_blocks": 2223,
+      "shared_read_blocks": 0
+    },
+    "timing_scope": "single ephemeral CI observation; not a benchmark claim"
+  },
   "business_tables_removed_after_downgrade": true,
-  "revision_after_reupgrade": "20261005_02"
+  "revision_after_reupgrade": "20261012_03"
 }

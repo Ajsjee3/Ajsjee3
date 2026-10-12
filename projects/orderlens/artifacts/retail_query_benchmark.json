@@ -1,0 +1,62 @@
+{
+  "scope": "one local warm-cache SQLite comparison; not a production guarantee",
+  "comparison": "same database, NOT INDEXED versus INDEXED BY",
+  "environment": {
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+    "python": "3.12.14",
+    "sqlite": "3.53.1"
+  },
+  "schema_revision": "20261012_03",
+  "database_rows": 541907,
+  "database_bytes": 167718912,
+  "index": {
+    "name": "ix_retail_country_cancelled_time",
+    "columns": [
+      "country",
+      "is_cancellation",
+      "invoice_at_local"
+    ],
+    "storage_bytes": 27430912
+  },
+  "query": {
+    "country": "Germany",
+    "is_cancellation": false,
+    "start_at_local_inclusive": "2011-01-01T00:00:00",
+    "end_at_local_exclusive": "2012-01-01T00:00:00"
+  },
+  "result": {
+    "line_count": 8529,
+    "quantity": 112385,
+    "signed_line_amount_gbp": "213626.000000"
+  },
+  "measurement": {
+    "warmups_per_query": 5,
+    "alternating_runs_per_query": 31,
+    "forced_full_scan": {
+      "plan": [
+        "SCAN retail_lines"
+      ],
+      "runs": 31,
+      "minimum_ms": 37.913,
+      "median_ms": 41.062,
+      "p95_ms": 46.255,
+      "maximum_ms": 46.268
+    },
+    "forced_composite_index": {
+      "plan": [
+        "SEARCH retail_lines USING INDEX ix_retail_country_cancelled_time (country=? AND is_cancellation=? AND invoice_at_local>? AND invoice_at_local<?)"
+      ],
+      "runs": 31,
+      "minimum_ms": 1.61,
+      "median_ms": 1.917,
+      "p95_ms": 2.731,
+      "maximum_ms": 3.274
+    },
+    "median_ratio_scan_over_index": 21.42
+  },
+  "limits": [
+    "SQLite 한 파일과 한 국가·기간 조건만 측정했습니다.",
+    "OS 캐시를 비우지 않은 warm-cache 결과입니다.",
+    "PostgreSQL 실행계획은 별도 통합 검사에서 확인합니다."
+  ]
+}

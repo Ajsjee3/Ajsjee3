@@ -30,6 +30,13 @@ def main() -> None:
             created_tables = set(inspect(engine).get_table_names())
             if not expected_tables <= created_tables:
                 raise AssertionError("초기 마이그레이션이 필요한 테이블을 모두 만들지 않았습니다.")
+            retail_indexes = {
+                item["name"]: item["column_names"]
+                for item in inspect(engine).get_indexes("retail_lines")
+            }
+            expected_retail_index = ["country", "is_cancellation", "invoice_at_local"]
+            if retail_indexes.get("ix_retail_country_cancelled_time") != expected_retail_index:
+                raise AssertionError("공개 거래 집계 인덱스의 컬럼 순서가 다릅니다.")
 
             downgrade_database(database_url)
             remaining = set(inspect(engine).get_table_names()) & expected_tables
@@ -47,6 +54,10 @@ def main() -> None:
         "revision_after_upgrade": revision,
         "created_tables": sorted(expected_tables),
         "model_matches_migration": True,
+        "retail_query_index": {
+            "name": "ix_retail_country_cancelled_time",
+            "columns": expected_retail_index,
+        },
         "business_tables_removed_after_downgrade": True,
         "revision_after_reupgrade": reupgraded,
     }

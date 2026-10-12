@@ -3,12 +3,13 @@
 import csv
 import json
 import os
+from datetime import datetime
 from decimal import Decimal
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
 from fastapi.testclient import TestClient
-from sqlalchemy import func, inspect, select
+from sqlalchemy import func, inspect, select, text
 from sqlalchemy.engine import make_url
 from sqlalchemy.orm import Session
 
@@ -26,8 +27,19 @@ from orderlens.migrations import (
 )
 from orderlens.models import RetailImport, RetailLine
 from orderlens.retail import COLUMNS, transform_file
+from orderlens.retail_analytics import RETAIL_QUERY_INDEX, retail_summary
 from orderlens.retail_db import load_retail_output
 from scripts.generate_demo import AS_OF, generate_rows
+
+RETAIL_PLAN_SQL = """
+EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)
+SELECT COUNT(*), SUM(quantity), SUM(line_amount)
+FROM retail_lines
+WHERE country = :country
+  AND is_cancellation IS FALSE
+  AND invoice_at_local >= :start_at
+  AND invoice_at_local < :end_at
+""".strip()
 
 
 def required_test_url() -> str:
@@ -59,6 +71,30 @@ def read_all_pages(client: TestClient, limit: int = 17) -> list[tuple[str, str]]
             return seen
         offset = page["next_offset"]
     raise AssertionError("PostgreSQL 주문 목록의 마지막 페이지에 도달하지 못했습니다.")
+
+
+def plan_evidence(payload) -> dict:
+    document = payload[0]
+    nodes: list[str] = []
+    indexes: list[str] = []
+
+    def visit(node: dict) -> None:
+        nodes.append(node["Node Type"])
+        if node.get("Index Name"):
+            indexes.append(node["Index Name"])
+        for child in node.get("Plans", []):
+            visit(child)
+
+    root = document["Plan"]
+    visit(root)
+    return {
+        "nodes": nodes,
+        "indexes": indexes,
+        "planning_ms": document["Planning Time"],
+        "execution_ms": document["Execution Time"],
+        "shared_hit_blocks": root.get("Shared Hit Blocks", 0),
+        "shared_read_blocks": root.get("Shared Read Blocks", 0),
+    }
 
 
 def main() -> None:
@@ -104,6 +140,13 @@ def main() -> None:
         retail_constraints = inspector.get_unique_constraints("retail_lines")
         if not any(item["name"] == "uq_retail_source_record" for item in retail_constraints):
             raise AssertionError("공개 거래의 파일 해시·레코드 번호 UNIQUE 제약이 없습니다.")
+        retail_indexes = {
+            item["name"]: item["column_names"]
+            for item in inspector.get_indexes("retail_lines")
+        }
+        expected_retail_index = ["country", "is_cancellation", "invoice_at_local"]
+        if retail_indexes.get(RETAIL_QUERY_INDEX) != expected_retail_index:
+            raise AssertionError("PostgreSQL 공개 거래 집계 인덱스의 컬럼 순서가 다릅니다.")
         server_version = ".".join(map(str, engine.dialect.server_version_info))
     finally:
         engine.dispose()
@@ -198,6 +241,98 @@ def main() -> None:
     ):
         raise AssertionError("PostgreSQL이 GBP 소수 금액·지역 시각을 보존하지 못했습니다.")
 
+    synthetic_sha256 = "b" * 64
+    engine = make_engine(database_url)
+    try:
+        with engine.begin() as connection:
+            connection.execute(
+                text(
+                    """
+                    INSERT INTO retail_imports (
+                        source_sha256, accepted_output_sha256, rejected_output_sha256,
+                        dataset, dataset_url, source_url, license, provenance_scope,
+                        currency, source_rows, accepted_rows, rejected_rows,
+                        cancellation_rows, accepted_signed_line_amount,
+                        cancellation_signed_line_amount, created_at
+                    ) VALUES (
+                        :source_sha256, :accepted_sha256, :rejected_sha256,
+                        'synthetic planner fixture', 'local://postgres-ci', NULL, NULL,
+                        'synthetic_test', 'GBP', 100000, 100000, 0, 0,
+                        100000.000000, 0.000000, CURRENT_TIMESTAMP
+                    )
+                    """
+                ),
+                {
+                    "source_sha256": synthetic_sha256,
+                    "accepted_sha256": "c" * 64,
+                    "rejected_sha256": "d" * 64,
+                },
+            )
+            connection.execute(
+                text(
+                    """
+                    INSERT INTO retail_lines (
+                        source_sha256, source_record, invoice_no, stock_code,
+                        invoice_at_local, invoice_timezone, quantity, currency,
+                        unit_price, line_amount, is_cancellation, country, quality_flags
+                    )
+                    SELECT
+                        :source_sha256,
+                        row_number,
+                        'BENCH-' || row_number,
+                        'INDEX',
+                        TIMESTAMP '2011-01-01 00:00:00'
+                            + ((row_number % 365) * INTERVAL '1 day'),
+                        NULL,
+                        1,
+                        'GBP',
+                        1.000000,
+                        1.000000,
+                        FALSE,
+                        CASE WHEN row_number % 100 = 0 THEN 'Germany'
+                             ELSE 'United Kingdom' END,
+                        '[]'::json
+                    FROM generate_series(1, 100000) AS generated(row_number)
+                    """
+                ),
+                {"source_sha256": synthetic_sha256},
+            )
+            connection.exec_driver_sql("ANALYZE retail_lines")
+
+        query_parameters = {
+            "country": "Germany",
+            "start_at": datetime(2011, 1, 1),
+            "end_at": datetime(2012, 1, 1),
+        }
+        with Session(engine) as session:
+            query_summary = retail_summary(session, **query_parameters)
+        if (
+            query_summary.line_count,
+            query_summary.quantity,
+            query_summary.signed_line_amount,
+        ) != (1000, 1000, Decimal("1000.000000")):
+            raise AssertionError("PostgreSQL 집계 결과가 10만 행 고정 fixture와 다릅니다.")
+
+        with engine.connect() as connection:
+            default_plan = plan_evidence(
+                connection.execute(text(RETAIL_PLAN_SQL), query_parameters).scalar_one()
+            )
+            connection.rollback()
+        if RETAIL_QUERY_INDEX not in default_plan["indexes"]:
+            raise AssertionError("PostgreSQL planner가 공개 거래 집계 인덱스를 선택하지 않았습니다.")
+
+        with engine.begin() as connection:
+            connection.exec_driver_sql("SET LOCAL enable_indexscan = off")
+            connection.exec_driver_sql("SET LOCAL enable_indexonlyscan = off")
+            connection.exec_driver_sql("SET LOCAL enable_bitmapscan = off")
+            sequential_plan = plan_evidence(
+                connection.execute(text(RETAIL_PLAN_SQL), query_parameters).scalar_one()
+            )
+        if "Seq Scan" not in sequential_plan["nodes"] or sequential_plan["indexes"]:
+            raise AssertionError("PostgreSQL 강제 전체 스캔 기준 계획을 확인하지 못했습니다.")
+    finally:
+        engine.dispose()
+
     downgrade_database(database_url)
     engine = make_engine(database_url)
     try:
@@ -239,6 +374,24 @@ def main() -> None:
             "unit_price": str(cancellation.unit_price),
             "line_amount": str(cancellation.line_amount),
             "invoice_timezone": cancellation.invoice_timezone,
+        },
+        "retail_query_plan": {
+            "fixture_rows": 100000,
+            "target_country_rows": query_summary.line_count,
+            "query": {
+                "country": query_summary.country,
+                "is_cancellation": False,
+                "start_at_local_inclusive": query_summary.start_at_local.isoformat(),
+                "end_at_local_exclusive": query_summary.end_at_local_exclusive.isoformat(),
+            },
+            "result": {
+                "line_count": query_summary.line_count,
+                "quantity": query_summary.quantity,
+                "signed_line_amount_gbp": str(query_summary.signed_line_amount),
+            },
+            "default_plan": default_plan,
+            "forced_sequential_plan": sequential_plan,
+            "timing_scope": "single ephemeral CI observation; not a benchmark claim",
         },
         "business_tables_removed_after_downgrade": True,
         "revision_after_reupgrade": revision_after_reupgrade,

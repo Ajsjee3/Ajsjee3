@@ -1,7 +1,7 @@
 {
   "database": "temporary_sqlite",
-  "head_revision": "20261005_02",
-  "revision_after_upgrade": "20261005_02",
+  "head_revision": "20261012_03",
+  "revision_after_upgrade": "20261012_03",
   "created_tables": [
     "ingestion_runs",
     "order_snapshots",
@@ -10,6 +10,14 @@
     "retail_lines"
   ],
   "model_matches_migration": true,
+  "retail_query_index": {
+    "name": "ix_retail_country_cancelled_time",
+    "columns": [
+      "country",
+      "is_cancellation",
+      "invoice_at_local"
+    ]
+  },
   "business_tables_removed_after_downgrade": true,
-  "revision_after_reupgrade": "20261005_02"
+  "revision_after_reupgrade": "20261012_03"
 }

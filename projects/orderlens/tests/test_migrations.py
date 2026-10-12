@@ -30,6 +30,15 @@ def test_migrations_can_upgrade_downgrade_and_upgrade_again(tmp_path):
 
         retail_constraints = inspect(engine).get_unique_constraints("retail_lines")
         assert any(item["name"] == "uq_retail_source_record" for item in retail_constraints)
+        retail_indexes = {
+            item["name"]: item["column_names"]
+            for item in inspect(engine).get_indexes("retail_lines")
+        }
+        assert retail_indexes["ix_retail_country_cancelled_time"] == [
+            "country",
+            "is_cancellation",
+            "invoice_at_local",
+        ]
         retail_columns = {
             item["name"]: item for item in inspect(engine).get_columns("retail_lines")
         }
