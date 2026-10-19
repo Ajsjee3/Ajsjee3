@@ -37,6 +37,16 @@ def main() -> None:
             expected_retail_index = ["country", "is_cancellation", "invoice_at_local"]
             if retail_indexes.get("ix_retail_country_cancelled_time") != expected_retail_index:
                 raise AssertionError("공개 거래 집계 인덱스의 컬럼 순서가 다릅니다.")
+            attempt_indexes = {
+                item["name"]: item["column_names"]
+                for item in inspect(engine).get_indexes("retail_load_attempts")
+            }
+            expected_attempt_index = ["source_sha256", "started_at"]
+            if (
+                attempt_indexes.get("ix_retail_load_attempt_source_started")
+                != expected_attempt_index
+            ):
+                raise AssertionError("공개 거래 적재 시도 인덱스의 컬럼 순서가 다릅니다.")
 
             downgrade_database(database_url)
             remaining = set(inspect(engine).get_table_names()) & expected_tables
@@ -57,6 +67,10 @@ def main() -> None:
         "retail_query_index": {
             "name": "ix_retail_country_cancelled_time",
             "columns": expected_retail_index,
+        },
+        "retail_load_attempt_index": {
+            "name": "ix_retail_load_attempt_source_started",
+            "columns": expected_attempt_index,
         },
         "business_tables_removed_after_downgrade": True,
         "revision_after_reupgrade": reupgraded,

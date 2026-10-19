@@ -1,5 +1,20 @@
 # 참고 저장소와 적용한 부분
 
+## 2026-10-19 · 실행 시도별 실패·재시도 이력
+
+[apache/airflow](https://github.com/apache/airflow/tree/66b803d5efbbb743c357f2b4696f49a22aa662b8)의 실행 이력 구현과 변경 기록을 직접 읽었습니다. Airflow 전체 오케스트레이터를 도입하지 않고, 작은 적재 CLI에 필요한 실행 단위와 감사 이력 원칙만 적용했습니다.
+
+| 확인한 파일·변경 | 확인한 내용 | 이번 변경에 적용한 부분 |
+|---|---|---|
+| [README.md](https://github.com/apache/airflow/blob/66b803d5efbbb743c357f2b4696f49a22aa662b8/README.md) | 데이터 작업은 다시 실행해도 목적지에 중복을 만들지 않는 멱등성이 중요하다고 설명 | 강제 실패 뒤 복구와 이미 성공한 파일의 재실행을 모두 검증 |
+| [taskinstancehistory.py](https://github.com/apache/airflow/blob/66b803d5efbbb743c357f2b4696f49a22aa662b8/airflow-core/src/airflow/models/taskinstancehistory.py) | 실행 시도마다 상태·시작·종료·try 번호·제한된 재시도 사유를 별도 행에 보존 | 공개 거래 적재 한 번마다 UUID·상태·종료 시각·행 수·오류 코드를 별도 행으로 기록 |
+| [task_instances.py](https://github.com/apache/airflow/blob/66b803d5efbbb743c357f2b4696f49a22aa662b8/airflow-core/src/airflow/api_fastapi/execution_api/routes/task_instances.py) | 다음 시도로 넘어가기 전에 현재 시도의 종료 값과 최대 500자 사유를 이력에 복사 | 실패가 롤백돼도 남는 트랜잭션에서 종료 상태를 확정하고 계약 오류 설명을 500자로 제한 |
+| [test_task_instances.py](https://github.com/apache/airflow/blob/66b803d5efbbb743c357f2b4696f49a22aa662b8/airflow-core/tests/unit/api_fastapi/execution_api/versions/head/test_task_instances.py) | live 행만 확인하지 않고 재시도 뒤 history 행의 사유·종료 시각을 조회하는 회귀 테스트 | 실패·복구·재재실행 뒤 세 이력과 최종 거래 행 수를 DB에서 함께 확인 |
+| [tasks.rst](https://github.com/apache/airflow/blob/66b803d5efbbb743c357f2b4696f49a22aa662b8/airflow-core/docs/core-concepts/tasks.rst) | `running`, `failed`, `up_for_retry`, `success` 등 상태 의미와 재시도 경계를 문서화 | OrderLens가 실제로 쓰는 `running/succeeded/failed`와 결과 필드의 조합을 CHECK 제약과 결정 기록에 명시 |
+| [변경 커밋](https://github.com/apache/airflow/commit/66b803d5efbbb743c357f2b4696f49a22aa662b8) | 재시도 이력에 실제 종료 시각과 최종 값을 보존하도록 소스·테스트를 함께 수정 | 시도 종료 값을 갱신한 뒤 DB에서 직접 읽는 테스트와 재현 스크립트 추가 |
+
+확인한 Git blob SHA는 순서대로 `72391c87cf3423c29f7c35fdbe5369fec8ac0b26`, `47cfdb68ae57733065b491016e3fe3fe054b16cb`, `b813c4c8f7e2ee25952d3a8361bdcb4804c6b75f`, `da6ea74337df5fc3944b74e504fbae738088ccdc`, `95d9846dd5e5ded3c41974087e65721ca0a175ee`입니다. 외부 코드를 복사하거나 Airflow 의존성을 추가하지 않았고, 자동 스케줄링·재시도 정책도 구현한 것으로 표현하지 않습니다.
+
 ## 2026-09-22 · 거래 행의 단위와 정제 경계
 
 [dbt-labs/jaffle-shop](https://github.com/dbt-labs/jaffle-shop)의 다음 파일을 직접 읽었습니다. 가상의 식당 데이터를 사용하는 교육용 프로젝트이며 실제 거래 자료나 저자의 채용 성과를 보여 주는 저장소로 취급하지 않았습니다.

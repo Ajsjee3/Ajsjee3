@@ -1,3 +1,18 @@
+OrderLens 0.7.0 로컬 검증 요약 — 2026-10-19
+환경: Linux x86_64, Python 3.12.14, SQLite 3.53.1, 기존 requirements.lock 가상환경
+실행 위치: projects/orderlens
+명령: python -m scripts.check
+종료 코드: 0
+Ruff: All checks passed!
+pytest: 90 passed, 2 warnings
+마이그레이션: 20260921_01 → 20261005_02 → 20261012_03 → 20261019_04
+모델 일치, base downgrade·재upgrade, 적재 시도 CHECK·인덱스 확인
+강제 실패: 두 번째 행 금액 계약 위반, retail_imports 0, retail_lines 0
+시도 이력: failed/data_contract → succeeded/loaded → succeeded/already_loaded
+복구: 2행 적재, 같은 파일 재실행 새 행 0·중복 2, 최종 거래 2행
+근거: artifacts/retail_recovery.json, docs/decisions/retail_load_recovery.md
+미검증: 원본 SHA 확인 전 실패, 프로세스 강제 종료, 오래된 running 정리, 동시 첫 적재
+
 OrderLens 0.6.0 로컬 검증 요약 — 2026-10-12
 환경: Linux x86_64, Python 3.12.14, SQLite 3.53.1, 기존 requirements.lock 가상환경
 실행 위치: projects/orderlens

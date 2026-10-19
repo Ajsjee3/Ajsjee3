@@ -1,13 +1,14 @@
 {
   "database": "temporary_sqlite",
-  "head_revision": "20261012_03",
-  "revision_after_upgrade": "20261012_03",
+  "head_revision": "20261019_04",
+  "revision_after_upgrade": "20261019_04",
   "created_tables": [
     "ingestion_runs",
     "order_snapshots",
     "rejected_rows",
     "retail_imports",
-    "retail_lines"
+    "retail_lines",
+    "retail_load_attempts"
   ],
   "model_matches_migration": true,
   "retail_query_index": {
@@ -18,6 +19,13 @@
       "invoice_at_local"
     ]
   },
+  "retail_load_attempt_index": {
+    "name": "ix_retail_load_attempt_source_started",
+    "columns": [
+      "source_sha256",
+      "started_at"
+    ]
+  },
   "business_tables_removed_after_downgrade": true,
-  "revision_after_reupgrade": "20261012_03"
+  "revision_after_reupgrade": "20261019_04"
 }

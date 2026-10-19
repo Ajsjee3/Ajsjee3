@@ -31,7 +31,7 @@ python -m scripts.load_retail data/processed/retail-a --database-url sqlite:///r
 
 동일한 열을 가진 다른 CSV도 변환할 수 있습니다. 다만 입력 해시가 위 원본과 다르면 출처는 `unverified`, 다운로드 URL과 라이선스는 `null`로 기록합니다. 형식이 같다는 이유로 UCI 자료나 CC BY 자료로 단정하지 않습니다.
 
-적재 명령은 먼저 DB가 Alembic head인지 확인합니다. 첫 실행은 `status=loaded`, 두 번째 실행은 `status=already_loaded`를 반환합니다. 파일 해시는 같지만 정제 JSONL 해시나 보고서 내용이 달라지면 기존 행을 덮어쓰지 않고 중단합니다. 자세한 키·트랜잭션·금액 타입은 [DB 적재 결정 기록](decisions/retail_db_ingestion.md)에 있습니다.
+적재 명령은 먼저 DB가 Alembic head인지 확인합니다. 첫 실행은 `status=loaded`, 두 번째 실행은 `status=already_loaded`를 반환하며 서로 다른 `attempt_id`가 붙습니다. 파일 해시는 같지만 정제 JSONL 해시나 보고서 내용이 달라지면 기존 행을 덮어쓰지 않고 중단합니다. 실패·복구 이력은 [적재 복구 결정 기록](decisions/retail_load_recovery.md), 키·금액 타입은 [DB 적재 결정 기록](decisions/retail_db_ingestion.md)에 있습니다.
 
 ## 변환 계약
 
@@ -88,4 +88,4 @@ Linux x86_64, Python 3.12.14, SQLite 3.53.1의 임시 DB에 전체 정제 결과
 
 [전체 적재 근거](../artifacts/retail_db_check.json)는 임시 SQLite 결과입니다. PostgreSQL에서는 PR의 합성 2행으로 NUMERIC 정밀도, 지역 시각, UNIQUE 제약, 최초·재적재와 마이그레이션 왕복을 확인합니다. 전체 541,907행을 PostgreSQL에 적재하거나 처리 시간을 비교한 결과는 아닙니다.
 
-적재 구현은 [retail_db.py](../orderlens/retail_db.py), 예외·롤백 테스트는 [test_retail_db.py](../tests/test_retail_db.py)에 있습니다. 다음은 실제 규모에서 국가·기간·취소별 집계 SQL의 실행계획을 측정하고, 인덱스 전후를 같은 조건으로 비교하는 작업입니다. 취소와 원거래 연결 및 회계상 매출 계산은 아직 하지 않습니다.
+적재 구현은 [retail_db.py](../orderlens/retail_db.py), 예외·롤백 테스트는 [test_retail_db.py](../tests/test_retail_db.py)에 있습니다. 이후 국가·기간 집계 인덱스와 적재 시도 이력을 추가했지만 위 541,907행 결과와 `20261005_02` 값은 2026-10-05 당시 실행 기록입니다. 취소와 원거래 연결 및 회계상 매출 계산은 아직 하지 않습니다.

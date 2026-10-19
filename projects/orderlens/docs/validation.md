@@ -1,5 +1,20 @@
 # 검증 기록
 
+## 2026-10-19 · 0.7.0 로컬 검증
+
+Linux x86_64, Python 3.12.14, SQLite 3.53.1의 기존 requirements.lock 환경에서 `python -m scripts.check`를 실행했습니다. 종료 코드 0, Ruff 통과, pytest 90개 통과, 기존 의존성 경고 2종입니다. Alembic head `20261019_04` 적용, base까지 downgrade, 재upgrade, 모델 차이 없음과 적재 시도 인덱스·CHECK 제약 검사가 통과했습니다.
+
+`python -m scripts.check_retail_recovery`는 정제 행 두 개 중 두 번째의 `line_amount`를 계약과 다르게 바꾼 뒤 다음을 확인합니다.
+
+- 첫 행을 DB에 전달한 뒤 실패해도 `retail_imports=0`, `retail_lines=0`
+- 실패 시도는 `failed`, `data_contract`, 종료 시각과 제한된 오류 설명으로 보존
+- 파일 복구 뒤 2행 적재, 같은 파일을 다시 실행하면 새 행 0개·중복 2개
+- 시도 이력은 `failed → succeeded/loaded → succeeded/already_loaded`
+
+재현 근거는 [retail_recovery.json](../artifacts/retail_recovery.json)에 있습니다. PostgreSQL 전용 검사에도 같은 실패·복구·재재실행과 네 리비전 왕복을 추가했으며 PR의 원격 실행 전이므로 이 문단에는 성공으로 기록하지 않습니다.
+
+미검증 범위는 유효한 원본 SHA를 읽기 전의 실패 이력, 프로세스 강제 종료와 오래된 `running` 정리, 동시에 같은 새 파일을 적재하는 경합, 자동 재시도 횟수·간격, 전체 UCI 자료의 PostgreSQL 적재입니다.
+
 ## 2026-10-12 · 0.6.0 로컬 검증
 
 Linux x86_64, Python 3.12.14, SQLite 3.53.1의 기존 requirements.lock 환경에서 `python -m scripts.check`를 실행했습니다. 종료 코드 0, Ruff 통과, pytest 89개 통과, 의존성 경고 2종입니다. Alembic head `20261012_03` 적용, base까지 downgrade, 재upgrade, 모델 차이 없음과 복합 인덱스 컬럼 순서도 통과했습니다. 기존 합성 주문 309행 재전송, 실제 HTTP 8페이지·고유 주문 120건, 검색 평가 결과도 유지됐습니다.
