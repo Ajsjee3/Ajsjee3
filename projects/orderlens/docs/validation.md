@@ -11,7 +11,7 @@ Linux x86_64, Python 3.12.14, SQLite 3.53.1의 기존 requirements.lock 환경�
 - 파일 복구 뒤 2행 적재, 같은 파일을 다시 실행하면 새 행 0개·중복 2개
 - 시도 이력은 `failed → succeeded/loaded → succeeded/already_loaded`
 
-재현 근거는 [retail_recovery.json](../artifacts/retail_recovery.json)에 있습니다. PostgreSQL 전용 검사에도 같은 실패·복구·재재실행과 네 리비전 왕복을 추가했으며 PR의 원격 실행 전이므로 이 문단에는 성공으로 기록하지 않습니다.
+재현 근거는 [retail_recovery.json](../artifacts/retail_recovery.json)에 있습니다. [PR #7](https://github.com/Ajsjee3/Ajsjee3/pull/7)의 [GitHub Actions 실행](https://github.com/Ajsjee3/Ajsjee3/actions/runs/39239042095)에서도 `checks`, `postgres-integration` 두 job이 통과했습니다. Python 3.12.15와 PostgreSQL 16.15에서 head `20261019_04`, 모델 일치, 네 리비전 downgrade·재upgrade를 확인했습니다. PostgreSQL 강제 실패 뒤 import·거래 행은 모두 0건이었고 `failed/data_contract` 이력이 남았습니다. 복구 실행은 2행을 넣었고 같은 파일 재실행은 신규 0행·중복 2행이었습니다. 원격 출력은 [postgres_integration.json](../artifacts/postgres_integration.json)에 기록했습니다.
 
 미검증 범위는 유효한 원본 SHA를 읽기 전의 실패 이력, 프로세스 강제 종료와 오래된 `running` 정리, 동시에 같은 새 파일을 적재하는 경합, 자동 재시도 횟수·간격, 전체 UCI 자료의 PostgreSQL 적재입니다.
 

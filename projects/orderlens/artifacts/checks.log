@@ -12,6 +12,11 @@ pytest: 90 passed, 2 warnings
 복구: 2행 적재, 같은 파일 재실행 새 행 0·중복 2, 최종 거래 2행
 근거: artifacts/retail_recovery.json, docs/decisions/retail_load_recovery.md
 미검증: 원본 SHA 확인 전 실패, 프로세스 강제 종료, 오래된 running 정리, 동시 첫 적재
+GitHub Actions 39239042095: checks 및 postgres-integration success
+원격 환경: Python 3.12.15, PostgreSQL 16.15, pytest 90 passed / 2 warnings
+PostgreSQL: revision 20261019_04, 실패 뒤 import 0·거래 0, 복구 2행, 재실행 중복 2행
+네 리비전 upgrade·downgrade·재upgrade, 모델 일치 성공
+코드 커밋: a24101553783d124eb72432de8236719a1c56194
 
 OrderLens 0.6.0 로컬 검증 요약 — 2026-10-12
 환경: Linux x86_64, Python 3.12.14, SQLite 3.53.1, 기존 requirements.lock 가상환경

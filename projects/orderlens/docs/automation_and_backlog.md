@@ -17,7 +17,7 @@ GitHub Actions 설정도 포함되어 있습니다. 저장소에 올리고 Actio
 | UCI 공개 거래 정제 | 전체 CSV·반복 실행 검증 | 원본 제공처가 바뀔 때 해시·계약 재검토 |
 | 공개 거래 전용 DB 적재 | 전체 SQLite·합성 PostgreSQL 검증 | 동시 첫 적재 경합·조회 API |
 | 공개 거래 SQL 계획·인덱스 | 전체 SQLite 반복 측정·PostgreSQL 검사 구현 | cold-cache·다른 선택도·쓰기 비용 |
-| 공개 거래 적재 시도 이력 | 강제 실패·복구·재실행 SQLite 검증 | 강제 종료·오래된 running·동시 첫 적재 |
+| 공개 거래 적재 시도 이력 | 강제 실패·복구·재실행 SQLite·PostgreSQL 검증 | 강제 종료·오래된 running·동시 첫 적재 |
 | 버전 중복 방지·최신 상태 | 구현·검증 | PostgreSQL 동시 요청과 버전 간 계약 |
 | SQL 운영 지표 | 실제 데이터 집계·SQLite 계획 비교 | 지표 정의 확장·PostgreSQL 전체 자료 |
 | 상태별 주문 목록·페이지 조회 | 구현·SQLite 및 실제 HTTP 검증 | 동시 적재 중 일관성 정책, 큰 offset 성능 |
@@ -25,7 +25,7 @@ GitHub Actions 설정도 포함되어 있습니다. 저장소에 올리고 Actio
 | 규칙 기반 요약 | 구현·검증 | 근거를 인용하는 LLM 응답 |
 | Alembic 마이그레이션 | 네 리비전·SQLite 왕복 검증 | 기존 DB 기준점 연결·운영 전환 순서 |
 | Docker·PostgreSQL 설정 | PostgreSQL 16.15 원격 통합 검증 | 로컬 Compose 실행·기존 DB 전환 |
-| GitHub Actions | 0.6.0 일반·PostgreSQL 원격 검사 통과 | 0.7.0 PR에서 실패·복구 PostgreSQL 검사 확인 |
+| GitHub Actions | 0.7.0 일반·PostgreSQL 원격 검사 통과 | 의존성 갱신 때 경고·호환성 재검증 |
 | 공개 배포·사용자 권한 | 후속 과제 | 배포 환경·예산·사용자별 데이터 분리 |
 | 임베딩·벡터 DB·자율 에이전트 | 후속 과제 | 검색 기준선 비교·도구 권한·평가 |
 
