@@ -21,14 +21,15 @@ py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m scripts.check
 ```
 
-마지막 명령은 코드 검사, 핵심 테스트, 마이그레이션 왕복 검사, 예제 데이터 생성, API 데모, 문서 검색 평가, 실제 HTTP 시연을 순서대로 실행합니다. 기존 주문 DB를 덮어쓰지 않고 임시 DB를 사용하며 시연 서버는 자동 종료됩니다.
+마지막 명령은 코드 검사, 핵심 테스트, 마이그레이션 왕복 검사, 공개 거래 강제 실패·복구, 예제 데이터 생성, API 데모, 문서 검색 평가, 실제 HTTP 시연을 순서대로 실행합니다. 기존 주문 DB를 덮어쓰지 않고 임시 DB를 사용하며 시연 서버는 자동 종료됩니다.
 
 | 산출물 | 내용 |
 |---|---|
 | artifacts/demo_report.json | 적재 결과, 재전송 결과, 주문 지표, 근거 문서 |
 | artifacts/retrieval_evaluation.json | 작은 예제 집합에 대한 검색 평가 |
 | artifacts/http_smoke.json | 실제 HTTP 요청과 인증 검사 결과 |
-| artifacts/migration_check.json | 세 리비전의 upgrade·downgrade·재upgrade 결과 |
+| artifacts/migration_check.json | 네 리비전의 upgrade·downgrade·재upgrade 결과 |
+| artifacts/retail_recovery.json | 강제 적재 실패·복구·같은 파일 재실행 결과 |
 | artifacts/retail_db_check.json | UCI 전체 정제 행의 DB 적재·재실행 결과 |
 | artifacts/retail_query_benchmark.json | 전체 공개 거래의 SQLite 전체 스캔·복합 인덱스 계획 비교 |
 | data/demo_batch.json | 중복·오류가 섞인 재현 가능한 합성 주문 309행 |
@@ -45,7 +46,7 @@ python -m scripts.load_retail data/processed/retail-a --database-url sqlite:///r
 python -m scripts.load_retail data/processed/retail-a --database-url sqlite:///retail.db
 ```
 
-첫 실행은 정제 통과 행을 저장하고, 두 번째 실행은 같은 파일 해시와 출력 해시를 확인한 뒤 새 행을 만들지 않습니다. 기존 주문 API에 공개 거래가 나타나는 기능은 아직 없습니다.
+첫 실행은 정제 통과 행을 저장하고, 두 번째 실행은 같은 파일 해시와 출력 해시를 확인한 뒤 새 행을 만들지 않습니다. 두 출력의 `attempt_id`는 다르며 DB 이력에는 각각 `loaded`, `already_loaded` 결과가 남습니다. 적재가 실패하면 표준 오류에 `attempt_id`, `error_code`, 제한된 설명이 JSON으로 출력됩니다. 기존 주문 API에 공개 거래가 나타나는 기능은 아직 없습니다.
 
 ### 공개 거래 집계 계획 비교
 
@@ -171,7 +172,7 @@ python -m alembic history
 
 `python -m alembic downgrade base`는 업무 테이블과 데이터를 지우므로 학습용 임시 DB에서만 실행합니다. 자동 PostgreSQL 검사는 `_test`로 끝나는 별도 DB만 허용합니다.
 
-**이 작성 환경에는 Docker 실행 파일이 없어 로컬 컨테이너를 실행하지 못했습니다.** 대신 [GitHub Actions](https://github.com/Ajsjee3/Ajsjee3/actions/runs/38237841801)의 임시 PostgreSQL 16.15 서비스에서 세 리비전, 기존 주문 흐름, 공개 거래 재적재와 10만 행 실행계획을 실제 검사했습니다. 범위와 남은 한계는 [검증 기록](validation.md)에 구분했습니다.
+**이 작성 환경에는 Docker 실행 파일이 없어 로컬 컨테이너를 실행하지 못했습니다.** [GitHub Actions](https://github.com/Ajsjee3/Ajsjee3/actions/runs/39239042095)의 임시 PostgreSQL 16.15 서비스에서 네 리비전, 기존 주문 흐름, 공개 거래 실패·복구·재실행과 10만 행 실행계획을 실제 검사했습니다. 자세한 입력과 결과는 [검증 기록](validation.md)에 구분했습니다.
 
 ## 7. 다음 문서
 

@@ -1,5 +1,17 @@
 # 개발 기록
 
+## 2026-10-19 · 0.7.0
+
+공개 거래 CLI 실행마다 `retail_load_attempts` 행을 만들고 `running → succeeded/failed` 상태, 원본·보고서 해시, 종료 시각, 적재·중복 행 수와 제한된 오류를 남기도록 했습니다. 실제 import와 거래 행은 별도 트랜잭션으로 유지해 실패 데이터는 전부 롤백되지만 실행 이력은 보존됩니다. 네 번째 Alembic 리비전 `20261019_04`에 상태·결과·필드 조합 CHECK 제약과 `(source_sha256, started_at)` 인덱스를 추가했습니다.
+
+두 번째 정제 행의 금액을 일부러 틀리게 만들고 `batch_size=1`로 실행했습니다. 첫 행 INSERT 뒤 두 번째 행에서 중단됐지만 `retail_imports=0`, `retail_lines=0`이었고 `failed/data_contract` 시도만 남았습니다. 원본을 복구한 실행은 2행을 적재했고 다시 실행하면 새 행 0개·중복 2개였습니다. 세 이력은 `failed → succeeded/loaded → succeeded/already_loaded`였습니다.
+
+Linux x86_64, Python 3.12.14, SQLite 3.53.1에서 `python -m scripts.check` 종료 코드 0, Ruff 통과, pytest 90개 통과, 기존 의존성 경고 2종이었습니다. 네 리비전의 upgrade·base downgrade·재upgrade와 모델 차이 없음, 강제 실패·복구 재현, 기존 주문·HTTP·검색 결과도 통과했습니다. [PR #7](https://github.com/Ajsjee3/Ajsjee3/pull/7)의 [원격 검사](https://github.com/Ajsjee3/Ajsjee3/actions/runs/39239042095)도 두 job이 통과했습니다. PostgreSQL 16.15에서 실패 뒤 import·거래 행 0건, 복구 적재 2건, 재실행 중복 2건과 네 리비전 왕복을 확인했습니다.
+
+새 참고는 Apache Airflow의 실행 이력 모델·재시도 상태 처리·회귀 테스트·변경 커밋입니다. 실행 시도별 종료 값을 영속화하고 이력 행을 직접 검증하는 원칙만 적용했으며 Airflow 코드나 의존성, 자동 재시도 기능은 가져오지 않았습니다.
+
+`report.json`이나 원본 SHA 자체가 잘못된 실행, 프로세스 강제 종료 뒤 남는 `running` 판정, 동시 첫 적재 경합과 자동 재시도는 아직 다루지 않았습니다. 다음 작업은 기존 BM25 검색의 별도 평가 질문과 실패 사례를 늘리고 기준선을 다시 측정하는 것입니다.
+
 ## 2026-10-12 · 0.6.0
 
 공개 거래의 국가·취소 여부·지역 시각을 조건으로 하는 기간 집계와 Alembic 리비전 `20261012_03`을 추가했습니다. `(country, is_cancellation, invoice_at_local)` 순서로 동등 조건을 먼저, 범위 조건을 뒤에 두었습니다. 작은 테스트는 국가·기간 경계·취소 제외·GBP Decimal 합계를 확인하고, 마이그레이션은 인덱스 컬럼 순서와 upgrade·downgrade·재upgrade를 확인합니다.

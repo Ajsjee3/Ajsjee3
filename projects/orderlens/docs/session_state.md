@@ -1,10 +1,10 @@
 # 작업 상태
 
-현재 작업 버전은 OrderLens 0.6.0입니다. 검증 결과는 validation.md와 artifacts/에 기록합니다.
+현재 작업 버전은 OrderLens 0.7.0입니다. 검증 결과는 validation.md와 artifacts/에 기록합니다.
 
-UCI 공개 거래 541,907행의 전용 DB 적재에 이어 국가·취소 여부·기간 집계와 복합 인덱스를 구현했습니다. Germany 2011년 조건을 강제 전체 스캔과 강제 인덱스로 31회씩 측정했고, 같은 결과와 실행계획·환경·저장 공간을 기록했습니다. 기존 원화 주문 API와는 계속 분리합니다.
+UCI 공개 거래의 전용 DB 적재·기간 집계에 이어 실행 시도 이력을 구현했습니다. 강제 실패는 데이터 0행으로 롤백하면서 오류 이력을 남기고, 수정 후 복구와 같은 파일 재실행은 별도 성공 결과로 기록합니다. 기존 원화 주문 API와는 계속 분리합니다.
 
-이전 DB 적재 변경은 [PR #5](https://github.com/Ajsjee3/Ajsjee3/pull/5)에 있습니다. 이번 0.6.0은 [PR #6](https://github.com/Ajsjee3/Ajsjee3/pull/6)에서 로컬·원격 테스트 89개와 PostgreSQL 16.15의 10만 행 실행계획 검사를 통과했습니다. 다음 구현은 배치 실패 상태·재시도·중복 없는 복구 기록입니다.
+이전 SQL 실행계획 변경은 [PR #6](https://github.com/Ajsjee3/Ajsjee3/pull/6)에 있습니다. 이번 0.7.0은 로컬 테스트 90개와 네 리비전 왕복, 실패·복구 재현을 통과했습니다. [PR #7의 원격 검사](https://github.com/Ajsjee3/Ajsjee3/actions/runs/39239042095)에서도 PostgreSQL 16.15의 같은 흐름이 통과했습니다. 다음 구현은 검색 질문과 정답 문서를 분리한 평가 확대입니다.
 
 2026-09-22 대화와의 비교는 저장소 루트 docs/curriculum_alignment.md에 반영했습니다. 주 6~10시간, 첫 프로젝트를 직접 설명한 뒤 두 번째 프로젝트 선택, 금융 IT는 Java/Spring 별도 분기입니다. `learning_status=not_assessed`이므로 코드가 있다는 이유로 학습 완료로 처리하지 않습니다.
 

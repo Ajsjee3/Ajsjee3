@@ -1,0 +1,55 @@
+{
+  "environment": {
+    "platform": "Linux",
+    "python": "3.12.14",
+    "sqlite": "3.53.1"
+  },
+  "scenario": "두 번째 정제 행의 금액 계약 위반; batch_size=1",
+  "failure_message": "line_amount가 quantity × unit_price와 다릅니다.",
+  "after_failure": {
+    "retail_imports": 0,
+    "retail_lines": 0
+  },
+  "attempt_history": [
+    {
+      "status": "failed",
+      "result": null,
+      "inserted_rows": 0,
+      "duplicate_rows": 0,
+      "error_code": "data_contract",
+      "error_message": "line_amount가 quantity × unit_price와 다릅니다."
+    },
+    {
+      "status": "succeeded",
+      "result": "loaded",
+      "inserted_rows": 2,
+      "duplicate_rows": 0,
+      "error_code": null,
+      "error_message": null
+    },
+    {
+      "status": "succeeded",
+      "result": "already_loaded",
+      "inserted_rows": 0,
+      "duplicate_rows": 2,
+      "error_code": null,
+      "error_message": null
+    }
+  ],
+  "recovery": {
+    "status": "loaded",
+    "inserted": 2
+  },
+  "replay": {
+    "status": "already_loaded",
+    "duplicates": 2
+  },
+  "final_database": {
+    "retail_imports": 1,
+    "retail_lines": 2
+  },
+  "limits": [
+    "한 프로세스의 명시적 데이터 계약 실패를 재현했습니다.",
+    "프로세스 강제 종료와 동시에 시작한 여러 적재는 확인하지 않았습니다."
+  ]
+}

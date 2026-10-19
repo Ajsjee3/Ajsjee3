@@ -25,10 +25,10 @@ from orderlens.migrations import (
     require_current_schema,
     upgrade_database,
 )
-from orderlens.models import RetailImport, RetailLine
-from orderlens.retail import COLUMNS, transform_file
+from orderlens.models import RetailImport, RetailLine, RetailLoadAttempt
+from orderlens.retail import COLUMNS, file_sha256, transform_file
 from orderlens.retail_analytics import RETAIL_QUERY_INDEX, retail_summary
-from orderlens.retail_db import load_retail_output
+from orderlens.retail_db import RetailLoadError, run_retail_load
 from scripts.generate_demo import AS_OF, generate_rows
 
 RETAIL_PLAN_SQL = """
@@ -147,6 +147,15 @@ def main() -> None:
         expected_retail_index = ["country", "is_cancellation", "invoice_at_local"]
         if retail_indexes.get(RETAIL_QUERY_INDEX) != expected_retail_index:
             raise AssertionError("PostgreSQL 공개 거래 집계 인덱스의 컬럼 순서가 다릅니다.")
+        attempt_indexes = {
+            item["name"]: item["column_names"]
+            for item in inspector.get_indexes("retail_load_attempts")
+        }
+        if attempt_indexes.get("ix_retail_load_attempt_source_started") != [
+            "source_sha256",
+            "started_at",
+        ]:
+            raise AssertionError("PostgreSQL 적재 시도 인덱스의 컬럼 순서가 다릅니다.")
         server_version = ".".join(map(str, engine.dialect.server_version_info))
     finally:
         engine.dispose()
@@ -215,13 +224,51 @@ def main() -> None:
             ])
         output = Path(directory) / "processed"
         transform_file(source, output)
+        accepted_path = output / "accepted.jsonl"
+        report_path = output / "report.json"
+        valid_accepted = accepted_path.read_text(encoding="utf-8")
+        valid_report = report_path.read_text(encoding="utf-8")
+        records = [json.loads(line) for line in valid_accepted.splitlines()]
+        records[1]["line_amount"] = "999"
+        accepted_path.write_text(
+            "".join(json.dumps(row) + "\n" for row in records),
+            encoding="utf-8",
+        )
+        broken_report = json.loads(valid_report)
+        broken_report["outputs_sha256"]["accepted.jsonl"] = file_sha256(accepted_path)
+        report_path.write_text(json.dumps(broken_report), encoding="utf-8")
+
         engine = make_engine(database_url)
         try:
+            try:
+                run_retail_load(engine, output, batch_size=1)
+            except RetailLoadError as error:
+                retail_failure_message = str(error)
+            else:
+                raise AssertionError("PostgreSQL 강제 적재 실패가 발생하지 않았습니다.")
+
             with Session(engine) as session:
-                retail_first = load_retail_output(session, output, batch_size=1)
-                retail_replay = load_retail_output(session, output, batch_size=1)
+                failed_attempt = session.scalar(
+                    select(RetailLoadAttempt).where(RetailLoadAttempt.status == "failed")
+                )
+                imports_after_failure = session.scalar(
+                    select(func.count()).select_from(RetailImport)
+                )
+                lines_after_failure = session.scalar(
+                    select(func.count()).select_from(RetailLine)
+                )
+            if failed_attempt is None:
+                raise AssertionError("PostgreSQL 실패 시도 이력이 없습니다.")
+
+            accepted_path.write_text(valid_accepted, encoding="utf-8")
+            report_path.write_text(valid_report, encoding="utf-8")
+            retail_first = run_retail_load(engine, output, batch_size=1)
+            retail_replay = run_retail_load(engine, output, batch_size=1)
+
+            with Session(engine) as session:
                 retail_imports = session.scalar(select(func.count()).select_from(RetailImport))
                 retail_lines = session.scalar(select(func.count()).select_from(RetailLine))
+                retail_attempts = session.scalars(select(RetailLoadAttempt)).all()
                 cancellation = session.scalar(
                     select(RetailLine).where(RetailLine.invoice_no == "C123456")
                 )
@@ -234,6 +281,20 @@ def main() -> None:
         raise AssertionError("PostgreSQL 공개 거래 재적재 결과가 다릅니다.")
     if (retail_imports, retail_lines) != (1, 2):
         raise AssertionError("PostgreSQL 공개 거래 행 수가 다릅니다.")
+    if (imports_after_failure, lines_after_failure) != (0, 0):
+        raise AssertionError("PostgreSQL 실패 적재의 일부 행이 남았습니다.")
+    retail_attempt_results = sorted((item.status, item.result) for item in retail_attempts)
+    if retail_attempt_results != [
+        ("failed", None),
+        ("succeeded", "already_loaded"),
+        ("succeeded", "loaded"),
+    ]:
+        raise AssertionError(f"PostgreSQL 적재 시도 이력이 다릅니다: {retail_attempt_results}")
+    if (
+        failed_attempt.error_code != "data_contract"
+        or failed_attempt.error_message != retail_failure_message
+    ):
+        raise AssertionError("PostgreSQL 실패 원인이 제한된 계약 오류로 기록되지 않았습니다.")
     if (
         cancellation.unit_price != Decimal("0.001000")
         or cancellation.line_amount != Decimal("-0.003000")
@@ -367,8 +428,18 @@ def main() -> None:
         "returned_orders": len(seen),
         "unique_orders": len(set(seen)),
         "retail_import": {
+            "failed_attempt": {
+                "error_code": failed_attempt.error_code,
+                "error_message": failed_attempt.error_message,
+                "imports_after_failure": imports_after_failure,
+                "lines_after_failure": lines_after_failure,
+            },
             "first_inserted": retail_first["inserted"],
             "replay_duplicates": retail_replay["duplicates"],
+            "attempt_results": [
+                {"status": status, "result": result}
+                for status, result in retail_attempt_results
+            ],
             "imports_in_database": retail_imports,
             "lines_in_database": retail_lines,
             "unit_price": str(cancellation.unit_price),

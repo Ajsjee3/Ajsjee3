@@ -12,8 +12,8 @@ Python과 FastAPI를 배우며 주문 데이터 처리 프로젝트를 만들고
 
 - **구현:** FastAPI, SQLAlchemy, Alembic, PostgreSQL·SQLite, 입력 검증, 버전별 적재, SQL 집계, 운영 문서 검색
 - **재현:** 합성 데이터 309행을 다시 보내도 새 주문 버전은 0개, 집계 결과는 동일
-- **이번 변경:** UCI 공개 거래 541,907행의 국가·취소 여부·기간 집계를 비교하고 복합 인덱스 적용. 같은 조건 31회에서 SQLite 중앙값 41.062ms → 1.917ms(한 로컬 warm-cache 환경)
-- **다음 작업:** 실패한 적재 배치의 상태·재시도·복구 기록
+- **이번 변경:** 공개 거래 적재를 강제로 실패시켜 데이터 0건 롤백과 실패 이력을 확인하고, 수정 후 2건 적재·재실행 중복 2건을 구분
+- **다음 작업:** 검색 질문과 정답 문서를 분리한 평가 확대
 
 [코드와 실행 방법](https://github.com/Ajsjee3/Ajsjee3/blob/main/projects/orderlens/README.md) · [설계](https://github.com/Ajsjee3/Ajsjee3/blob/main/projects/orderlens/docs/design.md) · [검증 결과](https://github.com/Ajsjee3/Ajsjee3/blob/main/projects/orderlens/docs/validation.md) · [개발 기록](https://github.com/Ajsjee3/Ajsjee3/blob/main/projects/orderlens/docs/progress.md)
 

@@ -1,17 +1,18 @@
 {
   "source": "github_actions_log",
-  "run_url": "https://github.com/Ajsjee3/Ajsjee3/actions/runs/38237841801",
-  "commit": "349c1ad8d750b915b8d1fe7cd113f88cf3caedd7",
+  "run_url": "https://github.com/Ajsjee3/Ajsjee3/actions/runs/39239042095",
+  "commit": "a24101553783d124eb72432de8236719a1c56194",
   "database": "ephemeral_postgresql_service",
   "postgresql_version": "16.15",
-  "head_revision": "20261012_03",
-  "revision_after_upgrade": "20261012_03",
+  "head_revision": "20261019_04",
+  "revision_after_upgrade": "20261019_04",
   "created_tables": [
     "ingestion_runs",
     "order_snapshots",
     "rejected_rows",
     "retail_imports",
-    "retail_lines"
+    "retail_lines",
+    "retail_load_attempts"
   ],
   "timestamp_with_timezone": true,
   "model_matches_migration": true,
@@ -32,8 +33,28 @@
   "returned_orders": 120,
   "unique_orders": 120,
   "retail_import": {
+    "failed_attempt": {
+      "error_code": "data_contract",
+      "error_message": "line_amount가 quantity × unit_price와 다릅니다.",
+      "imports_after_failure": 0,
+      "lines_after_failure": 0
+    },
     "first_inserted": 2,
     "replay_duplicates": 2,
+    "attempt_results": [
+      {
+        "status": "failed",
+        "result": null
+      },
+      {
+        "status": "succeeded",
+        "result": "already_loaded"
+      },
+      {
+        "status": "succeeded",
+        "result": "loaded"
+      }
+    ],
     "imports_in_database": 1,
     "lines_in_database": 2,
     "unit_price": "0.001000",
@@ -62,8 +83,8 @@
       "indexes": [
         "ix_retail_country_cancelled_time"
       ],
-      "planning_ms": 0.046,
-      "execution_ms": 0.338,
+      "planning_ms": 0.069,
+      "execution_ms": 0.799,
       "shared_hit_blocks": 1003,
       "shared_read_blocks": 0
     },
@@ -73,13 +94,13 @@
         "Seq Scan"
       ],
       "indexes": [],
-      "planning_ms": 0.041,
-      "execution_ms": 14.671,
+      "planning_ms": 0.057,
+      "execution_ms": 15.2,
       "shared_hit_blocks": 2223,
       "shared_read_blocks": 0
     },
     "timing_scope": "single ephemeral CI observation; not a benchmark claim"
   },
   "business_tables_removed_after_downgrade": true,
-  "revision_after_reupgrade": "20261012_03"
+  "revision_after_reupgrade": "20261019_04"
 }

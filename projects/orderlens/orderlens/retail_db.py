@@ -6,11 +6,14 @@ from collections.abc import Iterator
 from datetime import datetime
 from decimal import Decimal, localcontext
 from pathlib import Path
+from uuid import uuid4
 
-from sqlalchemy import insert
+from sqlalchemy import Engine, insert
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from orderlens.models import RetailImport, RetailLine
+from orderlens.db import utc_now
+from orderlens.models import RetailImport, RetailLine, RetailLoadAttempt
 from orderlens.retail import decimal_text, file_sha256
 
 BATCH_SIZE = 1_000
@@ -37,6 +40,15 @@ TOTAL_AMOUNT_PATTERN = re.compile(r"-?\d{1,32}(?:\.\d{1,6})?")
 
 class RetailLoadError(ValueError):
     pass
+
+
+class RetailLoadAttemptError(RetailLoadError):
+    """DB에 실패 이력을 남긴 적재 시도의 공개 오류입니다."""
+
+    def __init__(self, attempt_id: str, error_code: str, message: str):
+        super().__init__(message)
+        self.attempt_id = attempt_id
+        self.error_code = error_code
 
 
 def _integer(value, field: str, *, minimum: int = 0) -> int:
@@ -66,13 +78,18 @@ def _decimal(value, field: str, pattern: re.Pattern[str]) -> Decimal:
     return number
 
 
-def read_manifest(output_dir: Path) -> dict:
+def _read_manifest_document(output_dir: Path) -> dict:
     try:
         report = json.loads((output_dir / "report.json").read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as error:
         raise RetailLoadError("유효한 report.json이 필요합니다.") from error
     if not isinstance(report, dict):
         raise RetailLoadError("report.json의 최상위 값은 객체여야 합니다.")
+    return report
+
+
+def _validate_manifest(output_dir: Path, report: dict) -> dict:
+    """읽은 보고서와 두 출력 파일의 계약을 검증합니다."""
 
     source_sha256 = _sha256(report.get("input_sha256"), "input_sha256")
     outputs = report.get("outputs_sha256")
@@ -115,6 +132,10 @@ def read_manifest(output_dir: Path) -> dict:
     )
     report["input_sha256"] = source_sha256
     return report
+
+
+def read_manifest(output_dir: Path) -> dict:
+    return _validate_manifest(output_dir, _read_manifest_document(output_dir))
 
 
 def validate_rejections(output_dir: Path, source_sha256: str, expected_rows: int) -> None:
@@ -232,14 +253,16 @@ def _same_import(existing: RetailImport, report: dict) -> bool:
     )
 
 
-def load_retail_output(session: Session, output_dir: Path, batch_size: int = BATCH_SIZE) -> dict:
-    """정제 결과를 한 트랜잭션에 적재하고 같은 파일의 재실행은 중복으로 반환합니다."""
+def _load_retail_output(
+    session: Session,
+    output_dir: Path,
+    report: dict,
+    batch_size: int,
+) -> dict:
     if isinstance(batch_size, bool) or not isinstance(batch_size, int) or batch_size < 1:
         raise ValueError("batch_size는 1 이상의 정수여야 합니다.")
-    report = read_manifest(output_dir)
     source_sha256 = report["input_sha256"]
     counts = report["counts"]
-    validate_rejections(output_dir, source_sha256, counts["rejected"])
 
     with localcontext() as context:
         context.prec = 50
@@ -315,3 +338,106 @@ def load_retail_output(session: Session, output_dir: Path, batch_size: int = BAT
             "duplicates": 0,
             "rows_in_database": inserted,
         }
+
+
+def load_retail_output(session: Session, output_dir: Path, batch_size: int = BATCH_SIZE) -> dict:
+    """정제 결과를 한 트랜잭션에 적재하고 같은 파일의 재실행은 중복으로 반환합니다."""
+    report = read_manifest(output_dir)
+    validate_rejections(
+        output_dir,
+        report["input_sha256"],
+        report["counts"]["rejected"],
+    )
+    return _load_retail_output(session, output_dir, report, batch_size)
+
+
+def _failure_record(error: Exception) -> tuple[str, str]:
+    """원본 값이나 DB 파라미터를 노출하지 않는 제한된 실패 정보를 만듭니다."""
+    if isinstance(error, RetailLoadError):
+        return "data_contract", str(error)[:500]
+    if isinstance(error, OSError):
+        return "input_io", "입력 파일을 읽는 중 오류가 발생했습니다."
+    if isinstance(error, SQLAlchemyError):
+        return "database", "데이터베이스 작업 중 오류가 발생했습니다."
+    return "unexpected", f"{type(error).__name__} 오류로 적재가 중단됐습니다."
+
+
+def _finish_attempt(
+    engine: Engine,
+    attempt_id: str,
+    *,
+    status: str,
+    result: str | None = None,
+    inserted_rows: int = 0,
+    duplicate_rows: int = 0,
+    error_code: str | None = None,
+    error_message: str | None = None,
+) -> None:
+    with Session(engine) as session, session.begin():
+        attempt = session.get(RetailLoadAttempt, attempt_id, with_for_update=True)
+        if attempt is None:
+            raise RuntimeError("적재 시도 기록을 찾을 수 없습니다.")
+        attempt.status = status
+        attempt.result = result
+        attempt.finished_at = utc_now()
+        attempt.inserted_rows = inserted_rows
+        attempt.duplicate_rows = duplicate_rows
+        attempt.error_code = error_code
+        attempt.error_message = error_message
+
+
+def run_retail_load(engine: Engine, output_dir: Path, batch_size: int = BATCH_SIZE) -> dict:
+    """시도 이력을 별도 커밋하고 실제 적재의 성공·실패 결과를 연결합니다.
+
+    report.json 자체가 없거나 원본 SHA를 읽을 수 없는 경우에는 신뢰할 식별자가
+    없으므로 시도 행을 만들지 않습니다. 식별자를 읽은 뒤의 파일·행 검증 실패는
+    실제 적재 트랜잭션과 별개로 남습니다.
+    """
+    if isinstance(batch_size, bool) or not isinstance(batch_size, int) or batch_size < 1:
+        raise ValueError("batch_size는 1 이상의 정수여야 합니다.")
+
+    report_document = _read_manifest_document(output_dir)
+    source_sha256 = _sha256(report_document.get("input_sha256"), "input_sha256")
+    attempt_id = str(uuid4())
+    with Session(engine) as session, session.begin():
+        session.add(
+            RetailLoadAttempt(
+                id=attempt_id,
+                source_sha256=source_sha256,
+                manifest_sha256=file_sha256(output_dir / "report.json"),
+                status="running",
+                result=None,
+                inserted_rows=0,
+                duplicate_rows=0,
+            )
+        )
+
+    try:
+        report = _validate_manifest(output_dir, report_document)
+        validate_rejections(
+            output_dir,
+            source_sha256,
+            report["counts"]["rejected"],
+        )
+        with Session(engine) as session:
+            result = _load_retail_output(session, output_dir, report, batch_size)
+    except Exception as error:
+        error_code, error_message = _failure_record(error)
+        _finish_attempt(
+            engine,
+            attempt_id,
+            status="failed",
+            error_code=error_code,
+            error_message=error_message,
+        )
+        raise RetailLoadAttemptError(attempt_id, error_code, error_message) from error
+
+    _finish_attempt(
+        engine,
+        attempt_id,
+        status="succeeded",
+        result=result["status"],
+        inserted_rows=result["inserted"],
+        duplicate_rows=result["duplicates"],
+    )
+    return {**result, "attempt_id": attempt_id}

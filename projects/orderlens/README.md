@@ -23,6 +23,7 @@ OrderLens는 판매 경로와 주문 번호를 묶어 주문을 구분하고, �
 | 공개 거래의 단위와 품질을 확인해야 함 | GBP Decimal·취소 표시를 보존하고 오류 행·출처·해시를 기록 | [공개 데이터 정제](docs/public_retail.md) |
 | 같은 공개 파일이 다시 들어옴 | 파일 해시와 CSV 레코드 번호를 고유 키로 두고 한 트랜잭션에 분할 적재 | [DB 적재 설계](docs/decisions/retail_db_ingestion.md) |
 | 실제 규모의 국가·기간 집계가 전체 행을 읽음 | 같은 조건의 실행계획을 비교하고 동등 조건 뒤에 시각 범위를 둔 복합 인덱스 적용 | [인덱스 비교](docs/decisions/retail_query_index.md) |
+| 적재 실패가 롤백 뒤 사라짐 | 실행 시도는 먼저 남기고 데이터 트랜잭션을 분리해 실패·복구·재실행 결과 기록 | [복구 기록 설계](docs/decisions/retail_load_recovery.md) |
 | 운영 기준을 찾아야 함 | BM25 검색으로 문서 ID와 버전을 함께 반환 | [retrieval.py](orderlens/retrieval.py) |
 
 ## 실행
@@ -60,13 +61,14 @@ curl 'http://127.0.0.1:8000/v1/orders?source=market_a&status=paid&limit=2&offset
 | 재전송 전후 지표 | 동일 |
 | 고정된 주문 목록을 17건씩 실제 HTTP 조회 | 8페이지 · 120건 · 중복·누락 0건 |
 | 임시 SQLite 초기 마이그레이션 | upgrade · downgrade · 재upgrade 성공 |
-| PostgreSQL 16.15 통합 검사 | 주문 재전송·120건 페이지 유지 · 공개 거래 2행 재적재 · 10만 행 Index Scan · 세 리비전 왕복 |
+| PostgreSQL 16.15 통합 검사 | 주문 재전송·120건 페이지 유지 · 공개 거래 실패·복구·재실행 · 10만 행 Index Scan · 네 리비전 왕복 |
 | UCI 공개 거래의 임시 SQLite 적재 | 541,907행 · 고유 원본 위치 541,907개 · GBP 합계 9,769,872.054 |
 | 같은 공개 파일 재적재 | 새 행 0개 · 중복 541,907개 · DB 행 수 유지 |
 | Germany 비취소 2011년 집계 | 8,529행 · 수량 112,385 · 부호 있는 금액 GBP 213,626.000000 |
 | 같은 DB의 강제 계획 비교 | 전체 스캔 중앙값 41.062 ms · 복합 인덱스 1.917 ms · 각 31회 |
+| 강제 적재 실패 뒤 복구 | 실패 뒤 거래 0행 · 실패 이력 1건 · 복구 2행 · 재실행 새 행 0개 |
 
-명령 한 번으로 임시 DB 마이그레이션, 적재, 재전송, 지표 비교, 검색 평가, 실제 HTTP 요청까지 재실행합니다. 원본 결과는 [SQLite 마이그레이션](artifacts/migration_check.json), [공개 거래 DB 적재](artifacts/retail_db_check.json), [SQL 계획 비교](artifacts/retail_query_benchmark.json), [PostgreSQL 통합 검사](artifacts/postgres_integration.json), [demo_report.json](artifacts/demo_report.json), [HTTP 결과](artifacts/http_smoke.json), [검증 기록](docs/validation.md)에 남깁니다.
+명령 한 번으로 임시 DB 마이그레이션, 강제 적재 실패·복구, 적재·재전송, 지표 비교, 검색 평가, 실제 HTTP 요청까지 재실행합니다. 원본 결과는 [SQLite 마이그레이션](artifacts/migration_check.json), [실패·복구](artifacts/retail_recovery.json), [공개 거래 DB 적재](artifacts/retail_db_check.json), [SQL 계획 비교](artifacts/retail_query_benchmark.json), [PostgreSQL 통합 검사](artifacts/postgres_integration.json), [demo_report.json](artifacts/demo_report.json), [HTTP 결과](artifacts/http_smoke.json), [검증 기록](docs/validation.md)에 남깁니다.
 
 ## 설계에서 정한 기준
 
@@ -76,6 +78,7 @@ curl 'http://127.0.0.1:8000/v1/orders?source=market_a&status=paid&limit=2&offset
 - 앱은 DB 테이블을 자동 생성하지 않습니다. 서버 시작 전에 Alembic head를 적용하고, 코드와 DB의 리비전이 다르면 시작을 중단합니다.
 - 공개 거래 단가는 `NUMERIC(16,6)`, 행 금액은 `NUMERIC(26,6)`으로 저장합니다. 원천에 없는 시간대와 원화 금액을 만들지 않습니다.
 - 공개 거래 기간은 시작을 포함하고 종료를 제외합니다. `(country, is_cancellation, invoice_at_local)` 인덱스의 조회 이득과 저장 공간 비용을 함께 기록합니다.
+- 공개 거래 적재 시도와 데이터 INSERT는 트랜잭션을 분리합니다. 실패 데이터는 롤백하되, 원본·보고서 해시와 제한된 오류는 시도 이력에 남깁니다.
 - 취소·환불 주문은 유효 주문 금액에서 제외합니다. 배송 완료 주문이 없으면 지연율은 `null`입니다.
 - 검색 점수는 확률이 아닙니다. 현재 검색은 BM25이며 요약은 규칙 기반입니다.
 
@@ -83,8 +86,8 @@ curl 'http://127.0.0.1:8000/v1/orders?source=market_a&status=paid&limit=2&offset
 
 ## 다음 작업
 
-현재 버전은 **0.6.0**입니다. 세 번째 Alembic 리비전으로 공개 거래 국가·취소 여부·지역 시각 복합 인덱스를 추가했습니다. UCI Online Retail 정제 결과 541,907행에서 같은 집계를 강제 전체 스캔과 강제 인덱스로 각각 31회 비교했습니다. 환경과 한계를 포함한 결과는 [인덱스 비교](docs/decisions/retail_query_index.md)에 있습니다.
+현재 버전은 **0.7.0**입니다. 네 번째 Alembic 리비전으로 공개 거래 적재 시도 이력을 추가했습니다. 두 번째 행에서 강제 실패한 실행, 수정 후 복구, 같은 파일 재실행을 차례로 재현했고 데이터 행과 실행 이력을 함께 검증했습니다. 트랜잭션 경계와 한계는 [복구 기록 설계](docs/decisions/retail_load_recovery.md)에 있습니다.
 
-공개 거래 자료는 GBP 금액이고 배송 시각이 없어 기존 원화 배송 주문 API와 분리했습니다. 아직 공개 거래 조회 API나 화면은 없습니다. 다음 변경은 적재 배치에 실패 상태와 재시도 이력을 남기고, 중복 없이 복구되는 과정을 검증하는 작업입니다. 외부 배포와 LLM 답변 생성도 후속 작업입니다.
+공개 거래 자료는 GBP 금액이고 배송 시각이 없어 기존 원화 배송 주문 API와 분리했습니다. 아직 공개 거래 조회 API나 화면은 없습니다. 다음 변경은 기존 BM25 검색에서 질문과 정답 문서를 분리하고 실패 사례를 늘려 기준선을 다시 측정하는 작업입니다. 외부 배포와 LLM 답변 생성도 후속 작업입니다.
 
 [작업 목록](docs/automation_and_backlog.md) · [개발 기록](docs/progress.md) · [참고 저장소](docs/references.md) · [기여 안내](CONTRIBUTING.md)

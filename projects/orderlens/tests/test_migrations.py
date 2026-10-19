@@ -47,6 +47,24 @@ def test_migrations_can_upgrade_downgrade_and_upgrade_again(tmp_path):
         assert retail_columns["line_amount"]["type"].precision == 26
         assert retail_columns["line_amount"]["type"].scale == 6
 
+        attempt_indexes = {
+            item["name"]: item["column_names"]
+            for item in inspect(engine).get_indexes("retail_load_attempts")
+        }
+        assert attempt_indexes["ix_retail_load_attempt_source_started"] == [
+            "source_sha256",
+            "started_at",
+        ]
+        attempt_checks = {
+            item["name"] for item in inspect(engine).get_check_constraints("retail_load_attempts")
+        }
+        assert {
+            "ck_retail_load_attempt_status",
+            "ck_retail_load_attempt_result",
+            "ck_retail_load_attempt_counts",
+            "ck_retail_load_attempt_terminal_fields",
+        } <= attempt_checks
+
         downgrade_database(database_url)
         assert not (set(inspect(engine).get_table_names()) & set(Base.metadata.tables))
         assert current_revision(engine) is None

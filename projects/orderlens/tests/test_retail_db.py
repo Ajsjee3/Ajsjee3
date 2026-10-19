@@ -10,9 +10,14 @@ from sqlalchemy.orm import Session
 
 from orderlens.db import make_engine
 from orderlens.migrations import upgrade_database
-from orderlens.models import RetailImport, RetailLine
+from orderlens.models import RetailImport, RetailLine, RetailLoadAttempt
 from orderlens.retail import COLUMNS, file_sha256, transform_file
-from orderlens.retail_db import RetailLoadError, load_retail_output
+from orderlens.retail_db import (
+    RetailLoadAttemptError,
+    RetailLoadError,
+    load_retail_output,
+    run_retail_load,
+)
 
 
 def source_row(**changes):
@@ -118,6 +123,69 @@ def test_invalid_later_line_rolls_back_the_whole_import(tmp_path):
         engine.dispose()
 
 
+def test_tracked_failure_then_retry_keeps_history_without_duplicate_rows(tmp_path):
+    output = transformed_output(tmp_path, [source_row(), source_row(InvoiceNo="123457")])
+    accepted_path = output / "accepted.jsonl"
+    report_path = output / "report.json"
+    valid_accepted = accepted_path.read_text()
+    valid_report = report_path.read_text()
+
+    records = [json.loads(line) for line in valid_accepted.splitlines()]
+    records[1]["line_amount"] = "999"
+    accepted_path.write_text("".join(json.dumps(row) + "\n" for row in records))
+    broken_report = json.loads(valid_report)
+    broken_report["outputs_sha256"]["accepted.jsonl"] = file_sha256(accepted_path)
+    report_path.write_text(json.dumps(broken_report))
+
+    _database_url, engine = migrated_engine(tmp_path)
+    try:
+        with pytest.raises(RetailLoadAttemptError, match="quantity × unit_price") as failure:
+            run_retail_load(engine, output, batch_size=1)
+
+        with Session(engine) as session:
+            failed = session.get(RetailLoadAttempt, failure.value.attempt_id)
+            assert failed is not None
+            failed_attempt_id = failed.id
+            assert failure.value.error_code == "data_contract"
+            assert failed.status == "failed"
+            assert failed.result is None
+            assert failed.finished_at is not None
+            assert failed.error_code == "data_contract"
+            assert failed.error_message == "line_amount가 quantity × unit_price와 다릅니다."
+            assert (failed.inserted_rows, failed.duplicate_rows) == (0, 0)
+            assert session.scalar(select(func.count()).select_from(RetailImport)) == 0
+            assert session.scalar(select(func.count()).select_from(RetailLine)) == 0
+
+        accepted_path.write_text(valid_accepted)
+        report_path.write_text(valid_report)
+        recovered = run_retail_load(engine, output, batch_size=1)
+        replay = run_retail_load(engine, output, batch_size=1)
+
+        with Session(engine) as session:
+            attempts = {
+                attempt.id: attempt
+                for attempt in session.scalars(select(RetailLoadAttempt)).all()
+            }
+            recovered_attempt = attempts[recovered["attempt_id"]]
+            replay_attempt = attempts[replay["attempt_id"]]
+            assert attempts[failed_attempt_id].status == "failed"
+            assert (recovered_attempt.status, recovered_attempt.result) == (
+                "succeeded",
+                "loaded",
+            )
+            assert (recovered_attempt.inserted_rows, recovered_attempt.duplicate_rows) == (2, 0)
+            assert (replay_attempt.status, replay_attempt.result) == (
+                "succeeded",
+                "already_loaded",
+            )
+            assert (replay_attempt.inserted_rows, replay_attempt.duplicate_rows) == (0, 2)
+            assert len(attempts) == 3
+            assert session.scalar(select(func.count()).select_from(RetailImport)) == 1
+            assert session.scalar(select(func.count()).select_from(RetailLine)) == 2
+    finally:
+        engine.dispose()
+
+
 def test_load_retail_cli_requires_migration_and_reports_replay(tmp_path):
     output = transformed_output(tmp_path, [source_row()])
     database_url, engine = migrated_engine(tmp_path)
@@ -132,5 +200,35 @@ def test_load_retail_cli_requires_migration_and_reports_replay(tmp_path):
     ]
     first = subprocess.run(command, capture_output=True, text=True, check=True)
     replay = subprocess.run(command, capture_output=True, text=True, check=True)
-    assert json.loads(first.stdout)["inserted"] == 1
-    assert json.loads(replay.stdout)["duplicates"] == 1
+    first_result = json.loads(first.stdout)
+    replay_result = json.loads(replay.stdout)
+    assert first_result["inserted"] == 1
+    assert replay_result["duplicates"] == 1
+    assert first_result["attempt_id"] != replay_result["attempt_id"]
+
+    report_path = output / "report.json"
+    changed_report = json.loads(report_path.read_text())
+    changed_report["dataset"] = "changed dataset label"
+    report_path.write_text(json.dumps(changed_report))
+    failed = subprocess.run(command, capture_output=True, text=True, check=False)
+    assert failed.returncode == 1
+    failed_result = json.loads(failed.stderr)
+    assert failed_result["status"] == "failed"
+    assert failed_result["error_code"] == "data_contract"
+    assert failed_result["attempt_id"] not in {
+        first_result["attempt_id"],
+        replay_result["attempt_id"],
+    }
+
+    engine = make_engine(database_url)
+    try:
+        with Session(engine) as session:
+            attempts = session.scalars(select(RetailLoadAttempt)).all()
+            assert {(item.status, item.result) for item in attempts} == {
+                ("succeeded", "loaded"),
+                ("succeeded", "already_loaded"),
+                ("failed", None),
+            }
+            assert len(attempts) == 3
+    finally:
+        engine.dispose()

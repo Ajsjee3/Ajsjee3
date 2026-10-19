@@ -5,6 +5,7 @@ from sqlalchemy import (
     JSON,
     BigInteger,
     Boolean,
+    CheckConstraint,
     DateTime,
     ForeignKey,
     Index,
@@ -80,6 +81,52 @@ class RetailImport(Base):
     accepted_signed_line_amount: Mapped[Decimal] = mapped_column(Numeric(38, 6))
     cancellation_signed_line_amount: Mapped[Decimal] = mapped_column(Numeric(38, 6))
     created_at: Mapped[datetime] = mapped_column(UTCDateTime, default=utc_now)
+
+
+class RetailLoadAttempt(Base):
+    """공개 거래 적재를 실행한 한 번의 시도와 종료 결과를 보존합니다."""
+
+    __tablename__ = "retail_load_attempts"
+    __table_args__ = (
+        CheckConstraint(
+            "status IN ('running', 'succeeded', 'failed')",
+            name="ck_retail_load_attempt_status",
+        ),
+        CheckConstraint(
+            "result IS NULL OR result IN ('loaded', 'already_loaded')",
+            name="ck_retail_load_attempt_result",
+        ),
+        CheckConstraint(
+            "inserted_rows >= 0 AND duplicate_rows >= 0",
+            name="ck_retail_load_attempt_counts",
+        ),
+        CheckConstraint(
+            "(status = 'running' AND finished_at IS NULL AND result IS NULL "
+            "AND error_code IS NULL AND error_message IS NULL) OR "
+            "(status = 'succeeded' AND finished_at IS NOT NULL AND result IS NOT NULL "
+            "AND error_code IS NULL AND error_message IS NULL) OR "
+            "(status = 'failed' AND finished_at IS NOT NULL AND result IS NULL "
+            "AND error_code IS NOT NULL AND error_message IS NOT NULL)",
+            name="ck_retail_load_attempt_terminal_fields",
+        ),
+        Index(
+            "ix_retail_load_attempt_source_started",
+            "source_sha256",
+            "started_at",
+        ),
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    source_sha256: Mapped[str] = mapped_column(String(64))
+    manifest_sha256: Mapped[str] = mapped_column(String(64))
+    status: Mapped[str] = mapped_column(String(20))
+    result: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    started_at: Mapped[datetime] = mapped_column(UTCDateTime, default=utc_now)
+    finished_at: Mapped[datetime | None] = mapped_column(UTCDateTime, nullable=True)
+    inserted_rows: Mapped[int] = mapped_column(Integer, default=0)
+    duplicate_rows: Mapped[int] = mapped_column(Integer, default=0)
+    error_code: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    error_message: Mapped[str | None] = mapped_column(String(500), nullable=True)
 
 
 class RetailLine(Base):

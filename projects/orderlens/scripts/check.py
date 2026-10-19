@@ -9,6 +9,7 @@ def main():
         ["-m", "ruff", "check", "."],
         ["-m", "pytest", "-q"],
         ["-m", "scripts.check_migrations"],
+        ["-m", "scripts.check_retail_recovery"],
         ["-m", "scripts.generate_demo"],
         ["-m", "scripts.demo"],
         ["-m", "scripts.evaluate_retrieval"],
