@@ -1,5 +1,21 @@
 # 참고 저장소와 적용한 부분
 
+## 2026-10-26 · 검색 평가 자료와 실패 행
+
+[beir-cellar/beir](https://github.com/beir-cellar/beir/tree/ef83d29307061c65d04b035b4f4e7c18bd8374af)의 검색 평가 형식·코드·실행 예제와 관련 변경 기록을 직접 읽었습니다. 큰 벤치마크 라이브러리를 도입하지 않고, 작은 OrderLens 자료에서 문서·질문·정답표를 분리하고 순위 지표와 실패 행을 남기는 원칙만 적용했습니다.
+
+| 확인한 파일·변경 | 확인한 내용 | 이번 변경에 적용한 부분 |
+|---|---|---|
+| [README.md](https://github.com/beir-cellar/beir/blob/ef83d29307061c65d04b035b4f4e7c18bd8374af/README.md) | corpus·query·qrels로 검색 자료를 구성하고 여러 순위 지표로 평가 | 검색 대상·질문·관련 문서 표를 서로 다른 JSON에 보존 |
+| [data_loader.py](https://github.com/beir-cellar/beir/blob/ef83d29307061c65d04b035b4f4e7c18bd8374af/beir/datasets/data_loader.py) | `corpus.jsonl`, `queries.jsonl`, `qrels/test.tsv`를 따로 읽고 ID 연결을 검사 | 중복 ID, 빈 질문, 정답 누락과 알 수 없는 문서 참조를 실행 전에 거부 |
+| [evaluation.py](https://github.com/beir-cellar/beir/blob/ef83d29307061c65d04b035b4f4e7c18bd8374af/beir/retrieval/evaluation.py) | NDCG·MAP·Recall·Precision과 MRR 계산 | 작은 이진 정답표에 맞춰 Top-1·Recall@3·MRR@3을 직접 계산 |
+| [dataset README](https://github.com/beir-cellar/beir/blob/ef83d29307061c65d04b035b4f4e7c18bd8374af/examples/dataset/README.md) | 질문·정답의 출처와 split을 데이터 설명에 함께 둠 | 수작업 질문, 고정일, 실제 사용자 로그가 아니라는 한계를 결과에 포함 |
+| [BM25 평가 예제](https://github.com/beir-cellar/beir/blob/ef83d29307061c65d04b035b4f4e7c18bd8374af/examples/retrieval/evaluation/lexical/evaluate_bm25.py) | 검색 실행과 평가를 한 명령으로 재현 | `python -m scripts.check` 안에서 기준선을 다시 만들고 JSON 저장 |
+| [사용자 자료 예제](https://github.com/beir-cellar/beir/blob/ef83d29307061c65d04b035b4f4e7c18bd8374af/examples/retrieval/evaluation/custom/evaluate_custom_dataset_files.py) | 별도 corpus·query·qrels 파일의 최소 스키마 | 작은 저장소에 맞는 JSON 스키마와 계약 테스트 작성 |
+| [변경 커밋](https://github.com/beir-cellar/beir/commit/845dfe9eb250bd27159e295a3b4b0d90c45cb721) | 사용자 정의 파일 로더와 실행 예제를 코드·문서로 함께 추가 | 평가 입력과 실행 스크립트·테스트·설명을 한 변경으로 연결 |
+
+확인한 Git blob SHA는 순서대로 `e0e7e1019c116dc091deb7ce44657d7c887ed08e`, `b4223f4ab30a55868becece044cc4b2b86181233`, `91aaf2bff505b7a9d8669d3c98c39a0bf3394715`, `447d10732053f4c78f69af4d9ecbd3ad573980d1`, `f4524f3d54321371259bdbe924ef99650d021b27`, `9c5f27a2f2511ed2c876d3af4a92e0ac5455638`입니다. BEIR 소스·데이터·측정값을 복사하지 않았고 의존성도 추가하지 않았습니다. OrderLens의 질문과 관련 문서 표는 현재 기능을 기준으로 새로 작성했습니다.
+
 ## 2026-10-19 · 실행 시도별 실패·재시도 이력
 
 [apache/airflow](https://github.com/apache/airflow/tree/66b803d5efbbb743c357f2b4696f49a22aa662b8)의 실행 이력 구현과 변경 기록을 직접 읽었습니다. Airflow 전체 오케스트레이터를 도입하지 않고, 작은 적재 CLI에 필요한 실행 단위와 감사 이력 원칙만 적용했습니다.

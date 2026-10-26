@@ -1,3 +1,23 @@
+OrderLens 0.8.0 로컬 검증 요약 — 2026-10-26
+환경: Linux x86_64, Python 3.12.14, SQLite 3.53.1, 기존 requirements.lock 가상환경
+실행 위치: projects/orderlens
+명령: python -m scripts.check
+종료 코드: 0
+Ruff: All checks passed!
+pytest: 95 passed, 2 warnings
+마이그레이션: 20260921_01 → 20261005_02 → 20261012_03 → 20261019_04
+모델 일치, base downgrade·재upgrade, 강제 적재 실패·복구와 HTTP 8페이지·고유 주문 120건 통과
+검색 자료: 운영 문서 10개, 관련 질문 24개, 무관 질문 8개, 별도 qrels
+검색 기준선: Top-1 0.625, Recall@3 0.9375, MRR@3 0.770833
+무관 질문: 결과 없음 2/8, 오탐 6건; 관련 질문 실패 행 9건
+근거: artifacts/retrieval_evaluation.json, docs/validation.md
+한계: 수작업 고정 질문이며 실제 사용자 로그·독립 평가가 아님; 검색 점수는 관련 확률이 아님
+GitHub Actions 40310364289: checks 및 postgres-integration success
+원격 환경: Python 3.12.15, PostgreSQL 16.15, pytest 95 passed / 2 warnings
+원격 검색 기준선: Top-1 0.625, Recall@3 0.9375, MRR@3 0.770833, 무관 질문 결과 없음 0.25
+PostgreSQL: revision 20261019_04, 네 리비전 왕복·모델 일치·주문 120건·공개 거래 실패 복구 통과
+코드 커밋: 0b4d789bb3ab3c417734803ef360a1d7b24188b3
+
 OrderLens 0.7.0 로컬 검증 요약 — 2026-10-19
 환경: Linux x86_64, Python 3.12.14, SQLite 3.53.1, 기존 requirements.lock 가상환경
 실행 위치: projects/orderlens

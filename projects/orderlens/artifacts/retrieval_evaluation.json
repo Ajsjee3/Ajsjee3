@@ -1,139 +1,667 @@
 {
-  "scope": "15 hand_written_demo_cases_not_independent_real_world_benchmark",
-  "document_count": 6,
-  "answerable_cases": 12,
-  "top1_accuracy": 1.0,
-  "recall_at_3": 1.0,
-  "mrr_at_3": 1.0,
-  "empty_result_rate_on_unrelated": 1.0,
-  "cases": [
+  "dataset_id": "orderlens-retrieval-eval-v1",
+  "frozen_on": "2026-10-26",
+  "query_origin": "manually_curated_paraphrases_not_real_user_queries",
+  "retriever": "orderlens_bm25_korean_bigrams",
+  "top_k": 3,
+  "score_is_probability": false,
+  "document_count": 10,
+  "answerable_query_count": 24,
+  "unanswerable_query_count": 8,
+  "metrics": {
+    "top1_accuracy": 0.625,
+    "recall_at_3": 0.9375,
+    "mrr_at_3": 0.770833,
+    "unanswerable_empty_result_rate": 0.25
+  },
+  "failure_counts": {
+    "answerable": 9,
+    "unanswerable_false_positive": 6
+  },
+  "answerable_failures": [
     {
-      "query": "배송 예정 시각을 넘긴 미완료 주문",
-      "expected": "late-delivery",
-      "retrieved": [
-        "late-delivery",
-        "delivery-rate",
-        "money"
-      ],
-      "rank": 1
-    },
-    {
-      "query": "지연 주문 운송장 상태 확인",
-      "expected": "late-delivery",
-      "retrieved": [
-        "late-delivery",
-        "delivery-rate",
-        "money"
-      ],
-      "rank": 1
-    },
-    {
-      "query": "중복 적재 버전 충돌",
-      "expected": "duplicates",
-      "retrieved": [
-        "duplicates",
-        "quality"
-      ],
-      "rank": 1
-    },
-    {
-      "query": "revision 같은 내용 저장 생략",
-      "expected": "duplicates",
-      "retrieved": [
-        "duplicates",
-        "money",
+      "id": "q01",
+      "query": "택배가 아직 오지 않았는데 지연 건으로 잡히는 조건",
+      "category": "late_delivery",
+      "relevant": [
         "late-delivery"
       ],
-      "rank": 1
-    },
-    {
-      "query": "유효 주문 금액 취소 환불",
-      "expected": "money",
       "retrieved": [
-        "money",
-        "delivery-rate",
-        "quality"
+        "order-pages",
+        "migrations",
+        "delivery-rate"
       ],
-      "rank": 1
+      "first_relevant_rank": null,
+      "relevant_in_top_k": 0
     },
     {
-      "query": "booked_amount_krw 회계 매출",
-      "expected": "money",
-      "retrieved": [
-        "money"
-      ],
-      "rank": 1
-    },
-    {
-      "query": "음수 금액 오류 행 수정",
-      "expected": "quality",
-      "retrieved": [
-        "quality",
-        "money"
-      ],
-      "rank": 1
-    },
-    {
-      "query": "schema_error row_number",
-      "expected": "quality",
-      "retrieved": [
-        "quality"
-      ],
-      "rank": 1
-    },
-    {
-      "query": "UTC 시간대 조회 기간",
-      "expected": "time-window",
-      "retrieved": [
-        "time-window",
-        "quality",
-        "late-delivery"
-      ],
-      "rank": 1
-    },
-    {
-      "query": "start_at end_at 포함 제외",
-      "expected": "time-window",
-      "retrieved": [
-        "time-window",
-        "delivery-rate",
-        "money"
-      ],
-      "rank": 1
-    },
-    {
-      "query": "배송 지연율 분모",
-      "expected": "delivery-rate",
-      "retrieved": [
-        "delivery-rate",
-        "late-delivery",
-        "quality"
-      ],
-      "rank": 1
-    },
-    {
-      "query": "late_delivery_rate 배송 완료 없으면",
-      "expected": "delivery-rate",
-      "retrieved": [
-        "delivery-rate",
-        "late-delivery",
+      "id": "q03",
+      "query": "같은 주문 파일을 두 번 보내면 DB에 또 들어가나요",
+      "category": "duplicates",
+      "relevant": [
         "duplicates"
       ],
-      "rank": 1
+      "retrieved": [
+        "retail-load-recovery",
+        "migrations",
+        "duplicates"
+      ],
+      "first_relevant_rank": 3,
+      "relevant_in_top_k": 1
+    },
+    {
+      "id": "q05",
+      "query": "취소된 건까지 금액 합계에 들어가나요",
+      "category": "money",
+      "relevant": [
+        "money"
+      ],
+      "retrieved": [
+        "retail-query",
+        "money",
+        "quality"
+      ],
+      "first_relevant_rank": 2,
+      "relevant_in_top_k": 1
+    },
+    {
+      "id": "q08",
+      "query": "날짜에 timezone을 넣지 않은 레코드는 어떻게 처리하나요",
+      "category": "quality_and_time",
+      "relevant": [
+        "quality",
+        "time-window"
+      ],
+      "retrieved": [
+        "money",
+        "migrations",
+        "quality"
+      ],
+      "first_relevant_rank": 3,
+      "relevant_in_top_k": 1
+    },
+    {
+      "id": "q09",
+      "query": "조회 시작과 종료 경계가 포함되는 범위",
+      "category": "time_window",
+      "relevant": [
+        "time-window"
+      ],
+      "retrieved": [
+        "retail-query",
+        "time-window",
+        "order-pages"
+      ],
+      "first_relevant_rank": 2,
+      "relevant_in_top_k": 1
+    },
+    {
+      "id": "q20",
+      "query": "새 DB를 최신 revision으로 올리는 명령",
+      "category": "migrations",
+      "relevant": [
+        "migrations"
+      ],
+      "retrieved": [
+        "duplicates",
+        "migrations",
+        "order-pages"
+      ],
+      "first_relevant_rank": 2,
+      "relevant_in_top_k": 1
+    },
+    {
+      "id": "q22",
+      "query": "같은 주문을 다시 올리면 또 저장되나요",
+      "category": "hard_paraphrase",
+      "relevant": [
+        "duplicates"
+      ],
+      "retrieved": [
+        "retail-load-recovery",
+        "duplicates",
+        "order-pages"
+      ],
+      "first_relevant_rank": 2,
+      "relevant_in_top_k": 1
+    },
+    {
+      "id": "q23",
+      "query": "두 번째 레코드가 깨졌을 때 먼저 넣은 데이터 처리",
+      "category": "hard_paraphrase",
+      "relevant": [
+        "retail-load-recovery"
+      ],
+      "retrieved": [
+        "migrations",
+        "duplicates",
+        "retail-load-recovery"
+      ],
+      "first_relevant_rank": 3,
+      "relevant_in_top_k": 1
+    },
+    {
+      "id": "q24",
+      "query": "목록을 넘기면서 결과가 겹치는 이유",
+      "category": "hard_paraphrase",
+      "relevant": [
+        "order-pages"
+      ],
+      "retrieved": [
+        "migrations",
+        "order-pages"
+      ],
+      "first_relevant_rank": 2,
+      "relevant_in_top_k": 1
     }
   ],
-  "unrelated_cases": [
+  "unanswerable_false_positives": [
     {
-      "query": "블랙홀 은하 천체",
-      "returned_count": 0
+      "id": "u03",
+      "query": "배송비 할인 쿠폰 정책",
+      "category": "domain_adjacent",
+      "retrieved": [
+        "money",
+        "delivery-rate",
+        "late-delivery"
+      ],
+      "returned_count": 3
     },
     {
-      "query": "피아노 바이올린",
-      "returned_count": 0
+      "id": "u04",
+      "query": "고객 전화번호와 주소 변경",
+      "category": "domain_adjacent",
+      "retrieved": [
+        "late-delivery",
+        "migrations"
+      ],
+      "returned_count": 2
     },
     {
-      "query": "야구 축구 배구",
-      "returned_count": 0
+      "id": "u05",
+      "query": "원화를 달러로 환전하는 환율",
+      "category": "domain_adjacent",
+      "retrieved": [
+        "money"
+      ],
+      "returned_count": 1
+    },
+    {
+      "id": "u06",
+      "query": "DB 백업 파일을 복원하는 명령",
+      "category": "domain_adjacent",
+      "retrieved": [
+        "retail-load-recovery",
+        "migrations",
+        "time-window"
+      ],
+      "returned_count": 3
+    },
+    {
+      "id": "u07",
+      "query": "상품 재고가 부족할 때 주문 취소",
+      "category": "domain_adjacent",
+      "retrieved": [
+        "delivery-rate",
+        "money",
+        "retail-query"
+      ],
+      "returned_count": 3
+    },
+    {
+      "id": "u08",
+      "query": "택배사 API 요금제 변경",
+      "category": "domain_adjacent",
+      "retrieved": [
+        "migrations",
+        "order-pages"
+      ],
+      "returned_count": 2
     }
+  ],
+  "answerable_cases": [
+    {
+      "id": "q01",
+      "query": "택배가 아직 오지 않았는데 지연 건으로 잡히는 조건",
+      "category": "late_delivery",
+      "relevant": [
+        "late-delivery"
+      ],
+      "retrieved": [
+        "order-pages",
+        "migrations",
+        "delivery-rate"
+      ],
+      "first_relevant_rank": null,
+      "relevant_in_top_k": 0
+    },
+    {
+      "id": "q02",
+      "query": "발송 중인 주문이 약속 시간을 넘겼을 때 확인할 내용",
+      "category": "late_delivery",
+      "relevant": [
+        "late-delivery"
+      ],
+      "retrieved": [
+        "late-delivery",
+        "delivery-rate",
+        "duplicates"
+      ],
+      "first_relevant_rank": 1,
+      "relevant_in_top_k": 1
+    },
+    {
+      "id": "q03",
+      "query": "같은 주문 파일을 두 번 보내면 DB에 또 들어가나요",
+      "category": "duplicates",
+      "relevant": [
+        "duplicates"
+      ],
+      "retrieved": [
+        "retail-load-recovery",
+        "migrations",
+        "duplicates"
+      ],
+      "first_relevant_rank": 3,
+      "relevant_in_top_k": 1
+    },
+    {
+      "id": "q04",
+      "query": "이미 처리한 revision의 내용이 달라졌을 때 결과",
+      "category": "duplicates",
+      "relevant": [
+        "duplicates"
+      ],
+      "retrieved": [
+        "duplicates",
+        "money",
+        "migrations"
+      ],
+      "first_relevant_rank": 1,
+      "relevant_in_top_k": 1
+    },
+    {
+      "id": "q05",
+      "query": "취소된 건까지 금액 합계에 들어가나요",
+      "category": "money",
+      "relevant": [
+        "money"
+      ],
+      "retrieved": [
+        "retail-query",
+        "money",
+        "quality"
+      ],
+      "first_relevant_rank": 2,
+      "relevant_in_top_k": 1
+    },
+    {
+      "id": "q06",
+      "query": "booked_amount_krw를 회계 매출로 사용해도 되나요",
+      "category": "money",
+      "relevant": [
+        "money"
+      ],
+      "retrieved": [
+        "money",
+        "duplicates",
+        "retail-query"
+      ],
+      "first_relevant_rank": 1,
+      "relevant_in_top_k": 1
+    },
+    {
+      "id": "q07",
+      "query": "필수값이 비어 있는 행은 어디서 확인하고 고치나요",
+      "category": "quality",
+      "relevant": [
+        "quality"
+      ],
+      "retrieved": [
+        "quality",
+        "late-delivery",
+        "retail-load-recovery"
+      ],
+      "first_relevant_rank": 1,
+      "relevant_in_top_k": 1
+    },
+    {
+      "id": "q08",
+      "query": "날짜에 timezone을 넣지 않은 레코드는 어떻게 처리하나요",
+      "category": "quality_and_time",
+      "relevant": [
+        "quality",
+        "time-window"
+      ],
+      "retrieved": [
+        "money",
+        "migrations",
+        "quality"
+      ],
+      "first_relevant_rank": 3,
+      "relevant_in_top_k": 1
+    },
+    {
+      "id": "q09",
+      "query": "조회 시작과 종료 경계가 포함되는 범위",
+      "category": "time_window",
+      "relevant": [
+        "time-window"
+      ],
+      "retrieved": [
+        "retail-query",
+        "time-window",
+        "order-pages"
+      ],
+      "first_relevant_rank": 2,
+      "relevant_in_top_k": 1
+    },
+    {
+      "id": "q10",
+      "query": "서울 시각 표기와 Z를 같은 순간으로 처리하는 기준",
+      "category": "time_window",
+      "relevant": [
+        "time-window"
+      ],
+      "retrieved": [
+        "time-window",
+        "retail-query",
+        "late-delivery"
+      ],
+      "first_relevant_rank": 1,
+      "relevant_in_top_k": 1
+    },
+    {
+      "id": "q11",
+      "query": "배송 완료가 한 건도 없을 때 지연 비율 값",
+      "category": "delivery_rate",
+      "relevant": [
+        "delivery-rate"
+      ],
+      "retrieved": [
+        "delivery-rate",
+        "late-delivery",
+        "order-pages"
+      ],
+      "first_relevant_rank": 1,
+      "relevant_in_top_k": 1
+    },
+    {
+      "id": "q12",
+      "query": "환불 주문을 배송 지연율 분모에 넣나요",
+      "category": "delivery_rate",
+      "relevant": [
+        "delivery-rate"
+      ],
+      "retrieved": [
+        "delivery-rate",
+        "late-delivery",
+        "money"
+      ],
+      "first_relevant_rank": 1,
+      "relevant_in_top_k": 1
+    },
+    {
+      "id": "q13",
+      "query": "주문 목록의 다음 묶음을 가져오려면 어떤 값을 보내나요",
+      "category": "order_pages",
+      "relevant": [
+        "order-pages"
+      ],
+      "retrieved": [
+        "order-pages",
+        "delivery-rate",
+        "money"
+      ],
+      "first_relevant_rank": 1,
+      "relevant_in_top_k": 1
+    },
+    {
+      "id": "q14",
+      "query": "페이지를 넘길 때 조회 기준 시각을 왜 고정하나요",
+      "category": "order_pages",
+      "relevant": [
+        "order-pages"
+      ],
+      "retrieved": [
+        "order-pages",
+        "late-delivery",
+        "time-window"
+      ],
+      "first_relevant_rank": 1,
+      "relevant_in_top_k": 1
+    },
+    {
+      "id": "q15",
+      "query": "공개 거래 두 번째 줄 오류 뒤 첫 번째 줄이 DB에 남나요",
+      "category": "retail_recovery",
+      "relevant": [
+        "retail-load-recovery"
+      ],
+      "retrieved": [
+        "retail-load-recovery",
+        "retail-query",
+        "migrations"
+      ],
+      "first_relevant_rank": 1,
+      "relevant_in_top_k": 1
+    },
+    {
+      "id": "q16",
+      "query": "이미 적재한 공개 파일을 다시 실행한 결과",
+      "category": "retail_recovery",
+      "relevant": [
+        "retail-load-recovery"
+      ],
+      "retrieved": [
+        "retail-load-recovery",
+        "retail-query",
+        "quality"
+      ],
+      "first_relevant_rank": 1,
+      "relevant_in_top_k": 1
+    },
+    {
+      "id": "q17",
+      "query": "독일 거래를 날짜 범위로 집계할 때 쓰는 인덱스",
+      "category": "retail_query",
+      "relevant": [
+        "retail-query"
+      ],
+      "retrieved": [
+        "retail-query",
+        "retail-load-recovery",
+        "quality"
+      ],
+      "first_relevant_rank": 1,
+      "relevant_in_top_k": 1
+    },
+    {
+      "id": "q18",
+      "query": "취소 표시된 GBP 거래를 기간 합계에서 빼는 조건",
+      "category": "retail_query",
+      "relevant": [
+        "retail-query"
+      ],
+      "retrieved": [
+        "retail-query",
+        "order-pages",
+        "retail-load-recovery"
+      ],
+      "first_relevant_rank": 1,
+      "relevant_in_top_k": 1
+    },
+    {
+      "id": "q19",
+      "query": "스키마 버전이 코드보다 낮으면 서버가 자동으로 고치나요",
+      "category": "migrations",
+      "relevant": [
+        "migrations"
+      ],
+      "retrieved": [
+        "migrations",
+        "duplicates",
+        "delivery-rate"
+      ],
+      "first_relevant_rank": 1,
+      "relevant_in_top_k": 1
+    },
+    {
+      "id": "q20",
+      "query": "새 DB를 최신 revision으로 올리는 명령",
+      "category": "migrations",
+      "relevant": [
+        "migrations"
+      ],
+      "retrieved": [
+        "duplicates",
+        "migrations",
+        "order-pages"
+      ],
+      "first_relevant_rank": 2,
+      "relevant_in_top_k": 1
+    },
+    {
+      "id": "q21",
+      "query": "택배가 안 왔어요 지연으로 보는 기준이 뭔가요",
+      "category": "hard_paraphrase",
+      "relevant": [
+        "late-delivery"
+      ],
+      "retrieved": [
+        "late-delivery",
+        "time-window",
+        "delivery-rate"
+      ],
+      "first_relevant_rank": 1,
+      "relevant_in_top_k": 1
+    },
+    {
+      "id": "q22",
+      "query": "같은 주문을 다시 올리면 또 저장되나요",
+      "category": "hard_paraphrase",
+      "relevant": [
+        "duplicates"
+      ],
+      "retrieved": [
+        "retail-load-recovery",
+        "duplicates",
+        "order-pages"
+      ],
+      "first_relevant_rank": 2,
+      "relevant_in_top_k": 1
+    },
+    {
+      "id": "q23",
+      "query": "두 번째 레코드가 깨졌을 때 먼저 넣은 데이터 처리",
+      "category": "hard_paraphrase",
+      "relevant": [
+        "retail-load-recovery"
+      ],
+      "retrieved": [
+        "migrations",
+        "duplicates",
+        "retail-load-recovery"
+      ],
+      "first_relevant_rank": 3,
+      "relevant_in_top_k": 1
+    },
+    {
+      "id": "q24",
+      "query": "목록을 넘기면서 결과가 겹치는 이유",
+      "category": "hard_paraphrase",
+      "relevant": [
+        "order-pages"
+      ],
+      "retrieved": [
+        "migrations",
+        "order-pages"
+      ],
+      "first_relevant_rank": 2,
+      "relevant_in_top_k": 1
+    }
+  ],
+  "unanswerable_cases": [
+    {
+      "id": "u01",
+      "query": "블랙홀을 관측하는 방법",
+      "category": "unrelated",
+      "retrieved": [],
+      "returned_count": 0
+    },
+    {
+      "id": "u02",
+      "query": "피아노 조율 주기와 비용",
+      "category": "unrelated",
+      "retrieved": [],
+      "returned_count": 0
+    },
+    {
+      "id": "u03",
+      "query": "배송비 할인 쿠폰 정책",
+      "category": "domain_adjacent",
+      "retrieved": [
+        "money",
+        "delivery-rate",
+        "late-delivery"
+      ],
+      "returned_count": 3
+    },
+    {
+      "id": "u04",
+      "query": "고객 전화번호와 주소 변경",
+      "category": "domain_adjacent",
+      "retrieved": [
+        "late-delivery",
+        "migrations"
+      ],
+      "returned_count": 2
+    },
+    {
+      "id": "u05",
+      "query": "원화를 달러로 환전하는 환율",
+      "category": "domain_adjacent",
+      "retrieved": [
+        "money"
+      ],
+      "returned_count": 1
+    },
+    {
+      "id": "u06",
+      "query": "DB 백업 파일을 복원하는 명령",
+      "category": "domain_adjacent",
+      "retrieved": [
+        "retail-load-recovery",
+        "migrations",
+        "time-window"
+      ],
+      "returned_count": 3
+    },
+    {
+      "id": "u07",
+      "query": "상품 재고가 부족할 때 주문 취소",
+      "category": "domain_adjacent",
+      "retrieved": [
+        "delivery-rate",
+        "money",
+        "retail-query"
+      ],
+      "returned_count": 3
+    },
+    {
+      "id": "u08",
+      "query": "택배사 API 요금제 변경",
+      "category": "domain_adjacent",
+      "retrieved": [
+        "migrations",
+        "order-pages"
+      ],
+      "returned_count": 2
+    }
+  ],
+  "limits": [
+    "질의는 수작업 고정 예제이며 실제 사용자 로그가 아닙니다.",
+    "평가 자료 작성자와 검색 구현자가 분리된 독립 평가가 아닙니다.",
+    "한 번의 작은 한국어 corpus 결과를 실무 정확도로 일반화하지 않습니다."
   ]
 }

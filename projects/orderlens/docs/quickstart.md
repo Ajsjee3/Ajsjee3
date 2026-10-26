@@ -26,7 +26,7 @@ py -3.12 -m venv .venv
 | 산출물 | 내용 |
 |---|---|
 | artifacts/demo_report.json | 적재 결과, 재전송 결과, 주문 지표, 근거 문서 |
-| artifacts/retrieval_evaluation.json | 작은 예제 집합에 대한 검색 평가 |
+| artifacts/retrieval_evaluation.json | 10문서·32개 고정 질문의 지표와 질문별 실패 사례 |
 | artifacts/http_smoke.json | 실제 HTTP 요청과 인증 검사 결과 |
 | artifacts/migration_check.json | 네 리비전의 upgrade·downgrade·재upgrade 결과 |
 | artifacts/retail_recovery.json | 강제 적재 실패·복구·같은 파일 재실행 결과 |
@@ -136,7 +136,7 @@ curl 'http://127.0.0.1:8000/v1/orders?source=market_a&status=paid&limit=2&offset
 | 4 | orderlens/models.py, db.py | Python 객체가 어떤 테이블에 저장될까요? |
 | 5 | orderlens/ingestion.py | 중복과 충돌은 어떻게 구분할까요? |
 | 6 | orderlens/analytics.py | 같은 주문의 여러 버전 중 어느 것을 집계할까요? |
-| 7 | orderlens/retrieval.py | 검색 점수와 답변의 정확성은 왜 다를까요? |
+| 7 | orderlens/retrieval.py, retrieval_evaluation.py | 검색 점수와 평가 정답은 어떻게 구분할까요? |
 | 8 | orderlens/retail.py, retail_db.py | 파일 출처·Decimal·재실행은 어떻게 보존할까요? |
 | 9 | orderlens/retail_analytics.py, scripts/benchmark_retail_sql.py | 조회 조건과 인덱스 계획을 어떻게 같은 결과로 비교할까요? |
 | 10 | tests/ | 어떤 입력을 넣었을 때 어떤 결과를 기대할까요? |
@@ -172,7 +172,7 @@ python -m alembic history
 
 `python -m alembic downgrade base`는 업무 테이블과 데이터를 지우므로 학습용 임시 DB에서만 실행합니다. 자동 PostgreSQL 검사는 `_test`로 끝나는 별도 DB만 허용합니다.
 
-**이 작성 환경에는 Docker 실행 파일이 없어 로컬 컨테이너를 실행하지 못했습니다.** [GitHub Actions](https://github.com/Ajsjee3/Ajsjee3/actions/runs/39239042095)의 임시 PostgreSQL 16.15 서비스에서 네 리비전, 기존 주문 흐름, 공개 거래 실패·복구·재실행과 10만 행 실행계획을 실제 검사했습니다. 자세한 입력과 결과는 [검증 기록](validation.md)에 구분했습니다.
+**이 작성 환경에는 Docker 실행 파일이 없어 로컬 컨테이너를 실행하지 못했습니다.** [GitHub Actions](https://github.com/Ajsjee3/Ajsjee3/actions/runs/40310364289)의 임시 PostgreSQL 16.15 서비스에서 네 리비전, 기존 주문 흐름, 공개 거래 실패·복구·재실행과 10만 행 실행계획을 실제 검사했습니다. 자세한 입력과 결과는 [검증 기록](validation.md)에 구분했습니다.
 
 ## 7. 다음 문서
 

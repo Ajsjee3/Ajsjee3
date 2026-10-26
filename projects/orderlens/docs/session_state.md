@@ -1,10 +1,10 @@
 # 작업 상태
 
-현재 작업 버전은 OrderLens 0.7.0입니다. 검증 결과는 validation.md와 artifacts/에 기록합니다.
+현재 작업 버전은 OrderLens 0.8.0입니다. 검증 결과는 validation.md와 artifacts/에 기록합니다.
 
-UCI 공개 거래의 전용 DB 적재·기간 집계에 이어 실행 시도 이력을 구현했습니다. 강제 실패는 데이터 0행으로 롤백하면서 오류 이력을 남기고, 수정 후 복구와 같은 파일 재실행은 별도 성공 결과로 기록합니다. 기존 원화 주문 API와는 계속 분리합니다.
+운영 문서 10개, 관련 질문 24개, 무관 질문 8개와 별도 qrels로 BM25 기준선을 평가합니다. Top-1 0.625, Recall@3 0.9375, MRR@3 0.770833이고 무관 질문 결과 없음은 0.25입니다. 질문별 실패 행을 보존하며 실제 사용자 로그나 독립 평가로 표현하지 않습니다.
 
-이전 SQL 실행계획 변경은 [PR #6](https://github.com/Ajsjee3/Ajsjee3/pull/6)에 있습니다. 이번 0.7.0은 로컬 테스트 90개와 네 리비전 왕복, 실패·복구 재현을 통과했습니다. [PR #7의 원격 검사](https://github.com/Ajsjee3/Ajsjee3/actions/runs/39239042095)에서도 PostgreSQL 16.15의 같은 흐름이 통과했습니다. 다음 구현은 검색 질문과 정답 문서를 분리한 평가 확대입니다.
+이전 배치 복구 변경은 [PR #7](https://github.com/Ajsjee3/Ajsjee3/pull/7)에 있습니다. 이번 0.8.0은 로컬 테스트 95개와 네 리비전 왕복, 실패·복구, 실제 HTTP 검사를 통과했습니다. [PR #8 원격 검사](https://github.com/Ajsjee3/Ajsjee3/actions/runs/40310364289)도 일반·PostgreSQL 16.15 두 job이 통과했습니다. 다음 구현은 고정 질문을 바꾸지 않고 BM25 점수 기준으로 근거 부족 질문을 보류했을 때 정답 검색과 오탐의 변화를 비교하는 것입니다.
 
 2026-09-22 대화와의 비교는 저장소 루트 docs/curriculum_alignment.md에 반영했습니다. 주 6~10시간, 첫 프로젝트를 직접 설명한 뒤 두 번째 프로젝트 선택, 금융 IT는 Java/Spring 별도 분기입니다. `learning_status=not_assessed`이므로 코드가 있다는 이유로 학습 완료로 처리하지 않습니다.
 

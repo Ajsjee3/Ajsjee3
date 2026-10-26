@@ -24,7 +24,7 @@ OrderLens는 판매 경로와 주문 번호를 묶어 주문을 구분하고, �
 | 같은 공개 파일이 다시 들어옴 | 파일 해시와 CSV 레코드 번호를 고유 키로 두고 한 트랜잭션에 분할 적재 | [DB 적재 설계](docs/decisions/retail_db_ingestion.md) |
 | 실제 규모의 국가·기간 집계가 전체 행을 읽음 | 같은 조건의 실행계획을 비교하고 동등 조건 뒤에 시각 범위를 둔 복합 인덱스 적용 | [인덱스 비교](docs/decisions/retail_query_index.md) |
 | 적재 실패가 롤백 뒤 사라짐 | 실행 시도는 먼저 남기고 데이터 트랜잭션을 분리해 실패·복구·재실행 결과 기록 | [복구 기록 설계](docs/decisions/retail_load_recovery.md) |
-| 운영 기준을 찾아야 함 | BM25 검색으로 문서 ID와 버전을 함께 반환 | [retrieval.py](orderlens/retrieval.py) |
+| 운영 기준을 찾아야 함 | BM25로 문서 ID·버전을 반환하고 별도 질문·정답표로 실패 사례까지 평가 | [retrieval_evaluation.py](orderlens/retrieval_evaluation.py) |
 
 ## 실행
 
@@ -67,8 +67,11 @@ curl 'http://127.0.0.1:8000/v1/orders?source=market_a&status=paid&limit=2&offset
 | Germany 비취소 2011년 집계 | 8,529행 · 수량 112,385 · 부호 있는 금액 GBP 213,626.000000 |
 | 같은 DB의 강제 계획 비교 | 전체 스캔 중앙값 41.062 ms · 복합 인덱스 1.917 ms · 각 31회 |
 | 강제 적재 실패 뒤 복구 | 실패 뒤 거래 0행 · 실패 이력 1건 · 복구 2행 · 재실행 새 행 0개 |
+| BM25 고정 평가집합 | 문서 10개 · 관련 질문 24개 · 무관 질문 8개 |
+| BM25 기준선 | Top-1 0.625 · Recall@3 0.9375 · MRR@3 0.770833 |
+| 무관 질문 보류 | 결과 없음 2/8 · 오탐 6건 |
 
-명령 한 번으로 임시 DB 마이그레이션, 강제 적재 실패·복구, 적재·재전송, 지표 비교, 검색 평가, 실제 HTTP 요청까지 재실행합니다. 원본 결과는 [SQLite 마이그레이션](artifacts/migration_check.json), [실패·복구](artifacts/retail_recovery.json), [공개 거래 DB 적재](artifacts/retail_db_check.json), [SQL 계획 비교](artifacts/retail_query_benchmark.json), [PostgreSQL 통합 검사](artifacts/postgres_integration.json), [demo_report.json](artifacts/demo_report.json), [HTTP 결과](artifacts/http_smoke.json), [검증 기록](docs/validation.md)에 남깁니다.
+명령 한 번으로 임시 DB 마이그레이션, 강제 적재 실패·복구, 적재·재전송, 지표 비교, 검색 평가, 실제 HTTP 요청까지 재실행합니다. 원본 결과는 [검색 평가](artifacts/retrieval_evaluation.json), [SQLite 마이그레이션](artifacts/migration_check.json), [실패·복구](artifacts/retail_recovery.json), [공개 거래 DB 적재](artifacts/retail_db_check.json), [SQL 계획 비교](artifacts/retail_query_benchmark.json), [PostgreSQL 통합 검사](artifacts/postgres_integration.json), [demo_report.json](artifacts/demo_report.json), [HTTP 결과](artifacts/http_smoke.json), [검증 기록](docs/validation.md)에 남깁니다.
 
 ## 설계에서 정한 기준
 
@@ -80,14 +83,16 @@ curl 'http://127.0.0.1:8000/v1/orders?source=market_a&status=paid&limit=2&offset
 - 공개 거래 기간은 시작을 포함하고 종료를 제외합니다. `(country, is_cancellation, invoice_at_local)` 인덱스의 조회 이득과 저장 공간 비용을 함께 기록합니다.
 - 공개 거래 적재 시도와 데이터 INSERT는 트랜잭션을 분리합니다. 실패 데이터는 롤백하되, 원본·보고서 해시와 제한된 오류는 시도 이력에 남깁니다.
 - 취소·환불 주문은 유효 주문 금액에서 제외합니다. 배송 완료 주문이 없으면 지연율은 `null`입니다.
-- 검색 점수는 확률이 아닙니다. 현재 검색은 BM25이며 요약은 규칙 기반입니다.
+- 검색 점수는 확률이 아닙니다. 현재 검색은 BM25이며 요약은 규칙 기반입니다. 평가 질문은 실제 사용자 로그가 아니라 수작업한 고정 예제입니다.
 
 상세 내용은 [설계 문서](docs/design.md)에서 확인할 수 있습니다.
 
 ## 다음 작업
 
-현재 버전은 **0.7.0**입니다. 네 번째 Alembic 리비전으로 공개 거래 적재 시도 이력을 추가했습니다. 두 번째 행에서 강제 실패한 실행, 수정 후 복구, 같은 파일 재실행을 차례로 재현했고 데이터 행과 실행 이력을 함께 검증했습니다. 트랜잭션 경계와 한계는 [복구 기록 설계](docs/decisions/retail_load_recovery.md)에 있습니다.
+현재 버전은 **0.8.0**입니다. 운영 문서 10개, 수작업한 관련 질문 24개와 무관 질문 8개, 별도 정답표로 검색 기준선을 다시 측정했습니다. 데이터 계약은 문서·질문·정답표의 ID와 종류를 검사하고, 관련 문서가 1위가 아니거나 무관 질문에 결과가 나온 사례를 모두 JSON에 남깁니다.
 
-공개 거래 자료는 GBP 금액이고 배송 시각이 없어 기존 원화 배송 주문 API와 분리했습니다. 아직 공개 거래 조회 API나 화면은 없습니다. 다음 변경은 기존 BM25 검색에서 질문과 정답 문서를 분리하고 실패 사례를 늘려 기준선을 다시 측정하는 작업입니다. 외부 배포와 LLM 답변 생성도 후속 작업입니다.
+이 평가집합은 실제 사용자 로그도 독립 평가도 아닙니다. 높은 수치만 고르지 않도록 2026-10-26에 고정했고, 다음 변경에서는 질문을 바꾸지 않은 채 점수 기준으로 무관 질문을 보류했을 때 정답 검색과 오탐이 어떻게 달라지는지 비교합니다. 공개 거래 조회 API, 외부 배포와 LLM 답변 생성도 후속 작업입니다.
+
+[PR #8](https://github.com/Ajsjee3/Ajsjee3/pull/8)의 [GitHub Actions](https://github.com/Ajsjee3/Ajsjee3/actions/runs/40310364289)에서 Python 3.12.15 일반 검사와 PostgreSQL 16.15 통합 검사가 통과했습니다.
 
 [작업 목록](docs/automation_and_backlog.md) · [개발 기록](docs/progress.md) · [참고 저장소](docs/references.md) · [기여 안내](CONTRIBUTING.md)

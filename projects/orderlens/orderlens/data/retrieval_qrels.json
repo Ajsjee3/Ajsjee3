@@ -1,0 +1,30 @@
+{
+  "dataset_id": "orderlens-retrieval-eval-v1",
+  "frozen_on": "2026-10-26",
+  "relevance": {
+    "q01": ["late-delivery"],
+    "q02": ["late-delivery"],
+    "q03": ["duplicates"],
+    "q04": ["duplicates"],
+    "q05": ["money"],
+    "q06": ["money"],
+    "q07": ["quality"],
+    "q08": ["quality", "time-window"],
+    "q09": ["time-window"],
+    "q10": ["time-window"],
+    "q11": ["delivery-rate"],
+    "q12": ["delivery-rate"],
+    "q13": ["order-pages"],
+    "q14": ["order-pages"],
+    "q15": ["retail-load-recovery"],
+    "q16": ["retail-load-recovery"],
+    "q17": ["retail-query"],
+    "q18": ["retail-query"],
+    "q19": ["migrations"],
+    "q20": ["migrations"],
+    "q21": ["late-delivery"],
+    "q22": ["duplicates"],
+    "q23": ["retail-load-recovery"],
+    "q24": ["order-pages"]
+  }
+}
