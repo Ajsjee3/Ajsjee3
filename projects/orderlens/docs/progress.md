@@ -8,6 +8,8 @@
 
 Linux x86_64, Python 3.12.14, SQLite 3.53.1의 기존 `requirements.lock` 환경에서 `python -m scripts.check`를 실행했습니다. 종료 코드 0, Ruff 통과, pytest 95개 통과, 기존 의존성 경고 2종이었습니다. 네 리비전의 마이그레이션 왕복, 강제 적재 실패·복구, 주문 재전송, 실제 HTTP 8페이지·고유 주문 120건도 함께 통과했습니다.
 
+[PR #8](https://github.com/Ajsjee3/Ajsjee3/pull/8)의 [원격 검사](https://github.com/Ajsjee3/Ajsjee3/actions/runs/40310364289)도 두 job이 통과했습니다. 일반 검사는 Python 3.12.15에서 Ruff와 pytest 95개, 같은 검색 기준선과 실제 HTTP 120건을 확인했습니다. PostgreSQL 16.15 통합 검사는 기존 네 리비전 왕복, 모델 일치, 주문 재전송·120건 페이지와 공개 거래 실패·복구를 통과했습니다.
+
 새 참고는 `beir-cellar/beir`의 별도 corpus·query·qrels 형식, 데이터 검사, Recall·MRR 평가, 사용자 정의 데이터 예제와 해당 변경 커밋입니다. 형식 분리와 실패 행 보존 원칙만 적용했고 BEIR 코드나 의존성은 가져오지 않았습니다. 다음 작업은 이 고정 질문을 수정하지 않고 BM25 점수 기준으로 근거 부족 질문을 보류했을 때 정답 검색과 오탐의 변화를 비교하는 것입니다.
 
 ## 2026-10-19 · 0.7.0

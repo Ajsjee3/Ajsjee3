@@ -25,7 +25,7 @@ GitHub Actions 설정도 포함되어 있습니다. 저장소에 올리고 Actio
 | 규칙 기반 요약 | 구현·검증 | 근거를 인용하는 LLM 응답 |
 | Alembic 마이그레이션 | 네 리비전·SQLite 왕복 검증 | 기존 DB 기준점 연결·운영 전환 순서 |
 | Docker·PostgreSQL 설정 | PostgreSQL 16.15 원격 통합 검증 | 로컬 Compose 실행·기존 DB 전환 |
-| GitHub Actions | 0.7.0 일반·PostgreSQL 원격 검사 통과 | 0.8.0 PR 검사 후 근거 갱신 |
+| GitHub Actions | 0.8.0 일반·PostgreSQL 16.15 원격 검사 통과 | 의존성 갱신 때 경고·호환성 재검증 |
 | 공개 배포·사용자 권한 | 후속 과제 | 배포 환경·예산·사용자별 데이터 분리 |
 | 임베딩·벡터 DB·자율 에이전트 | 후속 과제 | 검색 기준선 비교·도구 권한·평가 |
 

@@ -17,6 +17,8 @@ Linux x86_64, Python 3.12.14, SQLite 3.53.1의 기존 `requirements.lock` 환경
 
 [평가 JSON](../artifacts/retrieval_evaluation.json)은 각 질문의 기대 문서·검색 순위와 실패 행을 보존합니다. 수작업 질문이며 실제 사용자 로그나 독립 평가가 아니고, 작은 corpus에 맞춘 한 번의 기준선입니다. 검색 점수는 관련 확률이 아닙니다. 이후 변경은 고정 자료를 그대로 두고 개발 자료에서 보류 기준을 정한 뒤 같은 지표로 비교해야 합니다.
 
+[PR #8](https://github.com/Ajsjee3/Ajsjee3/pull/8)의 [GitHub Actions 실행](https://github.com/Ajsjee3/Ajsjee3/actions/runs/40310364289)에서도 `checks`, `postgres-integration` 두 job이 통과했습니다. Python 3.12.15에서 Ruff, pytest 95개와 위 검색 지표, 실제 HTTP 8페이지·고유 주문 120건을 확인했습니다. PostgreSQL 16.15에서는 head `20261019_04`, 모델 일치, 네 리비전 왕복과 기존 주문·공개 거래 복구 흐름을 확인했습니다.
+
 ## 2026-10-19 · 0.7.0 로컬 검증
 
 Linux x86_64, Python 3.12.14, SQLite 3.53.1의 기존 requirements.lock 환경에서 `python -m scripts.check`를 실행했습니다. 종료 코드 0, Ruff 통과, pytest 90개 통과, 기존 의존성 경고 2종입니다. Alembic head `20261019_04` 적용, base까지 downgrade, 재upgrade, 모델 차이 없음과 적재 시도 인덱스·CHECK 제약 검사가 통과했습니다.

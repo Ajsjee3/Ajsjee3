@@ -93,4 +93,6 @@ curl 'http://127.0.0.1:8000/v1/orders?source=market_a&status=paid&limit=2&offset
 
 이 평가집합은 실제 사용자 로그도 독립 평가도 아닙니다. 높은 수치만 고르지 않도록 2026-10-26에 고정했고, 다음 변경에서는 질문을 바꾸지 않은 채 점수 기준으로 무관 질문을 보류했을 때 정답 검색과 오탐이 어떻게 달라지는지 비교합니다. 공개 거래 조회 API, 외부 배포와 LLM 답변 생성도 후속 작업입니다.
 
+[PR #8](https://github.com/Ajsjee3/Ajsjee3/pull/8)의 [GitHub Actions](https://github.com/Ajsjee3/Ajsjee3/actions/runs/40310364289)에서 Python 3.12.15 일반 검사와 PostgreSQL 16.15 통합 검사가 통과했습니다.
+
 [작업 목록](docs/automation_and_backlog.md) · [개발 기록](docs/progress.md) · [참고 저장소](docs/references.md) · [기여 안내](CONTRIBUTING.md)
