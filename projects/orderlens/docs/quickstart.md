@@ -26,7 +26,7 @@ py -3.12 -m venv .venv
 | 산출물 | 내용 |
 |---|---|
 | artifacts/demo_report.json | 적재 결과, 재전송 결과, 주문 지표, 근거 문서 |
-| artifacts/retrieval_evaluation.json | 작은 예제 집합에 대한 검색 평가 |
+| artifacts/retrieval_evaluation.json | 10문서·32개 고정 질문의 지표와 질문별 실패 사례 |
 | artifacts/http_smoke.json | 실제 HTTP 요청과 인증 검사 결과 |
 | artifacts/migration_check.json | 네 리비전의 upgrade·downgrade·재upgrade 결과 |
 | artifacts/retail_recovery.json | 강제 적재 실패·복구·같은 파일 재실행 결과 |
@@ -136,7 +136,7 @@ curl 'http://127.0.0.1:8000/v1/orders?source=market_a&status=paid&limit=2&offset
 | 4 | orderlens/models.py, db.py | Python 객체가 어떤 테이블에 저장될까요? |
 | 5 | orderlens/ingestion.py | 중복과 충돌은 어떻게 구분할까요? |
 | 6 | orderlens/analytics.py | 같은 주문의 여러 버전 중 어느 것을 집계할까요? |
-| 7 | orderlens/retrieval.py | 검색 점수와 답변의 정확성은 왜 다를까요? |
+| 7 | orderlens/retrieval.py, retrieval_evaluation.py | 검색 점수와 평가 정답은 어떻게 구분할까요? |
 | 8 | orderlens/retail.py, retail_db.py | 파일 출처·Decimal·재실행은 어떻게 보존할까요? |
 | 9 | orderlens/retail_analytics.py, scripts/benchmark_retail_sql.py | 조회 조건과 인덱스 계획을 어떻게 같은 결과로 비교할까요? |
 | 10 | tests/ | 어떤 입력을 넣었을 때 어떤 결과를 기대할까요? |

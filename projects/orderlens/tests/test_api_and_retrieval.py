@@ -24,6 +24,13 @@ def test_unrelated_query_has_no_evidence(client):
     assert response.json()["matches"] == []
 
 
+def test_document_search_returns_page_contract(client):
+    body = client.post(
+        "/v1/knowledge/search", json={"query": "next_offset as_of 페이지"}
+    ).json()
+    assert body["matches"][0]["document_id"] == "order-pages"
+
+
 def test_blank_query_is_rejected(client):
     assert client.post("/v1/knowledge/search", json={"query": "   "}).status_code == 422
 
