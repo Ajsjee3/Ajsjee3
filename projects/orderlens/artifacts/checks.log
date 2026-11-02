@@ -13,6 +13,9 @@ pytest: 101 passed, 2 warnings
 고정 평가 실패: 답할 수 있는 질문 보류 2건, 잘못된 1위 수용 7건, 무관 질문 수용 1건
 한계: 두 자료 모두 수작업이며 실제 사용자 로그·독립 평가가 아님; BM25 점수는 확률이 아님
 근거: artifacts/retrieval_evaluation.json, docs/validation.md
+GitHub Actions 41433052062: checks 및 postgres-integration success
+원격 환경: Python 3.12, PostgreSQL 16.15, pytest 101 passed / 2 warnings
+원격 검증: 같은 검색 정책 지표, 네 리비전 왕복·모델 일치·주문 120건·공개 거래 실패 복구 통과
 
 OrderLens 0.8.0 로컬 검증 요약 — 2026-10-26
 환경: Linux x86_64, Python 3.12.14, SQLite 3.53.1, 기존 requirements.lock 가상환경

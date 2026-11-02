@@ -8,6 +8,8 @@ API는 기준 미만 결과를 빈 목록으로 돌려주며 `abstained`, `abste
 
 Linux x86_64, Python 3.12.14, SQLite 3.53.1의 `requirements.lock` 환경에서 `python -m scripts.check`를 실행했습니다. 종료 코드 0, Ruff 통과, pytest 101개 통과, 기존 의존성 경고 2종이었습니다. 네 리비전 왕복, 강제 적재 실패·복구, 주문 재전송, 실제 Uvicorn HTTP 8페이지·고유 주문 120건도 함께 통과했습니다.
 
+[PR #9](https://github.com/Ajsjee3/Ajsjee3/pull/9)의 [원격 검사](https://github.com/Ajsjee3/Ajsjee3/actions/runs/41433052062)도 `checks`, `postgres-integration` 두 job이 통과했습니다. Python 3.12 일반 검사에서 pytest 101개와 같은 검색 결과를 확인했고, PostgreSQL 16.15 통합 검사는 기존 네 리비전 왕복, 모델 일치, 주문 재전송·120건 페이지와 공개 거래 실패·복구를 통과했습니다.
+
 새 참고는 `langchain-ai/langchainjs`의 최소 점수 필터 소스, 예제, 통합 테스트, 패키지 실행 안내와 기능 도입 커밋입니다. 검색 뒤 점수 기준으로 결과를 제거하고 경계를 테스트하는 원칙만 적용했습니다. 해당 구현은 벡터 유사도이고 현재 패키지는 유지보수 모드이므로 라이브러리·점수 값·재귀 검색 코드는 가져오지 않았습니다.
 
 다음: 검색 결과의 문서 ID와 버전을 인용하는 무료 규칙 기반 답변 계약을 만들고, 근거 누락·잘못된 근거를 고정 질문으로 평가합니다.

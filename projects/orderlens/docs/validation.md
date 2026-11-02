@@ -20,6 +20,8 @@ Linux x86_64, Python 3.12.14, SQLite 3.53.1의 `requirements.lock` 환경에서 
 
 기존 보류 없는 기준선의 무관 질문 결과 없음 비율은 0.25였습니다. 정책 적용 뒤 0.875로 바뀌었지만, 답할 수 있는 질문도 2개 보류됐고 검색 순위 자체의 오류는 해결하지 못했습니다. 두 질문 모음 모두 수작업 자료이며 실제 사용자 로그나 독립 평가가 아닙니다. `artifacts/retrieval_evaluation.json`에 개발 자료의 선택 결과와 고정 평가의 모든 실패 행을 남겼습니다.
 
+[PR #9](https://github.com/Ajsjee3/Ajsjee3/pull/9)의 [GitHub Actions 실행](https://github.com/Ajsjee3/Ajsjee3/actions/runs/41433052062)에서도 `checks`, `postgres-integration` 두 job이 통과했습니다. Python 3.12 일반 검사에서 Ruff, pytest 101개와 위 검색 지표, 실제 HTTP 8페이지·고유 주문 120건을 확인했습니다. PostgreSQL 16.15에서는 head `20261019_04`, 모델 일치, 네 리비전 왕복과 기존 주문·공개 거래 복구 흐름을 확인했습니다.
+
 ## 2026-10-26 · 0.8.0 로컬 검증
 
 Linux x86_64, Python 3.12.14, SQLite 3.53.1의 기존 `requirements.lock` 환경에서 `python -m scripts.check`를 실행했습니다. 종료 코드 0, Ruff 통과, pytest 95개 통과, 기존 의존성 경고 2종입니다. Alembic head `20261019_04` 적용, base downgrade·재upgrade와 모델 일치, 강제 적재 실패·복구, 주문 재전송, 실제 Uvicorn HTTP 8페이지·고유 주문 120건도 함께 통과했습니다.

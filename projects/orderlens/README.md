@@ -97,6 +97,6 @@ curl 'http://127.0.0.1:8000/v1/orders?source=market_a&status=paid&limit=2&offset
 
 2026-10-26에 고정한 24개 관련 질문·8개 무관 질문은 기준 선택에 사용하지 않았습니다. 고정 평가에서 정답 문서 1위 수용률은 0.625, 무관 질문 보류율은 0.875였습니다. 답할 수 있는 질문 2개도 보류됐고 잘못된 1위 결과 7개와 무관 질문 1개는 통과했습니다. 두 자료 모두 수작업 예제이며 실제 사용자 로그나 독립 평가가 아닙니다. 다음은 검색 문서를 인용하는 무료 규칙 기반 응답 계약과 근거 누락 평가입니다.
 
-[PR #8](https://github.com/Ajsjee3/Ajsjee3/pull/8)의 [GitHub Actions](https://github.com/Ajsjee3/Ajsjee3/actions/runs/40310364289)에서 Python 3.12.15 일반 검사와 PostgreSQL 16.15 통합 검사가 통과했습니다.
+[PR #9](https://github.com/Ajsjee3/Ajsjee3/pull/9)의 [GitHub Actions](https://github.com/Ajsjee3/Ajsjee3/actions/runs/41433052062)에서 Python 3.12 일반 검사와 PostgreSQL 16.15 통합 검사가 통과했습니다.
 
 [작업 목록](docs/automation_and_backlog.md) · [개발 기록](docs/progress.md) · [참고 저장소](docs/references.md) · [기여 안내](CONTRIBUTING.md)
