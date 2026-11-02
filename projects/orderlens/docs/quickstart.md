@@ -104,10 +104,12 @@ curl -X POST http://127.0.0.1:8000/v1/knowledge/search \
 | GET /v1/metrics | 최신 버전 기반 전체·판매 경로별 주문 지표 |
 | GET /v1/orders | 판매 경로·상태별 최신 주문 목록과 페이지 조회 |
 | GET /v1/orders/attention | 배송 예정 시각이 지난 미완료 주문 조회 |
-| POST /v1/knowledge/search | 업무 문서 검색 및 문서 ID·버전·근거 반환 |
+| POST /v1/knowledge/search | 업무 문서 검색, 점수 기준 미달 보류와 문서 ID·버전·근거 반환 |
 | GET /v1/brief | 운영 지표와 관련 문서를 연결한 규칙 기반 요약 |
 
 health와 API 문서를 제외한 /v1 API는 X-API-Key를 확인합니다. 고객에게 연락하거나 주문을 변경하는 동작은 구현하지 않았습니다.
+
+검색 응답의 `score_is_probability`는 false입니다. `abstained=true`이면 `matches`가 비어 있고, `abstention_reason`은 토큰이 겹치지 않은 `no_token_overlap` 또는 원래 1위가 기준보다 낮은 `top_score_below_minimum`입니다. `minimum_score`와 필터링 전 `top_score`를 함께 반환하지만 이 숫자를 확률로 해석하지 않습니다.
 
 ### 주문 목록의 다음 페이지
 
@@ -136,7 +138,7 @@ curl 'http://127.0.0.1:8000/v1/orders?source=market_a&status=paid&limit=2&offset
 | 4 | orderlens/models.py, db.py | Python 객체가 어떤 테이블에 저장될까요? |
 | 5 | orderlens/ingestion.py | 중복과 충돌은 어떻게 구분할까요? |
 | 6 | orderlens/analytics.py | 같은 주문의 여러 버전 중 어느 것을 집계할까요? |
-| 7 | orderlens/retrieval.py, retrieval_evaluation.py | 검색 점수와 평가 정답은 어떻게 구분할까요? |
+| 7 | orderlens/retrieval.py, retrieval_policy.py, retrieval_evaluation.py | 검색 점수 기준을 고정 평가와 분리해 어떻게 정할까요? |
 | 8 | orderlens/retail.py, retail_db.py | 파일 출처·Decimal·재실행은 어떻게 보존할까요? |
 | 9 | orderlens/retail_analytics.py, scripts/benchmark_retail_sql.py | 조회 조건과 인덱스 계획을 어떻게 같은 결과로 비교할까요? |
 | 10 | tests/ | 어떤 입력을 넣었을 때 어떤 결과를 기대할까요? |

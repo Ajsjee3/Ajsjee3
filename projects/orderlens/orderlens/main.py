@@ -24,6 +24,7 @@ from orderlens.ingestion import ingest, run_summary
 from orderlens.migrations import require_current_schema
 from orderlens.models import IngestionRun
 from orderlens.retrieval import BM25Index
+from orderlens.retrieval_policy import BM25AbstentionPolicy
 from orderlens.schemas import IngestRequest, OrderPage, OrderSource, OrderStatus, SearchRequest
 
 logger = logging.getLogger("orderlens")
@@ -61,6 +62,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 files("orderlens.data").joinpath("knowledge.json").read_text("utf-8")
             )
             app.state.search = BM25Index(knowledge)
+            app.state.search_policy = BM25AbstentionPolicy()
             yield
         finally:
             engine.dispose()
@@ -158,10 +160,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @router.post("/knowledge/search", tags=["knowledge"])
     def search_knowledge(payload: SearchRequest, request: Request):
+        decision = request.app.state.search_policy.search(
+            request.app.state.search, payload.query, payload.top_k
+        )
         return {
-            "mode": "retrieval_only",
+            "mode": "retrieval_only_with_abstention",
             "score_is_probability": False,
-            "matches": request.app.state.search.search(payload.query, payload.top_k),
+            **decision.as_dict(),
         }
 
     @router.get("/brief", tags=["analytics"])
@@ -175,7 +180,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             "text": f"전체 {counts['total_orders']}건 중 배송 예정 시각을 넘긴 미완료 주문은 "
             f"{counts['overdue_open_orders']}건입니다. 주문 상태와 배송 이력을 확인해 주세요.",
             "metrics": counts,
-            "evidence": request.app.state.search.search("배송 지연 미완료 주문", 1),
+            "evidence": request.app.state.search_policy.search(
+                request.app.state.search, "배송 지연 미완료 주문", 1
+            ).matches,
             "action_executed": False,
         }
 

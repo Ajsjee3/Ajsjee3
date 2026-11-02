@@ -1,0 +1,21 @@
+{
+  "dataset_id": "orderlens-retrieval-calibration-v1",
+  "relevance": {
+    "ca01": ["late-delivery"],
+    "ca02": ["duplicates"],
+    "ca03": ["money"],
+    "ca04": ["quality"],
+    "ca05": ["time-window"],
+    "ca06": ["delivery-rate"],
+    "ca07": ["order-pages"],
+    "ca08": ["retail-load-recovery"],
+    "ca09": ["retail-query"],
+    "ca10": ["migrations"],
+    "ca11": ["late-delivery"],
+    "ca12": ["duplicates"],
+    "ca13": ["quality"],
+    "ca14": ["time-window"],
+    "ca15": ["delivery-rate"],
+    "ca16": ["order-pages"]
+  }
+}

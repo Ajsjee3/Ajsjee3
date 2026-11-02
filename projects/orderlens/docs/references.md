@@ -1,5 +1,20 @@
 # 참고 저장소와 적용한 부분
 
+## 2026-11-02 · 검색 점수 기준과 경계 테스트
+
+[langchain-ai/langchainjs](https://github.com/langchain-ai/langchainjs/tree/1f66c978e365467e4324a661adfd7d956d512a17)의 README, 소스, 실행 예제, 통합 테스트와 기능 도입 변경을 직접 읽었습니다. LangChain Classic은 유지보수용 패키지이고 OrderLens의 BM25 점수는 벡터 유사도와 의미가 다르므로, 의존성이나 예제의 `0.9` 값을 가져오지 않고 결과 필터·경계 검증 원칙만 적용했습니다.
+
+| 확인한 파일·변경 | 확인한 내용 | 이번 변경에 적용한 부분 |
+|---|---|---|
+| [저장소 README](https://github.com/langchain-ai/langchainjs/blob/1f66c978e365467e4324a661adfd7d956d512a17/README.md) | 설치 방법과 검색·평가를 포함한 구성 요소의 역할 | 외부 라이브러리를 추가하지 않고 현재 작은 BM25 구현을 유지 |
+| [Classic README](https://github.com/langchain-ai/langchainjs/blob/1f66c978e365467e4324a661adfd7d956d512a17/libs/langchain-classic/README.md) | 설치·실행 예제와 신규 개발에는 권하지 않는 유지보수 범위 | 참고 코드의 현재 상태를 명시하고 패키지를 새 의존성으로 채택하지 않음 |
+| [score_threshold.ts](https://github.com/langchain-ai/langchainjs/blob/1f66c978e365467e4324a661adfd7d956d512a17/libs/langchain-classic/src/retrievers/score_threshold.ts) | 검색 점수가 최소값 이상인 결과만 남김 | BM25 결과를 검색 뒤 필터링하고 기준 미달이면 명시적으로 보류 |
+| [실행 예제](https://github.com/langchain-ai/langchainjs/blob/1f66c978e365467e4324a661adfd7d956d512a17/examples/src/langchain-classic/retrievers/similarity_score_threshold.ts) | 최소 점수와 최대 결과 범위를 호출부에서 드러냄 | API 응답에 기준 점수와 필터링 전 1위 점수를 함께 노출 |
+| [통합 테스트](https://github.com/langchain-ai/langchainjs/blob/1f66c978e365467e4324a661adfd7d956d512a17/libs/langchain-classic/src/retrievers/tests/score_threshold.int.test.ts) | 기준 이상 결과와 반환 상한을 실행 경로에서 확인 | 기준과 같은 점수는 유지하고 바로 아래 점수는 제거하는 단위 테스트 작성 |
+| [도입 커밋](https://github.com/langchain-ai/langchainjs/commit/c6899ae77bbd03428b0645a9dfc6355de12f84a7) | 소스·예제·통합 테스트·문서를 한 변경으로 추가하고 반복 조건도 수정 | 구현, 재현 스크립트, 실패 행, 설명을 같은 변경에 포함 |
+
+확인한 Git blob SHA는 순서대로 `e480f3ccd856f753f9c61190d31514e12cd999fd`, `0ad555b8f5d8949773314d1de7988be88e0e7e50`, `9610a7e8742e39953ef8cca3d93aee65de7b5622`, `ef2cdd3227b550245d85980d7dbd5c68b1387a90`, `c9d757a2077030d0b14bf4cc94bfeff5bdcd39c3`입니다. 외부 코드·문구·측정값을 복사하지 않았고 유료 임베딩 API도 호출하지 않았습니다. OrderLens의 기준 3.197979는 별도 개발 질문으로 재현했습니다.
+
 ## 2026-10-26 · 검색 평가 자료와 실패 행
 
 [beir-cellar/beir](https://github.com/beir-cellar/beir/tree/ef83d29307061c65d04b035b4f4e7c18bd8374af)의 검색 평가 형식·코드·실행 예제와 관련 변경 기록을 직접 읽었습니다. 큰 벤치마크 라이브러리를 도입하지 않고, 작은 OrderLens 자료에서 문서·질문·정답표를 분리하고 순위 지표와 실패 행을 남기는 원칙만 적용했습니다.
