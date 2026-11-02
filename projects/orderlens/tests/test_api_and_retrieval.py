@@ -13,21 +13,35 @@ def test_auth_is_required_and_health_is_public(client):
 
 def test_document_search_returns_evidence_with_honest_mode(client):
     body = client.post("/v1/knowledge/search", json={"query": "중복 적재 버전 충돌"}).json()
-    assert body["mode"] == "retrieval_only"
+    assert body["mode"] == "retrieval_only_with_abstention"
     assert body["score_is_probability"] is False
+    assert body["abstained"] is False
+    assert body["abstention_reason"] is None
+    assert body["top_score"] >= body["minimum_score"]
     assert body["matches"][0]["document_id"] == "duplicates"
     assert body["matches"][0]["source"] == "bundled_demo_policy"
 
 
 def test_unrelated_query_has_no_evidence(client):
     response = client.post("/v1/knowledge/search", json={"query": "블랙홀 은하 천체"})
-    assert response.json()["matches"] == []
+    body = response.json()
+    assert body["matches"] == []
+    assert body["abstained"] is True
+    assert body["abstention_reason"] == "no_token_overlap"
+
+
+def test_weak_domain_overlap_is_abstained(client):
+    body = client.post("/v1/knowledge/search", json={"query": "배송비 할인 쿠폰 정책"}).json()
+
+    assert body["top_score"] > 0
+    assert body["top_score"] < body["minimum_score"]
+    assert body["matches"] == []
+    assert body["abstained"] is True
+    assert body["abstention_reason"] == "top_score_below_minimum"
 
 
 def test_document_search_returns_page_contract(client):
-    body = client.post(
-        "/v1/knowledge/search", json={"query": "next_offset as_of 페이지"}
-    ).json()
+    body = client.post("/v1/knowledge/search", json={"query": "next_offset as_of 페이지"}).json()
     assert body["matches"][0]["document_id"] == "order-pages"
 
 

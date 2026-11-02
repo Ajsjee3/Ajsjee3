@@ -31,6 +31,11 @@
         "migrations",
         "delivery-rate"
       ],
+      "scores": [
+        4.228811,
+        2.924096,
+        2.740193
+      ],
       "first_relevant_rank": null,
       "relevant_in_top_k": 0
     },
@@ -46,6 +51,11 @@
         "migrations",
         "duplicates"
       ],
+      "scores": [
+        4.830017,
+        4.794174,
+        2.17232
+      ],
       "first_relevant_rank": 3,
       "relevant_in_top_k": 1
     },
@@ -60,6 +70,11 @@
         "retail-query",
         "money",
         "quality"
+      ],
+      "scores": [
+        6.180317,
+        3.135299,
+        1.748875
       ],
       "first_relevant_rank": 2,
       "relevant_in_top_k": 1
@@ -77,6 +92,11 @@
         "migrations",
         "quality"
       ],
+      "scores": [
+        2.066743,
+        1.856874,
+        1.628917
+      ],
       "first_relevant_rank": 3,
       "relevant_in_top_k": 1
     },
@@ -91,6 +111,11 @@
         "retail-query",
         "time-window",
         "order-pages"
+      ],
+      "scores": [
+        4.387447,
+        3.058349,
+        3.042897
       ],
       "first_relevant_rank": 2,
       "relevant_in_top_k": 1
@@ -107,6 +132,11 @@
         "migrations",
         "order-pages"
       ],
+      "scores": [
+        4.525338,
+        3.726952,
+        2.599905
+      ],
       "first_relevant_rank": 2,
       "relevant_in_top_k": 1
     },
@@ -121,6 +151,11 @@
         "retail-load-recovery",
         "duplicates",
         "order-pages"
+      ],
+      "scores": [
+        3.55131,
+        3.34036,
+        2.772432
       ],
       "first_relevant_rank": 2,
       "relevant_in_top_k": 1
@@ -137,6 +172,11 @@
         "duplicates",
         "retail-load-recovery"
       ],
+      "scores": [
+        3.904696,
+        2.241276,
+        2.068831
+      ],
       "first_relevant_rank": 3,
       "relevant_in_top_k": 1
     },
@@ -150,6 +190,10 @@
       "retrieved": [
         "migrations",
         "order-pages"
+      ],
+      "scores": [
+        1.856874,
+        1.838208
       ],
       "first_relevant_rank": 2,
       "relevant_in_top_k": 1
@@ -165,6 +209,11 @@
         "delivery-rate",
         "late-delivery"
       ],
+      "scores": [
+        2.993898,
+        1.656295,
+        1.51073
+      ],
       "returned_count": 3
     },
     {
@@ -175,6 +224,10 @@
         "late-delivery",
         "migrations"
       ],
+      "scores": [
+        2.898208,
+        1.856874
+      ],
       "returned_count": 2
     },
     {
@@ -183,6 +236,9 @@
       "category": "domain_adjacent",
       "retrieved": [
         "money"
+      ],
+      "scores": [
+        2.066743
       ],
       "returned_count": 1
     },
@@ -195,6 +251,11 @@
         "migrations",
         "time-window"
       ],
+      "scores": [
+        5.627769,
+        3.726952,
+        2.032289
+      ],
       "returned_count": 3
     },
     {
@@ -206,6 +267,11 @@
         "money",
         "retail-query"
       ],
+      "scores": [
+        2.600289,
+        2.46905,
+        1.620766
+      ],
       "returned_count": 3
     },
     {
@@ -215,6 +281,10 @@
       "retrieved": [
         "migrations",
         "order-pages"
+      ],
+      "scores": [
+        1.856874,
+        1.838208
       ],
       "returned_count": 2
     }
@@ -232,6 +302,11 @@
         "migrations",
         "delivery-rate"
       ],
+      "scores": [
+        4.228811,
+        2.924096,
+        2.740193
+      ],
       "first_relevant_rank": null,
       "relevant_in_top_k": 0
     },
@@ -246,6 +321,11 @@
         "late-delivery",
         "delivery-rate",
         "duplicates"
+      ],
+      "scores": [
+        6.890046,
+        6.417257,
+        3.15093
       ],
       "first_relevant_rank": 1,
       "relevant_in_top_k": 1
@@ -262,6 +342,11 @@
         "migrations",
         "duplicates"
       ],
+      "scores": [
+        4.830017,
+        4.794174,
+        2.17232
+      ],
       "first_relevant_rank": 3,
       "relevant_in_top_k": 1
     },
@@ -276,6 +361,11 @@
         "duplicates",
         "money",
         "migrations"
+      ],
+      "scores": [
+        8.390718,
+        2.066743,
+        1.856874
       ],
       "first_relevant_rank": 1,
       "relevant_in_top_k": 1
@@ -292,6 +382,11 @@
         "money",
         "quality"
       ],
+      "scores": [
+        6.180317,
+        3.135299,
+        1.748875
+      ],
       "first_relevant_rank": 2,
       "relevant_in_top_k": 1
     },
@@ -307,6 +402,11 @@
         "duplicates",
         "retail-query"
       ],
+      "scores": [
+        10.333714,
+        2.032289,
+        1.130353
+      ],
       "first_relevant_rank": 1,
       "relevant_in_top_k": 1
     },
@@ -321,6 +421,11 @@
         "quality",
         "late-delivery",
         "retail-load-recovery"
+      ],
+      "scores": [
+        4.51781,
+        2.155156,
+        1.797808
       ],
       "first_relevant_rank": 1,
       "relevant_in_top_k": 1
@@ -338,6 +443,11 @@
         "migrations",
         "quality"
       ],
+      "scores": [
+        2.066743,
+        1.856874,
+        1.628917
+      ],
       "first_relevant_rank": 3,
       "relevant_in_top_k": 1
     },
@@ -352,6 +462,11 @@
         "retail-query",
         "time-window",
         "order-pages"
+      ],
+      "scores": [
+        4.387447,
+        3.058349,
+        3.042897
       ],
       "first_relevant_rank": 2,
       "relevant_in_top_k": 1
@@ -368,6 +483,11 @@
         "retail-query",
         "late-delivery"
       ],
+      "scores": [
+        4.838557,
+        3.97935,
+        2.819845
+      ],
       "first_relevant_rank": 1,
       "relevant_in_top_k": 1
     },
@@ -382,6 +502,11 @@
         "delivery-rate",
         "late-delivery",
         "order-pages"
+      ],
+      "scores": [
+        7.461465,
+        5.821042,
+        1.838208
       ],
       "first_relevant_rank": 1,
       "relevant_in_top_k": 1
@@ -398,6 +523,11 @@
         "late-delivery",
         "money"
       ],
+      "scores": [
+        13.709065,
+        4.837442,
+        4.380734
+      ],
       "first_relevant_rank": 1,
       "relevant_in_top_k": 1
     },
@@ -412,6 +542,11 @@
         "order-pages",
         "delivery-rate",
         "money"
+      ],
+      "scores": [
+        7.29604,
+        1.405695,
+        1.281207
       ],
       "first_relevant_rank": 1,
       "relevant_in_top_k": 1
@@ -428,6 +563,11 @@
         "late-delivery",
         "time-window"
       ],
+      "scores": [
+        8.917272,
+        5.256327,
+        3.717967
+      ],
       "first_relevant_rank": 1,
       "relevant_in_top_k": 1
     },
@@ -442,6 +582,11 @@
         "retail-load-recovery",
         "retail-query",
         "migrations"
+      ],
+      "scores": [
+        5.80862,
+        4.548527,
+        3.726952
       ],
       "first_relevant_rank": 1,
       "relevant_in_top_k": 1
@@ -458,6 +603,11 @@
         "retail-query",
         "quality"
       ],
+      "scores": [
+        10.638391,
+        3.227346,
+        2.993979
+      ],
       "first_relevant_rank": 1,
       "relevant_in_top_k": 1
     },
@@ -472,6 +622,11 @@
         "retail-query",
         "retail-load-recovery",
         "quality"
+      ],
+      "scores": [
+        8.836497,
+        2.386981,
+        1.628917
       ],
       "first_relevant_rank": 1,
       "relevant_in_top_k": 1
@@ -488,6 +643,11 @@
         "order-pages",
         "retail-load-recovery"
       ],
+      "scores": [
+        14.216122,
+        4.052322,
+        3.039597
+      ],
       "first_relevant_rank": 1,
       "relevant_in_top_k": 1
     },
@@ -502,6 +662,11 @@
         "migrations",
         "duplicates",
         "delivery-rate"
+      ],
+      "scores": [
+        13.171936,
+        6.908586,
+        2.740193
       ],
       "first_relevant_rank": 1,
       "relevant_in_top_k": 1
@@ -518,6 +683,11 @@
         "migrations",
         "order-pages"
       ],
+      "scores": [
+        4.525338,
+        3.726952,
+        2.599905
+      ],
       "first_relevant_rank": 2,
       "relevant_in_top_k": 1
     },
@@ -532,6 +702,11 @@
         "late-delivery",
         "time-window",
         "delivery-rate"
+      ],
+      "scores": [
+        3.674845,
+        3.543533,
+        1.545599
       ],
       "first_relevant_rank": 1,
       "relevant_in_top_k": 1
@@ -548,6 +723,11 @@
         "duplicates",
         "order-pages"
       ],
+      "scores": [
+        3.55131,
+        3.34036,
+        2.772432
+      ],
       "first_relevant_rank": 2,
       "relevant_in_top_k": 1
     },
@@ -563,6 +743,11 @@
         "duplicates",
         "retail-load-recovery"
       ],
+      "scores": [
+        3.904696,
+        2.241276,
+        2.068831
+      ],
       "first_relevant_rank": 3,
       "relevant_in_top_k": 1
     },
@@ -577,6 +762,10 @@
         "migrations",
         "order-pages"
       ],
+      "scores": [
+        1.856874,
+        1.838208
+      ],
       "first_relevant_rank": 2,
       "relevant_in_top_k": 1
     }
@@ -587,6 +776,7 @@
       "query": "블랙홀을 관측하는 방법",
       "category": "unrelated",
       "retrieved": [],
+      "scores": [],
       "returned_count": 0
     },
     {
@@ -594,6 +784,7 @@
       "query": "피아노 조율 주기와 비용",
       "category": "unrelated",
       "retrieved": [],
+      "scores": [],
       "returned_count": 0
     },
     {
@@ -605,6 +796,11 @@
         "delivery-rate",
         "late-delivery"
       ],
+      "scores": [
+        2.993898,
+        1.656295,
+        1.51073
+      ],
       "returned_count": 3
     },
     {
@@ -615,6 +811,10 @@
         "late-delivery",
         "migrations"
       ],
+      "scores": [
+        2.898208,
+        1.856874
+      ],
       "returned_count": 2
     },
     {
@@ -623,6 +823,9 @@
       "category": "domain_adjacent",
       "retrieved": [
         "money"
+      ],
+      "scores": [
+        2.066743
       ],
       "returned_count": 1
     },
@@ -635,6 +838,11 @@
         "migrations",
         "time-window"
       ],
+      "scores": [
+        5.627769,
+        3.726952,
+        2.032289
+      ],
       "returned_count": 3
     },
     {
@@ -646,6 +854,11 @@
         "money",
         "retail-query"
       ],
+      "scores": [
+        2.600289,
+        2.46905,
+        1.620766
+      ],
       "returned_count": 3
     },
     {
@@ -656,6 +869,10 @@
         "migrations",
         "order-pages"
       ],
+      "scores": [
+        1.856874,
+        1.838208
+      ],
       "returned_count": 2
     }
   ],
@@ -663,5 +880,874 @@
     "질의는 수작업 고정 예제이며 실제 사용자 로그가 아닙니다.",
     "평가 자료 작성자와 검색 구현자가 분리된 독립 평가가 아닙니다.",
     "한 번의 작은 한국어 corpus 결과를 실무 정확도로 일반화하지 않습니다."
-  ]
+  ],
+  "abstention_policy": {
+    "calibration": {
+      "dataset_id": "orderlens-retrieval-calibration-v1",
+      "created_on": "2026-11-02",
+      "query_origin": "manually_curated_development_queries_not_real_user_queries",
+      "selection_metric": "balanced_correct_acceptance_and_unanswerable_abstention",
+      "tie_breaker": "higher_answerable_correct_acceptance_then_lower_threshold",
+      "answerable_query_count": 16,
+      "unanswerable_query_count": 10,
+      "selected": {
+        "minimum_score": 3.197979,
+        "answerable_correct_accept_rate": 0.875,
+        "unanswerable_abstention_rate": 0.9,
+        "balanced_correctness": 0.8875
+      },
+      "cases": [
+        {
+          "id": "ca01",
+          "query": "paid 상태인데 promised_by가 지난 주문을 지연으로 판단하나요",
+          "kind": "answerable",
+          "category": "late_delivery",
+          "top_document_id": "late-delivery",
+          "top_score": 9.185935,
+          "top1_correct": true
+        },
+        {
+          "id": "ca02",
+          "query": "source order_id revision이 똑같은 주문은 어떻게 처리돼요",
+          "kind": "answerable",
+          "category": "duplicates",
+          "top_document_id": "duplicates",
+          "top_score": 11.105439,
+          "top1_correct": true
+        },
+        {
+          "id": "ca03",
+          "query": "paid shipped delivered 금액만 booked amount에 포함되나요",
+          "kind": "answerable",
+          "category": "money",
+          "top_document_id": "money",
+          "top_score": 10.691536,
+          "top1_correct": true
+        },
+        {
+          "id": "ca04",
+          "query": "소수 금액을 넣은 행의 오류 위치를 찾는 방법",
+          "kind": "answerable",
+          "category": "quality",
+          "top_document_id": "quality",
+          "top_score": 6.202153,
+          "top1_correct": true
+        },
+        {
+          "id": "ca05",
+          "query": "start_at은 포함하고 end_at은 제외하는 게 맞나요",
+          "kind": "answerable",
+          "category": "time_window",
+          "top_document_id": "time-window",
+          "top_score": 10.15585,
+          "top1_correct": true
+        },
+        {
+          "id": "ca06",
+          "query": "완료 주문이 없을 때 late delivery rate 응답",
+          "kind": "answerable",
+          "category": "delivery_rate",
+          "top_document_id": "delivery-rate",
+          "top_score": 12.755316,
+          "top1_correct": true
+        },
+        {
+          "id": "ca07",
+          "query": "has_more가 참일 때 다음 offset을 어떻게 정하나요",
+          "kind": "answerable",
+          "category": "order_pages",
+          "top_document_id": "order-pages",
+          "top_score": 9.534646,
+          "top1_correct": true
+        },
+        {
+          "id": "ca08",
+          "query": "행 계약 오류가 나면 공개 거래 적재 트랜잭션은 롤백되나요",
+          "kind": "answerable",
+          "category": "retail_recovery",
+          "top_document_id": "retail-load-recovery",
+          "top_score": 20.380093,
+          "top1_correct": true
+        },
+        {
+          "id": "ca09",
+          "query": "국가와 취소 여부와 거래 시각 복합 인덱스 순서",
+          "kind": "answerable",
+          "category": "retail_query",
+          "top_document_id": "retail-query",
+          "top_score": 19.574865,
+          "top1_correct": true
+        },
+        {
+          "id": "ca10",
+          "query": "앱 시작 전에 alembic upgrade head가 필요한 경우",
+          "kind": "answerable",
+          "category": "migrations",
+          "top_document_id": "migrations",
+          "top_score": 9.765106,
+          "top1_correct": true
+        },
+        {
+          "id": "ca11",
+          "query": "택배가 늦었는지 보는 기준",
+          "kind": "answerable",
+          "category": "hard_paraphrase",
+          "top_document_id": "late-delivery",
+          "top_score": 1.519689,
+          "top1_correct": true
+        },
+        {
+          "id": "ca12",
+          "query": "재업로드하면 중복인가요",
+          "kind": "answerable",
+          "category": "hard_paraphrase",
+          "top_document_id": "duplicates",
+          "top_score": 2.14665,
+          "top1_correct": true
+        },
+        {
+          "id": "ca13",
+          "query": "잘못된 금액 행은 저장되나요",
+          "kind": "answerable",
+          "category": "hard_paraphrase",
+          "top_document_id": "quality",
+          "top_score": 3.497751,
+          "top1_correct": true
+        },
+        {
+          "id": "ca14",
+          "query": "기간 끝 시각도 조회되나요",
+          "kind": "answerable",
+          "category": "hard_paraphrase",
+          "top_document_id": "time-window",
+          "top_score": 3.717967,
+          "top1_correct": true
+        },
+        {
+          "id": "ca15",
+          "query": "늦게 도착한 완료 건의 비율",
+          "kind": "answerable",
+          "category": "hard_paraphrase",
+          "top_document_id": "delivery-rate",
+          "top_score": 4.259571,
+          "top1_correct": true
+        },
+        {
+          "id": "ca16",
+          "query": "다음 목록 위치는 어디서 얻나요",
+          "kind": "answerable",
+          "category": "hard_paraphrase",
+          "top_document_id": "order-pages",
+          "top_score": 4.523608,
+          "top1_correct": true
+        },
+        {
+          "id": "cu01",
+          "query": "배송 기사 배차 순서를 바꾸는 방법",
+          "kind": "unanswerable",
+          "category": "domain_adjacent",
+          "top_document_id": "retail-query",
+          "top_score": 1.966715,
+          "top1_correct": false
+        },
+        {
+          "id": "cu02",
+          "query": "고객 비밀번호 초기화 절차",
+          "kind": "unanswerable",
+          "category": "domain_adjacent",
+          "top_document_id": "late-delivery",
+          "top_score": 2.898208,
+          "top1_correct": false
+        },
+        {
+          "id": "cu03",
+          "query": "상품 카테고리별 재고 안전수량",
+          "kind": "unanswerable",
+          "category": "domain_adjacent",
+          "top_document_id": null,
+          "top_score": 0.0,
+          "top1_correct": false
+        },
+        {
+          "id": "cu04",
+          "query": "PostgreSQL 백업 주기와 보관 기간",
+          "kind": "unanswerable",
+          "category": "domain_adjacent",
+          "top_document_id": "retail-query",
+          "top_score": 2.096993,
+          "top1_correct": false
+        },
+        {
+          "id": "cu05",
+          "query": "할인 쿠폰 만료일 연장",
+          "kind": "unanswerable",
+          "category": "domain_adjacent",
+          "top_document_id": null,
+          "top_score": 0.0,
+          "top1_correct": false
+        },
+        {
+          "id": "cu06",
+          "query": "판매자 수수료 정산일",
+          "kind": "unanswerable",
+          "category": "domain_adjacent",
+          "top_document_id": "money",
+          "top_score": 4.133486,
+          "top1_correct": false
+        },
+        {
+          "id": "cu07",
+          "query": "환불 승인 담당자를 지정하는 방법",
+          "kind": "unanswerable",
+          "category": "domain_adjacent",
+          "top_document_id": "money",
+          "top_score": 2.172371,
+          "top1_correct": false
+        },
+        {
+          "id": "cu08",
+          "query": "택배 송장 출력 프린터 설정",
+          "kind": "unanswerable",
+          "category": "domain_adjacent",
+          "top_document_id": "late-delivery",
+          "top_score": 2.043645,
+          "top1_correct": false
+        },
+        {
+          "id": "cu09",
+          "query": "제주도 일주일 여행 일정",
+          "kind": "unanswerable",
+          "category": "unrelated",
+          "top_document_id": null,
+          "top_score": 0.0,
+          "top1_correct": false
+        },
+        {
+          "id": "cu10",
+          "query": "기타 코드로 연주하는 재즈 화성",
+          "kind": "unanswerable",
+          "category": "unrelated",
+          "top_document_id": "migrations",
+          "top_score": 1.856874,
+          "top1_correct": false
+        }
+      ]
+    },
+    "frozen_evaluation": {
+      "minimum_score": 3.197979,
+      "score_is_probability": false,
+      "metrics": {
+        "answerable_correct_accept_rate": 0.625,
+        "unanswerable_abstention_rate": 0.875,
+        "balanced_correctness": 0.75,
+        "answerable_accept_rate": 0.916667,
+        "accepted_result_precision": 0.652174
+      },
+      "failure_counts": {
+        "answerable_false_abstention": 2,
+        "wrong_answerable_accept": 7,
+        "unanswerable_false_accept": 1
+      },
+      "answerable_false_abstentions": [
+        {
+          "id": "q08",
+          "query": "날짜에 timezone을 넣지 않은 레코드는 어떻게 처리하나요",
+          "kind": "answerable",
+          "category": "quality_and_time",
+          "top_document_id": "money",
+          "top_score": 2.066743,
+          "top1_correct": false,
+          "accepted": false,
+          "abstention_reason": "top_score_below_minimum",
+          "returned": []
+        },
+        {
+          "id": "q24",
+          "query": "목록을 넘기면서 결과가 겹치는 이유",
+          "kind": "answerable",
+          "category": "hard_paraphrase",
+          "top_document_id": "migrations",
+          "top_score": 1.856874,
+          "top1_correct": false,
+          "accepted": false,
+          "abstention_reason": "top_score_below_minimum",
+          "returned": []
+        }
+      ],
+      "wrong_answerable_accepts": [
+        {
+          "id": "q01",
+          "query": "택배가 아직 오지 않았는데 지연 건으로 잡히는 조건",
+          "kind": "answerable",
+          "category": "late_delivery",
+          "top_document_id": "order-pages",
+          "top_score": 4.228811,
+          "top1_correct": false,
+          "accepted": true,
+          "abstention_reason": null,
+          "returned": [
+            "order-pages"
+          ]
+        },
+        {
+          "id": "q03",
+          "query": "같은 주문 파일을 두 번 보내면 DB에 또 들어가나요",
+          "kind": "answerable",
+          "category": "duplicates",
+          "top_document_id": "retail-load-recovery",
+          "top_score": 4.830017,
+          "top1_correct": false,
+          "accepted": true,
+          "abstention_reason": null,
+          "returned": [
+            "retail-load-recovery",
+            "migrations"
+          ]
+        },
+        {
+          "id": "q05",
+          "query": "취소된 건까지 금액 합계에 들어가나요",
+          "kind": "answerable",
+          "category": "money",
+          "top_document_id": "retail-query",
+          "top_score": 6.180317,
+          "top1_correct": false,
+          "accepted": true,
+          "abstention_reason": null,
+          "returned": [
+            "retail-query"
+          ]
+        },
+        {
+          "id": "q09",
+          "query": "조회 시작과 종료 경계가 포함되는 범위",
+          "kind": "answerable",
+          "category": "time_window",
+          "top_document_id": "retail-query",
+          "top_score": 4.387447,
+          "top1_correct": false,
+          "accepted": true,
+          "abstention_reason": null,
+          "returned": [
+            "retail-query"
+          ]
+        },
+        {
+          "id": "q20",
+          "query": "새 DB를 최신 revision으로 올리는 명령",
+          "kind": "answerable",
+          "category": "migrations",
+          "top_document_id": "duplicates",
+          "top_score": 4.525338,
+          "top1_correct": false,
+          "accepted": true,
+          "abstention_reason": null,
+          "returned": [
+            "duplicates",
+            "migrations"
+          ]
+        },
+        {
+          "id": "q22",
+          "query": "같은 주문을 다시 올리면 또 저장되나요",
+          "kind": "answerable",
+          "category": "hard_paraphrase",
+          "top_document_id": "retail-load-recovery",
+          "top_score": 3.55131,
+          "top1_correct": false,
+          "accepted": true,
+          "abstention_reason": null,
+          "returned": [
+            "retail-load-recovery",
+            "duplicates"
+          ]
+        },
+        {
+          "id": "q23",
+          "query": "두 번째 레코드가 깨졌을 때 먼저 넣은 데이터 처리",
+          "kind": "answerable",
+          "category": "hard_paraphrase",
+          "top_document_id": "migrations",
+          "top_score": 3.904696,
+          "top1_correct": false,
+          "accepted": true,
+          "abstention_reason": null,
+          "returned": [
+            "migrations"
+          ]
+        }
+      ],
+      "unanswerable_false_accepts": [
+        {
+          "id": "u06",
+          "query": "DB 백업 파일을 복원하는 명령",
+          "kind": "unanswerable",
+          "category": "domain_adjacent",
+          "top_document_id": "retail-load-recovery",
+          "top_score": 5.627769,
+          "top1_correct": false,
+          "accepted": true,
+          "abstention_reason": null,
+          "returned": [
+            "retail-load-recovery",
+            "migrations"
+          ]
+        }
+      ],
+      "cases": [
+        {
+          "id": "q01",
+          "query": "택배가 아직 오지 않았는데 지연 건으로 잡히는 조건",
+          "kind": "answerable",
+          "category": "late_delivery",
+          "top_document_id": "order-pages",
+          "top_score": 4.228811,
+          "top1_correct": false,
+          "accepted": true,
+          "abstention_reason": null,
+          "returned": [
+            "order-pages"
+          ]
+        },
+        {
+          "id": "q02",
+          "query": "발송 중인 주문이 약속 시간을 넘겼을 때 확인할 내용",
+          "kind": "answerable",
+          "category": "late_delivery",
+          "top_document_id": "late-delivery",
+          "top_score": 6.890046,
+          "top1_correct": true,
+          "accepted": true,
+          "abstention_reason": null,
+          "returned": [
+            "late-delivery",
+            "delivery-rate"
+          ]
+        },
+        {
+          "id": "q03",
+          "query": "같은 주문 파일을 두 번 보내면 DB에 또 들어가나요",
+          "kind": "answerable",
+          "category": "duplicates",
+          "top_document_id": "retail-load-recovery",
+          "top_score": 4.830017,
+          "top1_correct": false,
+          "accepted": true,
+          "abstention_reason": null,
+          "returned": [
+            "retail-load-recovery",
+            "migrations"
+          ]
+        },
+        {
+          "id": "q04",
+          "query": "이미 처리한 revision의 내용이 달라졌을 때 결과",
+          "kind": "answerable",
+          "category": "duplicates",
+          "top_document_id": "duplicates",
+          "top_score": 8.390718,
+          "top1_correct": true,
+          "accepted": true,
+          "abstention_reason": null,
+          "returned": [
+            "duplicates"
+          ]
+        },
+        {
+          "id": "q05",
+          "query": "취소된 건까지 금액 합계에 들어가나요",
+          "kind": "answerable",
+          "category": "money",
+          "top_document_id": "retail-query",
+          "top_score": 6.180317,
+          "top1_correct": false,
+          "accepted": true,
+          "abstention_reason": null,
+          "returned": [
+            "retail-query"
+          ]
+        },
+        {
+          "id": "q06",
+          "query": "booked_amount_krw를 회계 매출로 사용해도 되나요",
+          "kind": "answerable",
+          "category": "money",
+          "top_document_id": "money",
+          "top_score": 10.333714,
+          "top1_correct": true,
+          "accepted": true,
+          "abstention_reason": null,
+          "returned": [
+            "money"
+          ]
+        },
+        {
+          "id": "q07",
+          "query": "필수값이 비어 있는 행은 어디서 확인하고 고치나요",
+          "kind": "answerable",
+          "category": "quality",
+          "top_document_id": "quality",
+          "top_score": 4.51781,
+          "top1_correct": true,
+          "accepted": true,
+          "abstention_reason": null,
+          "returned": [
+            "quality"
+          ]
+        },
+        {
+          "id": "q08",
+          "query": "날짜에 timezone을 넣지 않은 레코드는 어떻게 처리하나요",
+          "kind": "answerable",
+          "category": "quality_and_time",
+          "top_document_id": "money",
+          "top_score": 2.066743,
+          "top1_correct": false,
+          "accepted": false,
+          "abstention_reason": "top_score_below_minimum",
+          "returned": []
+        },
+        {
+          "id": "q09",
+          "query": "조회 시작과 종료 경계가 포함되는 범위",
+          "kind": "answerable",
+          "category": "time_window",
+          "top_document_id": "retail-query",
+          "top_score": 4.387447,
+          "top1_correct": false,
+          "accepted": true,
+          "abstention_reason": null,
+          "returned": [
+            "retail-query"
+          ]
+        },
+        {
+          "id": "q10",
+          "query": "서울 시각 표기와 Z를 같은 순간으로 처리하는 기준",
+          "kind": "answerable",
+          "category": "time_window",
+          "top_document_id": "time-window",
+          "top_score": 4.838557,
+          "top1_correct": true,
+          "accepted": true,
+          "abstention_reason": null,
+          "returned": [
+            "time-window",
+            "retail-query"
+          ]
+        },
+        {
+          "id": "q11",
+          "query": "배송 완료가 한 건도 없을 때 지연 비율 값",
+          "kind": "answerable",
+          "category": "delivery_rate",
+          "top_document_id": "delivery-rate",
+          "top_score": 7.461465,
+          "top1_correct": true,
+          "accepted": true,
+          "abstention_reason": null,
+          "returned": [
+            "delivery-rate",
+            "late-delivery"
+          ]
+        },
+        {
+          "id": "q12",
+          "query": "환불 주문을 배송 지연율 분모에 넣나요",
+          "kind": "answerable",
+          "category": "delivery_rate",
+          "top_document_id": "delivery-rate",
+          "top_score": 13.709065,
+          "top1_correct": true,
+          "accepted": true,
+          "abstention_reason": null,
+          "returned": [
+            "delivery-rate",
+            "late-delivery",
+            "money"
+          ]
+        },
+        {
+          "id": "q13",
+          "query": "주문 목록의 다음 묶음을 가져오려면 어떤 값을 보내나요",
+          "kind": "answerable",
+          "category": "order_pages",
+          "top_document_id": "order-pages",
+          "top_score": 7.29604,
+          "top1_correct": true,
+          "accepted": true,
+          "abstention_reason": null,
+          "returned": [
+            "order-pages"
+          ]
+        },
+        {
+          "id": "q14",
+          "query": "페이지를 넘길 때 조회 기준 시각을 왜 고정하나요",
+          "kind": "answerable",
+          "category": "order_pages",
+          "top_document_id": "order-pages",
+          "top_score": 8.917272,
+          "top1_correct": true,
+          "accepted": true,
+          "abstention_reason": null,
+          "returned": [
+            "order-pages",
+            "late-delivery",
+            "time-window"
+          ]
+        },
+        {
+          "id": "q15",
+          "query": "공개 거래 두 번째 줄 오류 뒤 첫 번째 줄이 DB에 남나요",
+          "kind": "answerable",
+          "category": "retail_recovery",
+          "top_document_id": "retail-load-recovery",
+          "top_score": 5.80862,
+          "top1_correct": true,
+          "accepted": true,
+          "abstention_reason": null,
+          "returned": [
+            "retail-load-recovery",
+            "retail-query",
+            "migrations"
+          ]
+        },
+        {
+          "id": "q16",
+          "query": "이미 적재한 공개 파일을 다시 실행한 결과",
+          "kind": "answerable",
+          "category": "retail_recovery",
+          "top_document_id": "retail-load-recovery",
+          "top_score": 10.638391,
+          "top1_correct": true,
+          "accepted": true,
+          "abstention_reason": null,
+          "returned": [
+            "retail-load-recovery",
+            "retail-query"
+          ]
+        },
+        {
+          "id": "q17",
+          "query": "독일 거래를 날짜 범위로 집계할 때 쓰는 인덱스",
+          "kind": "answerable",
+          "category": "retail_query",
+          "top_document_id": "retail-query",
+          "top_score": 8.836497,
+          "top1_correct": true,
+          "accepted": true,
+          "abstention_reason": null,
+          "returned": [
+            "retail-query"
+          ]
+        },
+        {
+          "id": "q18",
+          "query": "취소 표시된 GBP 거래를 기간 합계에서 빼는 조건",
+          "kind": "answerable",
+          "category": "retail_query",
+          "top_document_id": "retail-query",
+          "top_score": 14.216122,
+          "top1_correct": true,
+          "accepted": true,
+          "abstention_reason": null,
+          "returned": [
+            "retail-query",
+            "order-pages"
+          ]
+        },
+        {
+          "id": "q19",
+          "query": "스키마 버전이 코드보다 낮으면 서버가 자동으로 고치나요",
+          "kind": "answerable",
+          "category": "migrations",
+          "top_document_id": "migrations",
+          "top_score": 13.171936,
+          "top1_correct": true,
+          "accepted": true,
+          "abstention_reason": null,
+          "returned": [
+            "migrations",
+            "duplicates"
+          ]
+        },
+        {
+          "id": "q20",
+          "query": "새 DB를 최신 revision으로 올리는 명령",
+          "kind": "answerable",
+          "category": "migrations",
+          "top_document_id": "duplicates",
+          "top_score": 4.525338,
+          "top1_correct": false,
+          "accepted": true,
+          "abstention_reason": null,
+          "returned": [
+            "duplicates",
+            "migrations"
+          ]
+        },
+        {
+          "id": "q21",
+          "query": "택배가 안 왔어요 지연으로 보는 기준이 뭔가요",
+          "kind": "answerable",
+          "category": "hard_paraphrase",
+          "top_document_id": "late-delivery",
+          "top_score": 3.674845,
+          "top1_correct": true,
+          "accepted": true,
+          "abstention_reason": null,
+          "returned": [
+            "late-delivery",
+            "time-window"
+          ]
+        },
+        {
+          "id": "q22",
+          "query": "같은 주문을 다시 올리면 또 저장되나요",
+          "kind": "answerable",
+          "category": "hard_paraphrase",
+          "top_document_id": "retail-load-recovery",
+          "top_score": 3.55131,
+          "top1_correct": false,
+          "accepted": true,
+          "abstention_reason": null,
+          "returned": [
+            "retail-load-recovery",
+            "duplicates"
+          ]
+        },
+        {
+          "id": "q23",
+          "query": "두 번째 레코드가 깨졌을 때 먼저 넣은 데이터 처리",
+          "kind": "answerable",
+          "category": "hard_paraphrase",
+          "top_document_id": "migrations",
+          "top_score": 3.904696,
+          "top1_correct": false,
+          "accepted": true,
+          "abstention_reason": null,
+          "returned": [
+            "migrations"
+          ]
+        },
+        {
+          "id": "q24",
+          "query": "목록을 넘기면서 결과가 겹치는 이유",
+          "kind": "answerable",
+          "category": "hard_paraphrase",
+          "top_document_id": "migrations",
+          "top_score": 1.856874,
+          "top1_correct": false,
+          "accepted": false,
+          "abstention_reason": "top_score_below_minimum",
+          "returned": []
+        },
+        {
+          "id": "u01",
+          "query": "블랙홀을 관측하는 방법",
+          "kind": "unanswerable",
+          "category": "unrelated",
+          "top_document_id": null,
+          "top_score": 0.0,
+          "top1_correct": false,
+          "accepted": false,
+          "abstention_reason": "no_token_overlap",
+          "returned": []
+        },
+        {
+          "id": "u02",
+          "query": "피아노 조율 주기와 비용",
+          "kind": "unanswerable",
+          "category": "unrelated",
+          "top_document_id": null,
+          "top_score": 0.0,
+          "top1_correct": false,
+          "accepted": false,
+          "abstention_reason": "no_token_overlap",
+          "returned": []
+        },
+        {
+          "id": "u03",
+          "query": "배송비 할인 쿠폰 정책",
+          "kind": "unanswerable",
+          "category": "domain_adjacent",
+          "top_document_id": "money",
+          "top_score": 2.993898,
+          "top1_correct": false,
+          "accepted": false,
+          "abstention_reason": "top_score_below_minimum",
+          "returned": []
+        },
+        {
+          "id": "u04",
+          "query": "고객 전화번호와 주소 변경",
+          "kind": "unanswerable",
+          "category": "domain_adjacent",
+          "top_document_id": "late-delivery",
+          "top_score": 2.898208,
+          "top1_correct": false,
+          "accepted": false,
+          "abstention_reason": "top_score_below_minimum",
+          "returned": []
+        },
+        {
+          "id": "u05",
+          "query": "원화를 달러로 환전하는 환율",
+          "kind": "unanswerable",
+          "category": "domain_adjacent",
+          "top_document_id": "money",
+          "top_score": 2.066743,
+          "top1_correct": false,
+          "accepted": false,
+          "abstention_reason": "top_score_below_minimum",
+          "returned": []
+        },
+        {
+          "id": "u06",
+          "query": "DB 백업 파일을 복원하는 명령",
+          "kind": "unanswerable",
+          "category": "domain_adjacent",
+          "top_document_id": "retail-load-recovery",
+          "top_score": 5.627769,
+          "top1_correct": false,
+          "accepted": true,
+          "abstention_reason": null,
+          "returned": [
+            "retail-load-recovery",
+            "migrations"
+          ]
+        },
+        {
+          "id": "u07",
+          "query": "상품 재고가 부족할 때 주문 취소",
+          "kind": "unanswerable",
+          "category": "domain_adjacent",
+          "top_document_id": "delivery-rate",
+          "top_score": 2.600289,
+          "top1_correct": false,
+          "accepted": false,
+          "abstention_reason": "top_score_below_minimum",
+          "returned": []
+        },
+        {
+          "id": "u08",
+          "query": "택배사 API 요금제 변경",
+          "kind": "unanswerable",
+          "category": "domain_adjacent",
+          "top_document_id": "migrations",
+          "top_score": 1.856874,
+          "top1_correct": false,
+          "accepted": false,
+          "abstention_reason": "top_score_below_minimum",
+          "returned": []
+        }
+      ],
+      "limits": [
+        "점수 기준은 수작업 개발 질의에서 정했으며 실제 사용자 질문 분포가 아닙니다.",
+        "BM25 점수는 확률이 아니고 현재 문서와 토큰화에만 적용됩니다.",
+        "문서나 토큰화가 바뀌면 개발 자료로 기준을 다시 정한 뒤 새 고정 평가가 필요합니다."
+      ]
+    }
+  }
 }

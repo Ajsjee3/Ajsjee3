@@ -16,16 +16,15 @@ def main():
     print(
         json.dumps(
             {
-                key: value
-                for key, value in report.items()
-                if key
-                not in {
-                    "answerable_cases",
-                    "unanswerable_cases",
-                    "answerable_failures",
-                    "unanswerable_false_positives",
-                    "limits",
-                }
+                "dataset_id": report["dataset_id"],
+                "baseline_metrics": report["metrics"],
+                "calibration": report["abstention_policy"]["calibration"]["selected"],
+                "frozen_policy_metrics": report["abstention_policy"]["frozen_evaluation"][
+                    "metrics"
+                ],
+                "frozen_policy_failures": report["abstention_policy"]["frozen_evaluation"][
+                    "failure_counts"
+                ],
             },
             ensure_ascii=False,
             indent=2,

@@ -25,6 +25,7 @@ OrderLens는 판매 경로와 주문 번호를 묶어 주문을 구분하고, �
 | 실제 규모의 국가·기간 집계가 전체 행을 읽음 | 같은 조건의 실행계획을 비교하고 동등 조건 뒤에 시각 범위를 둔 복합 인덱스 적용 | [인덱스 비교](docs/decisions/retail_query_index.md) |
 | 적재 실패가 롤백 뒤 사라짐 | 실행 시도는 먼저 남기고 데이터 트랜잭션을 분리해 실패·복구·재실행 결과 기록 | [복구 기록 설계](docs/decisions/retail_load_recovery.md) |
 | 운영 기준을 찾아야 함 | BM25로 문서 ID·버전을 반환하고 별도 질문·정답표로 실패 사례까지 평가 | [retrieval_evaluation.py](orderlens/retrieval_evaluation.py) |
+| 단어가 조금 겹친 무관 질문도 근거가 반환됨 | 별도 개발 질문으로 최소 점수를 선택하고 기준 미만 검색 결과를 명시적으로 보류 | [retrieval_policy.py](orderlens/retrieval_policy.py) |
 
 ## 실행
 
@@ -70,6 +71,8 @@ curl 'http://127.0.0.1:8000/v1/orders?source=market_a&status=paid&limit=2&offset
 | BM25 고정 평가집합 | 문서 10개 · 관련 질문 24개 · 무관 질문 8개 |
 | BM25 기준선 | Top-1 0.625 · Recall@3 0.9375 · MRR@3 0.770833 |
 | 무관 질문 보류 | 결과 없음 2/8 · 오탐 6건 |
+| 보류 기준 개발 자료 | 관련 질문 16개 · 무관 질문 10개 · 최소 BM25 점수 3.197979 |
+| 고정 평가에 보류 기준 적용 | 정답 문서 1위 수용 15/24 · 무관 질문 보류 7/8 · 답할 수 있는 질문 보류 2건 |
 
 명령 한 번으로 임시 DB 마이그레이션, 강제 적재 실패·복구, 적재·재전송, 지표 비교, 검색 평가, 실제 HTTP 요청까지 재실행합니다. 원본 결과는 [검색 평가](artifacts/retrieval_evaluation.json), [SQLite 마이그레이션](artifacts/migration_check.json), [실패·복구](artifacts/retail_recovery.json), [공개 거래 DB 적재](artifacts/retail_db_check.json), [SQL 계획 비교](artifacts/retail_query_benchmark.json), [PostgreSQL 통합 검사](artifacts/postgres_integration.json), [demo_report.json](artifacts/demo_report.json), [HTTP 결과](artifacts/http_smoke.json), [검증 기록](docs/validation.md)에 남깁니다.
 
@@ -84,14 +87,15 @@ curl 'http://127.0.0.1:8000/v1/orders?source=market_a&status=paid&limit=2&offset
 - 공개 거래 적재 시도와 데이터 INSERT는 트랜잭션을 분리합니다. 실패 데이터는 롤백하되, 원본·보고서 해시와 제한된 오류는 시도 이력에 남깁니다.
 - 취소·환불 주문은 유효 주문 금액에서 제외합니다. 배송 완료 주문이 없으면 지연율은 `null`입니다.
 - 검색 점수는 확률이 아닙니다. 현재 검색은 BM25이며 요약은 규칙 기반입니다. 평가 질문은 실제 사용자 로그가 아니라 수작업한 고정 예제입니다.
+- 최소 점수는 고정 평가와 분리한 개발 질문에서만 선택합니다. API는 `abstained`, `abstention_reason`, `minimum_score`, `top_score`를 함께 반환해 보류와 무검색을 구분합니다.
 
 상세 내용은 [설계 문서](docs/design.md)에서 확인할 수 있습니다.
 
 ## 다음 작업
 
-현재 버전은 **0.8.0**입니다. 운영 문서 10개, 수작업한 관련 질문 24개와 무관 질문 8개, 별도 정답표로 검색 기준선을 다시 측정했습니다. 데이터 계약은 문서·질문·정답표의 ID와 종류를 검사하고, 관련 문서가 1위가 아니거나 무관 질문에 결과가 나온 사례를 모두 JSON에 남깁니다.
+현재 버전은 **0.9.0**입니다. 고정 평가와 문장이 겹치지 않는 개발용 관련 질문 16개·무관 질문 10개에서 `balanced_correctness`가 가장 높은 BM25 최소 점수 3.197979를 선택했습니다. 동률이면 정답 수용률이 높은 값, 다시 같으면 더 낮은 기준을 고릅니다. API는 기준 미만 결과를 반환하지 않고 보류 사유를 표시합니다.
 
-이 평가집합은 실제 사용자 로그도 독립 평가도 아닙니다. 높은 수치만 고르지 않도록 2026-10-26에 고정했고, 다음 변경에서는 질문을 바꾸지 않은 채 점수 기준으로 무관 질문을 보류했을 때 정답 검색과 오탐이 어떻게 달라지는지 비교합니다. 공개 거래 조회 API, 외부 배포와 LLM 답변 생성도 후속 작업입니다.
+2026-10-26에 고정한 24개 관련 질문·8개 무관 질문은 기준 선택에 사용하지 않았습니다. 고정 평가에서 정답 문서 1위 수용률은 0.625, 무관 질문 보류율은 0.875였습니다. 답할 수 있는 질문 2개도 보류됐고 잘못된 1위 결과 7개와 무관 질문 1개는 통과했습니다. 두 자료 모두 수작업 예제이며 실제 사용자 로그나 독립 평가가 아닙니다. 다음은 검색 문서를 인용하는 무료 규칙 기반 응답 계약과 근거 누락 평가입니다.
 
 [PR #8](https://github.com/Ajsjee3/Ajsjee3/pull/8)의 [GitHub Actions](https://github.com/Ajsjee3/Ajsjee3/actions/runs/40310364289)에서 Python 3.12.15 일반 검사와 PostgreSQL 16.15 통합 검사가 통과했습니다.
 
