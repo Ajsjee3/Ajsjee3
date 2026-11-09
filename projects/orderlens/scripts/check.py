@@ -13,6 +13,7 @@ def main():
         ["-m", "scripts.generate_demo"],
         ["-m", "scripts.demo"],
         ["-m", "scripts.evaluate_retrieval"],
+        ["-m", "scripts.evaluate_grounded_answers"],
         ["-m", "scripts.smoke_http"],
     ]
     for command in commands:

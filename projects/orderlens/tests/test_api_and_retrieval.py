@@ -49,6 +49,29 @@ def test_blank_query_is_rejected(client):
     assert client.post("/v1/knowledge/search", json={"query": "   "}).status_code == 422
 
 
+def test_grounded_answer_returns_exact_quote_and_citation(client):
+    body = client.post("/v1/knowledge/answer", json={"query": "중복 적재 버전 충돌"}).json()
+    operation = client.get("/openapi.json").json()["paths"]["/v1/knowledge/answer"]["post"]
+
+    assert body["mode"] == "extractive_document_quote"
+    assert body["contract_version"] == "grounded-answer-v1"
+    assert body["answer"] == body["citations"][0]["quote"]
+    assert body["citations"][0]["document_id"] == "duplicates"
+    assert body["abstained"] is False
+    assert operation["responses"]["200"]["content"]["application/json"]["schema"] == {
+        "$ref": "#/components/schemas/GroundedAnswerResponse"
+    }
+
+
+def test_grounded_answer_abstains_without_text_or_citation(client):
+    body = client.post("/v1/knowledge/answer", json={"query": "배송비 할인 쿠폰 정책"}).json()
+
+    assert body["answer"] is None
+    assert body["citations"] == []
+    assert body["abstained"] is True
+    assert body["abstention_reason"] == "top_score_below_minimum"
+
+
 def test_brief_is_traceable_and_does_not_send_messages(client):
     client.post("/v1/ingestions", json={"rows": [order()]})
     body = client.get("/v1/brief", params={"as_of": "2026-09-08T00:00:00Z"}).json()

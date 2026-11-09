@@ -21,12 +21,13 @@ py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m scripts.check
 ```
 
-마지막 명령은 코드 검사, 핵심 테스트, 마이그레이션 왕복 검사, 공개 거래 강제 실패·복구, 예제 데이터 생성, API 데모, 문서 검색 평가, 실제 HTTP 시연을 순서대로 실행합니다. 기존 주문 DB를 덮어쓰지 않고 임시 DB를 사용하며 시연 서버는 자동 종료됩니다.
+마지막 명령은 코드 검사, 핵심 테스트, 마이그레이션 왕복 검사, 공개 거래 강제 실패·복구, 예제 데이터 생성, API 데모, 문서 검색·인용 답변 평가, 실제 HTTP 시연을 순서대로 실행합니다. 기존 주문 DB를 덮어쓰지 않고 임시 DB를 사용하며 시연 서버는 자동 종료됩니다.
 
 | 산출물 | 내용 |
 |---|---|
 | artifacts/demo_report.json | 적재 결과, 재전송 결과, 주문 지표, 근거 문서 |
 | artifacts/retrieval_evaluation.json | 10문서·32개 고정 질문의 지표와 질문별 실패 사례 |
+| artifacts/grounded_answer_evaluation.json | 인용 계약 무결성, 관련 문서 인용과 실패 사례 |
 | artifacts/http_smoke.json | 실제 HTTP 요청과 인증 검사 결과 |
 | artifacts/migration_check.json | 네 리비전의 upgrade·downgrade·재upgrade 결과 |
 | artifacts/retail_recovery.json | 강제 적재 실패·복구·같은 파일 재실행 결과 |
@@ -89,6 +90,11 @@ curl -X POST http://127.0.0.1:8000/v1/knowledge/search \
   -H 'Content-Type: application/json' \
   -H 'X-API-Key: orderlens-local-demo-key' \
   -d '{"query":"중복 적재 버전 충돌","top_k":3}'
+
+curl -X POST http://127.0.0.1:8000/v1/knowledge/answer \
+  -H 'Content-Type: application/json' \
+  -H 'X-API-Key: orderlens-local-demo-key' \
+  -d '{"query":"중복 적재 버전 충돌"}'
 ```
 
 첫 명령은 현재 폴더의 `orderlens.db`를 최신 스키마로 올립니다. 앱은 테이블을 자동 생성하지 않으며 적용된 리비전이 코드와 다르면 시작하지 않습니다. `scripts.demo`가 사용하는 임시 DB와 별개입니다. 로컬 키는 예제에 공개되어 있으므로 외부 공개 전에 환경 변수 ORDERLENS_API_KEY를 고유한 키로 설정해야 합니다.
@@ -105,11 +111,14 @@ curl -X POST http://127.0.0.1:8000/v1/knowledge/search \
 | GET /v1/orders | 판매 경로·상태별 최신 주문 목록과 페이지 조회 |
 | GET /v1/orders/attention | 배송 예정 시각이 지난 미완료 주문 조회 |
 | POST /v1/knowledge/search | 업무 문서 검색, 점수 기준 미달 보류와 문서 ID·버전·근거 반환 |
+| POST /v1/knowledge/answer | 1위 문서 본문과 ID·버전·인용문을 한 계약으로 반환; 기준 미달 시 보류 |
 | GET /v1/brief | 운영 지표와 관련 문서를 연결한 규칙 기반 요약 |
 
 health와 API 문서를 제외한 /v1 API는 X-API-Key를 확인합니다. 고객에게 연락하거나 주문을 변경하는 동작은 구현하지 않았습니다.
 
 검색 응답의 `score_is_probability`는 false입니다. `abstained=true`이면 `matches`가 비어 있고, `abstention_reason`은 토큰이 겹치지 않은 `no_token_overlap` 또는 원래 1위가 기준보다 낮은 `top_score_below_minimum`입니다. `minimum_score`와 필터링 전 `top_score`를 함께 반환하지만 이 숫자를 확률로 해석하지 않습니다.
+
+인용 답변은 수용된 1위 문서 본문을 그대로 반환합니다. `answer`와 `citations[0].quote`가 같고 인용에는 문서 ID·제목·출처·버전·검색 점수가 있습니다. 보류되면 `answer`는 null, `citations`는 빈 목록입니다. 문장을 새로 만들거나 여러 문서를 요약하는 API가 아닙니다.
 
 ### 주문 목록의 다음 페이지
 
@@ -139,9 +148,10 @@ curl 'http://127.0.0.1:8000/v1/orders?source=market_a&status=paid&limit=2&offset
 | 5 | orderlens/ingestion.py | 중복과 충돌은 어떻게 구분할까요? |
 | 6 | orderlens/analytics.py | 같은 주문의 여러 버전 중 어느 것을 집계할까요? |
 | 7 | orderlens/retrieval.py, retrieval_policy.py, retrieval_evaluation.py | 검색 점수 기준을 고정 평가와 분리해 어떻게 정할까요? |
-| 8 | orderlens/retail.py, retail_db.py | 파일 출처·Decimal·재실행은 어떻게 보존할까요? |
-| 9 | orderlens/retail_analytics.py, scripts/benchmark_retail_sql.py | 조회 조건과 인덱스 계획을 어떻게 같은 결과로 비교할까요? |
-| 10 | tests/ | 어떤 입력을 넣었을 때 어떤 결과를 기대할까요? |
+| 8 | orderlens/grounded_answer.py, grounded_answer_evaluation.py | 답변과 인용을 어떻게 묶고 관련성을 따로 평가할까요? |
+| 9 | orderlens/retail.py, retail_db.py | 파일 출처·Decimal·재실행은 어떻게 보존할까요? |
+| 10 | orderlens/retail_analytics.py, scripts/benchmark_retail_sql.py | 조회 조건과 인덱스 계획을 어떻게 같은 결과로 비교할까요? |
+| 11 | tests/ | 어떤 입력을 넣었을 때 어떤 결과를 기대할까요? |
 
 ## 5. 데이터 흐름
 

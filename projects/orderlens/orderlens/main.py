@@ -20,12 +20,21 @@ from orderlens import __version__
 from orderlens.analytics import attention_orders, metrics, order_page, quality_summary
 from orderlens.config import Settings
 from orderlens.db import make_engine
+from orderlens.grounded_answer import ExtractiveGroundedAnswerer
 from orderlens.ingestion import ingest, run_summary
 from orderlens.migrations import require_current_schema
 from orderlens.models import IngestionRun
 from orderlens.retrieval import BM25Index
 from orderlens.retrieval_policy import BM25AbstentionPolicy
-from orderlens.schemas import IngestRequest, OrderPage, OrderSource, OrderStatus, SearchRequest
+from orderlens.schemas import (
+    GroundedAnswerRequest,
+    GroundedAnswerResponse,
+    IngestRequest,
+    OrderPage,
+    OrderSource,
+    OrderStatus,
+    SearchRequest,
+)
 
 logger = logging.getLogger("orderlens")
 key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
@@ -63,6 +72,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             )
             app.state.search = BM25Index(knowledge)
             app.state.search_policy = BM25AbstentionPolicy()
+            app.state.answerer = ExtractiveGroundedAnswerer(
+                app.state.search, app.state.search_policy
+            )
             yield
         finally:
             engine.dispose()
@@ -168,6 +180,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             "score_is_probability": False,
             **decision.as_dict(),
         }
+
+    @router.post(
+        "/knowledge/answer", tags=["knowledge"], response_model=GroundedAnswerResponse
+    )
+    def answer_knowledge(payload: GroundedAnswerRequest, request: Request):
+        return request.app.state.answerer.answer(payload.query).as_dict()
 
     @router.get("/brief", tags=["analytics"])
     def brief(request: Request, session: Db, as_of: AwareDatetime | None = None):

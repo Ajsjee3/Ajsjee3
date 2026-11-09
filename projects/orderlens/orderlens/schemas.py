@@ -76,10 +76,9 @@ class IngestRequest(BaseModel):
     rows: list[dict[str, Any]] = Field(min_length=1, max_length=500)
 
 
-class SearchRequest(BaseModel):
+class KnowledgeQuery(BaseModel):
     model_config = ConfigDict(extra="forbid")
     query: str = Field(min_length=2, max_length=200)
-    top_k: int = Field(default=3, ge=1, le=5)
 
     @field_validator("query")
     @classmethod
@@ -88,3 +87,49 @@ class SearchRequest(BaseModel):
         if len(value) < 2:
             raise ValueError("검색어를 두 글자 이상 입력해 주세요.")
         return value
+
+
+class SearchRequest(KnowledgeQuery):
+    top_k: int = Field(default=3, ge=1, le=5)
+
+
+class GroundedAnswerRequest(KnowledgeQuery):
+    pass
+
+
+class GroundedCitationResponse(BaseModel):
+    document_id: str
+    title: str
+    source: str
+    version: str
+    quote: str
+    retrieval_score: float
+
+
+class GroundedAnswerResponse(BaseModel):
+    mode: Literal["extractive_document_quote"]
+    contract_version: Literal["grounded-answer-v1"]
+    score_is_probability: Literal[False]
+    query: str
+    answer: str | None
+    citations: list[GroundedCitationResponse]
+    minimum_score: float
+    top_score: float | None
+    abstained: bool
+    abstention_reason: Literal["no_token_overlap", "top_score_below_minimum"] | None
+
+    @model_validator(mode="after")
+    def check_grounding(self) -> Self:
+        if self.abstained:
+            if self.answer is not None or self.citations or self.abstention_reason is None:
+                raise ValueError("보류 응답에는 답변·인용이 없어야 하고 사유가 필요합니다.")
+            return self
+        if (
+            not self.answer
+            or len(self.citations) != 1
+            or self.answer != self.citations[0].quote
+            or self.abstention_reason is not None
+            or self.top_score != self.citations[0].retrieval_score
+        ):
+            raise ValueError("답변은 검색 점수와 같은 인용문 하나를 가져야 합니다.")
+        return self
