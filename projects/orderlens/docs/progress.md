@@ -8,6 +8,8 @@
 
 Linux x86_64, Python 3.12.14, SQLite 3.53.1의 `requirements.lock` 환경에서 `python -m scripts.check`를 실행했습니다. 종료 코드 0, Ruff 통과, pytest 107개 통과, 기존 의존성 경고 2종이었습니다. 네 리비전 왕복, 강제 적재 실패·복구, 주문 재전송과 실제 Uvicorn HTTP에서 인용 답변·보류 답변도 함께 통과했습니다.
 
+[PR #10](https://github.com/Ajsjee3/Ajsjee3/pull/10)의 [원격 검사](https://github.com/Ajsjee3/Ajsjee3/actions/runs/42605972144)에서도 Python 3.12 일반 검사와 PostgreSQL 16.15 통합 검사가 통과했습니다. 일반 검사에서 pytest 107개와 같은 인용 평가를 확인했고, PostgreSQL 검사는 기존 네 리비전 왕복·모델 일치와 주문·공개 거래 복구 흐름을 통과했습니다.
+
 새 참고는 `deepset-ai/haystack`의 답변 자료구조·직렬화 테스트·사용 안내·변경 커밋입니다. 답변과 출처를 한 구조에 묶고 직렬화 계약을 테스트하는 원칙만 적용했으며 라이브러리·모델·외부 코드는 가져오지 않았습니다.
 
 다음: 고정 평가를 수정하거나 기준 선택에 사용하지 않고, 별도 개발 질문에서 문서 제목·본문 가중치를 비교한 뒤 잘못된 1위 인용 7건의 변화를 같은 고정 자료로 확인합니다.

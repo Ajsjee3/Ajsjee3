@@ -101,4 +101,6 @@ curl 'http://127.0.0.1:8000/v1/orders?source=market_a&status=paid&limit=2&offset
 
 2026-10-26에 고정한 관련 질문 24개·무관 질문 8개에서 답변 23건의 인용 누락과 답변/인용문 불일치는 0건이었습니다. 다만 관련 문서를 인용한 답변은 관련 질문 전체의 15/24, 답변한 관련 질문의 15/22였습니다. 관련 질문 2개는 보류됐고 7개는 다른 문서를 인용했으며 무관 질문 1개에도 답했습니다. 형식 무결성과 답변 정확도를 구분합니다. 다음은 고정 평가를 튜닝에 사용하지 않는 별도 개발 질문으로 제목·본문 가중치를 비교하는 작은 검색 순위 실험입니다.
 
+[PR #10](https://github.com/Ajsjee3/Ajsjee3/pull/10)의 [GitHub Actions](https://github.com/Ajsjee3/Ajsjee3/actions/runs/42605972144)에서 Python 3.12 일반 검사와 PostgreSQL 16.15 통합 검사가 통과했습니다.
+
 [작업 목록](docs/automation_and_backlog.md) · [개발 기록](docs/progress.md) · [참고 저장소](docs/references.md) · [기여 안내](CONTRIBUTING.md)

@@ -25,6 +25,8 @@ Linux x86_64, Python 3.12.14, SQLite 3.53.1의 `requirements.lock` 환경에서 
 
 새 참고는 `deepset-ai/haystack`의 README, 답변 자료구조, 단위 테스트, 실행 안내와 직렬화 변경 커밋입니다. 답변과 출처 문서를 한 계약으로 묶고 직렬화 형태를 회귀 테스트하는 원칙만 적용했으며 외부 코드·모델·의존성은 가져오지 않았습니다. 로컬 Docker Compose와 전체 공개 거래의 PostgreSQL 적재는 이번 변경에서 실행하지 않았습니다.
 
+[PR #10](https://github.com/Ajsjee3/Ajsjee3/pull/10)의 [GitHub Actions 실행](https://github.com/Ajsjee3/Ajsjee3/actions/runs/42605972144)에서도 `checks`, `postgres-integration` 두 job이 통과했습니다. Python 3.12 일반 검사에서 Ruff, pytest 107개와 같은 인용 평가·실제 HTTP 결과를 확인했습니다. PostgreSQL 16.15에서는 head `20261019_04`, 모델 일치, 네 리비전 왕복과 기존 주문·공개 거래 복구 흐름을 확인했습니다.
+
 ## 2026-11-02 · 0.9.0 로컬 검증
 
 Linux x86_64, Python 3.12.14, SQLite 3.53.1의 `requirements.lock` 환경에서 `python -m scripts.check`를 실행했습니다. 종료 코드 0, Ruff 통과, pytest 101개 통과, 기존 의존성 경고 2종입니다. Alembic head `20261019_04` 적용, base downgrade·재upgrade와 모델 일치, 강제 적재 실패·복구, 주문 재전송, 실제 Uvicorn HTTP 8페이지·고유 주문 120건도 함께 통과했습니다.
