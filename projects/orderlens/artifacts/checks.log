@@ -1,3 +1,20 @@
+OrderLens 0.10.0 로컬 검증 요약 — 2026-11-09
+환경: Linux x86_64, Python 3.12.14, SQLite 3.53.1, requirements.lock 가상환경
+실행 위치: projects/orderlens
+명령: python -m scripts.check
+종료 코드: 0
+Ruff: All checks passed!
+pytest: 107 passed, 2 warnings
+마이그레이션: 20260921_01 → 20261005_02 → 20261012_03 → 20261019_04
+모델 일치, base downgrade·재upgrade, 강제 적재 실패·복구와 HTTP 8페이지·고유 주문 120건 통과
+인용 답변: 실제 HTTP에서 answer와 quote 일치, duplicates 문서 ID·버전 반환
+보류 답변: 배송비 할인 쿠폰 질문에 answer null, citations 빈 목록, top_score_below_minimum
+고정 32문항: 계약 오류 0건, 답변 23건, 인용 누락 0건, 답변/인용문 불일치 0건
+관련 문서 인용: 관련 질문 전체 15/24, 답변한 관련 질문 15/22
+실패: 관련 질문 보류 2건, 잘못된 문서 인용 7건, 무관 질문 답변 1건
+한계: 문서 전문을 그대로 반환; 수작업 질문이며 실제 사용자 로그·독립 평가가 아님
+근거: artifacts/grounded_answer_evaluation.json, artifacts/http_smoke.json, docs/validation.md
+
 OrderLens 0.9.0 로컬 검증 요약 — 2026-11-02
 환경: Linux x86_64, Python 3.12.14, SQLite 3.53.1, requirements.lock 가상환경
 실행 위치: projects/orderlens

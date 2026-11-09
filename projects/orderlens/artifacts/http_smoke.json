@@ -26,6 +26,20 @@
     "only_requested_source_and_status": true
   },
   "orders_unauthenticated": 401,
+  "grounded_answer": {
+    "status": 200,
+    "contract_version": "grounded-answer-v1",
+    "answer_equals_quote": true,
+    "document_id": "duplicates",
+    "contract_errors": []
+  },
+  "grounded_answer_abstention": {
+    "status": 200,
+    "reason": "top_score_below_minimum",
+    "answer": null,
+    "citations": [],
+    "contract_errors": []
+  },
   "attention_filter": {
     "status": 200,
     "source": "market_a",

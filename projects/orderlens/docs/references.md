@@ -1,5 +1,20 @@
 # 참고 저장소와 적용한 부분
 
+## 2026-11-09 · 답변과 출처 문서의 응답 계약
+
+[deepset-ai/haystack](https://github.com/deepset-ai/haystack/tree/8872d2bfba932964638c26575b074184913a8074)의 README, 답변 자료구조, 단위 테스트, 사용 안내와 직렬화 변경 기록을 직접 읽었습니다. Haystack의 모델·Reader·파이프라인을 설치하지 않고, 답변과 출처 문서를 같은 자료구조에 두고 직렬화 결과를 정확히 테스트하는 원칙만 적용했습니다.
+
+| 확인한 파일·변경 | 확인한 내용 | 이번 변경에 적용한 부분 |
+|---|---|---|
+| [저장소 README](https://github.com/deepset-ai/haystack/blob/8872d2bfba932964638c26575b074184913a8074/README.md) | 설치 명령, 문서 경로, 검색·질문 답변 파이프라인의 역할 | 새 외부 의존성 없이 기존 BM25와 고정 문서로 재현 가능한 범위 유지 |
+| [answer.py](https://github.com/deepset-ai/haystack/blob/8872d2bfba932964638c26575b074184913a8074/haystack/dataclasses/answer.py) | 추출 답변이 본문·질문·점수와 원본 문서를 한 객체에 보존 | 답변과 문서 ID·버전·인용문·검색 점수를 한 응답 계약에 포함 |
+| [test_answer.py](https://github.com/deepset-ai/haystack/blob/8872d2bfba932964638c26575b074184913a8074/test/dataclasses/test_answer.py) | 답변과 문서의 정확한 직렬화 형태, 왕복과 입력 불변성을 테스트 | 답변과 `quote` 일치, 인용 누락, 보류 시 빈 답변·인용을 계약 테스트로 고정 |
+| [자료구조 문서](https://github.com/deepset-ai/haystack/blob/8872d2bfba932964638c26575b074184913a8074/docs-website/docs/concepts/data-classes.mdx) | 추출 답변은 원본 문서 참조와 위치 정보를, 생성 답변은 여러 문서를 보존 | 현재 단계는 문서 하나의 전문을 그대로 인용한다고 범위를 명시 |
+| [실행 안내](https://github.com/deepset-ai/haystack/blob/8872d2bfba932964638c26575b074184913a8074/docs-website/docs/pipeline-components/readers/transformersextractivereader.mdx) | BM25 검색 결과를 Reader 입력으로 연결하는 실행 순서 | 검색과 답변 단계를 분리하되 모델 Reader는 도입하지 않고 결정론적 인용만 구현 |
+| [직렬화 변경 커밋](https://github.com/deepset-ai/haystack/commit/fb84d454d96d7f0976d25e0d33a2856fd0728f17) | 답변 직렬화를 평평한 필드 계약으로 바꾸고 테스트·이전 형식 호환을 함께 수정 | API 최상위 필드를 명시하고 `grounded-answer-v1` 계약 버전과 회귀 테스트 추가 |
+
+확인한 Git blob SHA는 순서대로 `afa079b2a7e90e815fdaf9b09edcd7ad010e3e91`, `614a0bb18fda013ea771672c83f701c5938bd807`, `6ea5224ab6980323cf8d795a34e569ceace5bf2d`, `358acaf4d94991b080933a9e2f0dd6611b0ebce0`, `8b6fe6b3e774065dd0b9a02d59e52492b36d4d4f`입니다. 외부 코드·문구·모델·측정값을 복사하지 않았고 해당 저장소를 실행하지도 않았습니다. OrderLens의 32문항 결과는 자체 고정 자료로 측정했습니다.
+
 ## 2026-11-02 · 검색 점수 기준과 경계 테스트
 
 [langchain-ai/langchainjs](https://github.com/langchain-ai/langchainjs/tree/1f66c978e365467e4324a661adfd7d956d512a17)의 README, 소스, 실행 예제, 통합 테스트와 기능 도입 변경을 직접 읽었습니다. LangChain Classic은 유지보수용 패키지이고 OrderLens의 BM25 점수는 벡터 유사도와 의미가 다르므로, 의존성이나 예제의 `0.9` 값을 가져오지 않고 결과 필터·경계 검증 원칙만 적용했습니다.

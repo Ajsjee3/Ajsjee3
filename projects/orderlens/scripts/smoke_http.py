@@ -11,6 +11,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from urllib.parse import urlencode
 
+from orderlens.grounded_answer import contract_errors
 from orderlens.migrations import upgrade_database
 from scripts.generate_demo import AS_OF, generate_rows
 
@@ -137,6 +138,33 @@ def main():
             orders_unauthorized, _, _ = request(port, "GET", "/v1/orders", authenticated=False)
             if orders_unauthorized != 401:
                 raise AssertionError("주문 목록의 인증 검증에 실패했습니다.")
+            answer_status, answer, _ = request(
+                port,
+                "POST",
+                "/v1/knowledge/answer",
+                {"query": "중복 적재 버전 충돌"},
+            )
+            abstention_status, abstention, _ = request(
+                port,
+                "POST",
+                "/v1/knowledge/answer",
+                {"query": "배송비 할인 쿠폰 정책"},
+            )
+            if answer_status != 200 or contract_errors(answer):
+                raise AssertionError("인용 답변의 실제 HTTP 계약 검증에 실패했습니다.")
+            if (
+                answer["answer"] != answer["citations"][0]["quote"]
+                or answer["citations"][0]["document_id"] != "duplicates"
+            ):
+                raise AssertionError("인용 답변과 검색 문서가 일치하지 않습니다.")
+            if (
+                abstention_status != 200
+                or not abstention["abstained"]
+                or abstention["answer"] is not None
+                or abstention["citations"]
+                or contract_errors(abstention)
+            ):
+                raise AssertionError("보류 답변에 본문 또는 인용이 남았습니다.")
             evidence = {
                 "transport": "real_loopback_http_to_uvicorn",
                 "database": "temporary_sqlite",
@@ -157,6 +185,20 @@ def main():
                     "only_requested_source_and_status": True,
                 },
                 "orders_unauthenticated": orders_unauthorized,
+                "grounded_answer": {
+                    "status": answer_status,
+                    "contract_version": answer["contract_version"],
+                    "answer_equals_quote": True,
+                    "document_id": answer["citations"][0]["document_id"],
+                    "contract_errors": [],
+                },
+                "grounded_answer_abstention": {
+                    "status": abstention_status,
+                    "reason": abstention["abstention_reason"],
+                    "answer": None,
+                    "citations": [],
+                    "contract_errors": [],
+                },
                 "attention_filter": {
                     "status": attention_status,
                     "source": "market_a",
