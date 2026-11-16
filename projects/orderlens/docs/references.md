@@ -1,5 +1,21 @@
 # 참고 저장소와 적용한 부분
 
+## 2026-11-16 · 검색 필드 가중치와 회귀 테스트
+
+[typesense/typesense](https://github.com/typesense/typesense/tree/208890d3127683873ca8476dedf01a7ec3589241)의 README, 필드 가중치 처리 소스·선언, 정상화·입력 검증 테스트와 변경 기록을 직접 읽었습니다. Typesense의 C++ 검색 구현이나 가중치 범위는 가져오지 않고, 제목·본문 후보를 별도 개발 자료로 선택하고 회귀 평가가 나빠지면 적용하지 않는 원칙만 사용했습니다.
+
+| 확인한 파일·변경 | 확인한 내용 | 이번 변경에 적용한 부분 |
+|---|---|---|
+| [저장소 README](https://github.com/typesense/typesense/blob/208890d3127683873ca8476dedf01a7ec3589241/README.md) | Bazel 빌드 명령, 필요한 의존성과 CI를 최신 실행 근거로 확인하는 안내 | 새 검색 서버나 의존성을 추가하지 않고 기존 Python 검사 명령으로 실험 재현 |
+| [collection.cpp](https://github.com/typesense/typesense/blob/208890d3127683873ca8476dedf01a7ec3589241/src/collection.cpp) | 여러 검색 필드의 가중치를 정렬·정규화해 검색 필드에 연결 | 제목과 본문을 구분해 후보 가중치를 명시하되 작은 단일 BM25 구현 범위 유지 |
+| [collection.h](https://github.com/typesense/typesense/blob/208890d3127683873ca8476dedf01a7ec3589241/include/collection.h) | 검색 필드, 입력 가중치와 처리 결과를 분리한 함수 계약 | 후보 선택 함수와 실제 런타임 설정을 분리하고 결과 JSON에 두 값을 모두 기록 |
+| [가중치 정상화 테스트](https://github.com/typesense/typesense/blob/208890d3127683873ca8476dedf01a7ec3589241/test/collection_specific_more_test.cpp) | 순서가 다른 값, 같은 값과 큰 값을 실제 출력 가중치로 검증 | 제목 가중치가 순위를 바꾸는 작은 문서 테스트와 허용 범위 검증 추가 |
+| [가중치 입력 검증 테스트](https://github.com/typesense/typesense/blob/208890d3127683873ca8476dedf01a7ec3589241/test/collection_test.cpp) | 필드 수와 가중치 수 불일치·빈 기본값을 테스트 | 후보 계약에 현재 설정 `1.0`을 반드시 포함하고 잘못된 값은 즉시 거부 |
+| [필드 가중치 도입 커밋](https://github.com/typesense/typesense/commit/667eee1dadeb92b5a0c160ca43bbf776798f7008) | 필드별 점수를 가중하는 변경과 테스트를 함께 추가 | 구현·테스트·평가 산출물·결정 기록을 하나의 변경으로 묶음 |
+| [교차 필드 제어 변경](https://github.com/typesense/typesense/commit/89a509513ab4daf594b96acc05466e676618a2d6) | 가중치가 교차 필드 결과 순위를 실제로 제어하도록 회귀 수정 | Top-1뿐 아니라 Recall@3·보류 실패도 비교해 한 지표 개선만으로 채택하지 않음 |
+
+확인 기준 커밋은 `208890d3127683873ca8476dedf01a7ec3589241`입니다. 이 변경은 Typesense를 실행하거나 코드·문구·측정값을 복사하지 않았습니다. OrderLens의 후보와 결과는 자체 10문서·개발 26문항·고정 32문항으로 측정했습니다.
+
 ## 2026-11-09 · 답변과 출처 문서의 응답 계약
 
 [deepset-ai/haystack](https://github.com/deepset-ai/haystack/tree/8872d2bfba932964638c26575b074184913a8074)의 README, 답변 자료구조, 단위 테스트, 사용 안내와 직렬화 변경 기록을 직접 읽었습니다. Haystack의 모델·Reader·파이프라인을 설치하지 않고, 답변과 출처 문서를 같은 자료구조에 두고 직렬화 결과를 정확히 테스트하는 원칙만 적용했습니다.

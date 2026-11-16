@@ -79,11 +79,17 @@ def validate_evaluation_data(documents: list[dict], queries: dict, qrels: dict) 
             )
 
 
-def evaluate_bm25(documents: list[dict], queries: dict, qrels: dict, top_k: int = 3) -> dict:
+def evaluate_bm25(
+    documents: list[dict],
+    queries: dict,
+    qrels: dict,
+    top_k: int = 3,
+    title_weight: float = 1.0,
+) -> dict:
     if top_k < 1:
         raise ValueError("top_k는 1 이상이어야 합니다.")
     validate_evaluation_data(documents, queries, qrels)
-    index = BM25Index(documents)
+    index = BM25Index(documents, title_weight=title_weight)
     relevance = qrels["relevance"]
     answerable_rows = []
     unanswerable_rows = []
@@ -157,6 +163,8 @@ def evaluate_bm25(documents: list[dict], queries: dict, qrels: dict, top_k: int 
         "frozen_on": queries["frozen_on"],
         "query_origin": queries["query_origin"],
         "retriever": "orderlens_bm25_korean_bigrams",
+        "title_weight": title_weight,
+        "body_weight": 1.0,
         "top_k": top_k,
         "score_is_probability": False,
         "document_count": len(documents),
@@ -179,9 +187,15 @@ def evaluate_bm25(documents: list[dict], queries: dict, qrels: dict, top_k: int 
     }
 
 
-def _policy_rows(documents: list[dict], queries: dict, qrels: dict, top_k: int) -> list[dict]:
+def _policy_rows(
+    documents: list[dict],
+    queries: dict,
+    qrels: dict,
+    top_k: int,
+    title_weight: float = 1.0,
+) -> list[dict]:
     validate_evaluation_data(documents, queries, qrels)
-    index = BM25Index(documents)
+    index = BM25Index(documents, title_weight=title_weight)
     rows = []
     for query in queries["queries"]:
         matches = index.search(query["text"], top_k=top_k)
@@ -224,9 +238,15 @@ def _policy_metrics(rows: list[dict], threshold: float) -> dict:
     }
 
 
-def calibrate_min_score(documents: list[dict], queries: dict, qrels: dict, top_k: int = 3) -> dict:
+def calibrate_min_score(
+    documents: list[dict],
+    queries: dict,
+    qrels: dict,
+    top_k: int = 3,
+    title_weight: float = 1.0,
+) -> dict:
     """개발용 질의에서만 점수 기준을 고릅니다. 고정 평가는 선택에 쓰지 않습니다."""
-    rows = _policy_rows(documents, queries, qrels, top_k)
+    rows = _policy_rows(documents, queries, qrels, top_k, title_weight=title_weight)
     candidates = []
     for threshold in _candidate_thresholds(rows):
         metrics = _policy_metrics(rows, threshold)
@@ -244,6 +264,8 @@ def calibrate_min_score(documents: list[dict], queries: dict, qrels: dict, top_k
         "created_on": queries["created_on"],
         "query_origin": queries["query_origin"],
         "selection_metric": queries["selection_metric"],
+        "title_weight": title_weight,
+        "body_weight": 1.0,
         "tie_breaker": "higher_answerable_correct_acceptance_then_lower_threshold",
         "answerable_query_count": sum(row["kind"] == "answerable" for row in rows),
         "unanswerable_query_count": sum(row["kind"] == "unanswerable" for row in rows),
@@ -258,10 +280,11 @@ def evaluate_abstention_policy(
     qrels: dict,
     minimum_score: float,
     top_k: int = 3,
+    title_weight: float = 1.0,
 ) -> dict:
-    rows = _policy_rows(documents, queries, qrels, top_k)
+    rows = _policy_rows(documents, queries, qrels, top_k, title_weight=title_weight)
     policy = BM25AbstentionPolicy(minimum_score)
-    index = BM25Index(documents)
+    index = BM25Index(documents, title_weight=title_weight)
     accepted_count = 0
     correct_accept_count = 0
     false_abstentions = []
@@ -304,6 +327,8 @@ def evaluate_abstention_policy(
     )
     return {
         "minimum_score": minimum_score,
+        "title_weight": title_weight,
+        "body_weight": 1.0,
         "score_is_probability": False,
         "metrics": metrics,
         "failure_counts": {
