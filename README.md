@@ -12,9 +12,9 @@ Python과 FastAPI를 배우며 주문 데이터 처리 프로젝트를 만들고
 
 - **구현:** FastAPI, SQLAlchemy, Alembic, PostgreSQL·SQLite, 입력 검증, 버전별 적재, SQL 집계, 운영 문서 검색
 - **재현:** 합성 데이터 309행을 다시 보내도 새 주문 버전은 0개, 집계 결과는 동일
-- **이번 변경:** 검색 1위 문서 전문과 문서 ID·버전·인용문을 한 응답 계약으로 묶고, 보류할 때는 답변과 인용을 함께 비움
-- **검색 검증:** 고정 32문항에서 인용 누락·답변/인용문 불일치 0건; 관련 질문의 관련 문서 인용 15/24, 잘못된 문서 인용 7건
-- **다음 작업:** 별도 개발 질문으로 문서 제목·본문 가중치를 비교하고 같은 고정 평가에서 순위 변화 확인
+- **이번 변경:** 개발 질문에서 제목·본문 가중치를 비교하고, 고정 평가의 전체 성공률이 낮아진 후보는 API에 적용하지 않음
+- **검색 검증:** 제목 가중치 후보의 Top-1은 0.625에서 0.666667로 올랐지만 균형 성공률은 0.75에서 0.729167로 낮아 현재 설정 유지
+- **다음 작업:** 배포 환경에서 DB 연결과 스키마 준비 상태를 구분하는 readiness 검사
 
 [코드와 실행 방법](https://github.com/Ajsjee3/Ajsjee3/blob/main/projects/orderlens/README.md) · [설계](https://github.com/Ajsjee3/Ajsjee3/blob/main/projects/orderlens/docs/design.md) · [검증 결과](https://github.com/Ajsjee3/Ajsjee3/blob/main/projects/orderlens/docs/validation.md) · [개발 기록](https://github.com/Ajsjee3/Ajsjee3/blob/main/projects/orderlens/docs/progress.md)
 

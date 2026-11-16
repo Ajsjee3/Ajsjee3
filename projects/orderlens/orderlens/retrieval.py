@@ -5,6 +5,7 @@ import re
 from collections import Counter
 
 STOPWORDS = {"어떻게", "무엇", "알려주세요", "해주세요", "방법", "관련", "어떤"}
+DEFAULT_TITLE_WEIGHT = 1.0
 
 
 def tokenize(text: str) -> list[str]:
@@ -21,9 +22,19 @@ def tokenize(text: str) -> list[str]:
 
 
 class BM25Index:
-    def __init__(self, documents: list[dict]):
+    def __init__(
+        self, documents: list[dict], title_weight: float = DEFAULT_TITLE_WEIGHT
+    ):
+        if not math.isfinite(title_weight) or title_weight < 1.0:
+            raise ValueError("title_weight는 1.0 이상이어야 합니다.")
+        self.title_weight = title_weight
         self.documents = documents
-        self.counts = [Counter(tokenize(doc["title"] + " " + doc["text"])) for doc in documents]
+        self.counts = []
+        for doc in documents:
+            counts = Counter(tokenize(doc["text"]))
+            for token, frequency in Counter(tokenize(doc["title"])).items():
+                counts[token] += frequency * title_weight
+            self.counts.append(counts)
         self.lengths = [sum(count.values()) for count in self.counts]
         self.average_length = sum(self.lengths) / len(self.lengths) if self.lengths else 1
         self.document_frequency = Counter()

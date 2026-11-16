@@ -21,12 +21,13 @@ py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m scripts.check
 ```
 
-마지막 명령은 코드 검사, 핵심 테스트, 마이그레이션 왕복 검사, 공개 거래 강제 실패·복구, 예제 데이터 생성, API 데모, 문서 검색·인용 답변 평가, 실제 HTTP 시연을 순서대로 실행합니다. 기존 주문 DB를 덮어쓰지 않고 임시 DB를 사용하며 시연 서버는 자동 종료됩니다.
+마지막 명령은 코드 검사, 핵심 테스트, 마이그레이션 왕복 검사, 공개 거래 강제 실패·복구, 예제 데이터 생성, API 데모, 문서 검색·제목 가중치·인용 답변 평가, 실제 HTTP 시연을 순서대로 실행합니다. 기존 주문 DB를 덮어쓰지 않고 임시 DB를 사용하며 시연 서버는 자동 종료됩니다.
 
 | 산출물 | 내용 |
 |---|---|
 | artifacts/demo_report.json | 적재 결과, 재전송 결과, 주문 지표, 근거 문서 |
 | artifacts/retrieval_evaluation.json | 10문서·32개 고정 질문의 지표와 질문별 실패 사례 |
+| artifacts/retrieval_field_weight_experiment.json | 개발 질문의 제목 가중치 선택과 고정 평가의 채택·미채택 근거 |
 | artifacts/grounded_answer_evaluation.json | 인용 계약 무결성, 관련 문서 인용과 실패 사례 |
 | artifacts/http_smoke.json | 실제 HTTP 요청과 인증 검사 결과 |
 | artifacts/migration_check.json | 네 리비전의 upgrade·downgrade·재upgrade 결과 |
@@ -148,10 +149,11 @@ curl 'http://127.0.0.1:8000/v1/orders?source=market_a&status=paid&limit=2&offset
 | 5 | orderlens/ingestion.py | 중복과 충돌은 어떻게 구분할까요? |
 | 6 | orderlens/analytics.py | 같은 주문의 여러 버전 중 어느 것을 집계할까요? |
 | 7 | orderlens/retrieval.py, retrieval_policy.py, retrieval_evaluation.py | 검색 점수 기준을 고정 평가와 분리해 어떻게 정할까요? |
-| 8 | orderlens/grounded_answer.py, grounded_answer_evaluation.py | 답변과 인용을 어떻게 묶고 관련성을 따로 평가할까요? |
-| 9 | orderlens/retail.py, retail_db.py | 파일 출처·Decimal·재실행은 어떻게 보존할까요? |
-| 10 | orderlens/retail_analytics.py, scripts/benchmark_retail_sql.py | 조회 조건과 인덱스 계획을 어떻게 같은 결과로 비교할까요? |
-| 11 | tests/ | 어떤 입력을 넣었을 때 어떤 결과를 기대할까요? |
+| 8 | orderlens/retrieval_weight_experiment.py | 개발 후보가 고정 평가를 통과하지 못하면 왜 설정을 유지할까요? |
+| 9 | orderlens/grounded_answer.py, grounded_answer_evaluation.py | 답변과 인용을 어떻게 묶고 관련성을 따로 평가할까요? |
+| 10 | orderlens/retail.py, retail_db.py | 파일 출처·Decimal·재실행은 어떻게 보존할까요? |
+| 11 | orderlens/retail_analytics.py, scripts/benchmark_retail_sql.py | 조회 조건과 인덱스 계획을 어떻게 같은 결과로 비교할까요? |
+| 12 | tests/ | 어떤 입력을 넣었을 때 어떤 결과를 기대할까요? |
 
 ## 5. 데이터 흐름
 

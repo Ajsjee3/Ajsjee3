@@ -3,6 +3,8 @@
   "frozen_on": "2026-10-26",
   "query_origin": "manually_curated_paraphrases_not_real_user_queries",
   "retriever": "orderlens_bm25_korean_bigrams",
+  "title_weight": 1.0,
+  "body_weight": 1.0,
   "top_k": 3,
   "score_is_probability": false,
   "document_count": 10,
@@ -887,6 +889,8 @@
       "created_on": "2026-11-02",
       "query_origin": "manually_curated_development_queries_not_real_user_queries",
       "selection_metric": "balanced_correct_acceptance_and_unanswerable_abstention",
+      "title_weight": 1.0,
+      "body_weight": 1.0,
       "tie_breaker": "higher_answerable_correct_acceptance_then_lower_threshold",
       "answerable_query_count": 16,
       "unanswerable_query_count": 10,
@@ -1135,6 +1139,8 @@
     },
     "frozen_evaluation": {
       "minimum_score": 3.197979,
+      "title_weight": 1.0,
+      "body_weight": 1.0,
       "score_is_probability": false,
       "metrics": {
         "answerable_correct_accept_rate": 0.625,

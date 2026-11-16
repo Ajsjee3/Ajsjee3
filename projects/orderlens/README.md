@@ -27,6 +27,7 @@ OrderLens는 판매 경로와 주문 번호를 묶어 주문을 구분하고, �
 | 운영 기준을 찾아야 함 | BM25로 문서 ID·버전을 반환하고 별도 질문·정답표로 실패 사례까지 평가 | [retrieval_evaluation.py](orderlens/retrieval_evaluation.py) |
 | 단어가 조금 겹친 무관 질문도 근거가 반환됨 | 별도 개발 질문으로 최소 점수를 선택하고 기준 미만 검색 결과를 명시적으로 보류 | [retrieval_policy.py](orderlens/retrieval_policy.py) |
 | 답변과 출처 문서가 분리될 수 있음 | 검색 1위 문서 전문과 ID·버전·인용문을 한 계약으로 묶고 보류 시 모두 비움 | [grounded_answer.py](orderlens/grounded_answer.py) |
+| 제목을 더 반영하면 검색이 좋아지는지 불명확함 | 개발 질문에서 가중치·점수를 고르고 고정 평가가 나빠지면 설정을 유지 | [가중치 실험](docs/decisions/retrieval_field_weight_experiment.md) |
 
 ## 실행
 
@@ -76,8 +77,10 @@ curl 'http://127.0.0.1:8000/v1/orders?source=market_a&status=paid&limit=2&offset
 | 고정 평가에 보류 기준 적용 | 정답 문서 1위 수용 15/24 · 무관 질문 보류 7/8 · 답할 수 있는 질문 보류 2건 |
 | 인용 답변 계약 평가 | 답변 23건 · 인용 누락 0건 · 답변/인용문 불일치 0건 |
 | 관련 문서를 인용한 답변 | 관련 질문 전체 15/24 · 답변한 관련 질문 15/22 · 잘못된 문서 인용 7건 |
+| 개발 질문의 제목 가중치 선택 | 제목 1.5 · 본문 1.0 · 최소 점수 4.186289 · 균형 정확도 0.90625 |
+| 고정 평가의 가중치 후보 비교 | Top-1 0.625 → 0.666667 · 균형 성공률 0.75 → 0.729167 · 미채택 |
 
-명령 한 번으로 임시 DB 마이그레이션, 강제 적재 실패·복구, 적재·재전송, 지표 비교, 검색·인용 답변 평가, 실제 HTTP 요청까지 재실행합니다. 원본 결과는 [검색 평가](artifacts/retrieval_evaluation.json), [인용 답변 평가](artifacts/grounded_answer_evaluation.json), [SQLite 마이그레이션](artifacts/migration_check.json), [실패·복구](artifacts/retail_recovery.json), [공개 거래 DB 적재](artifacts/retail_db_check.json), [SQL 계획 비교](artifacts/retail_query_benchmark.json), [PostgreSQL 통합 검사](artifacts/postgres_integration.json), [demo_report.json](artifacts/demo_report.json), [HTTP 결과](artifacts/http_smoke.json), [검증 기록](docs/validation.md)에 남깁니다.
+명령 한 번으로 임시 DB 마이그레이션, 강제 적재 실패·복구, 적재·재전송, 지표 비교, 검색·인용 답변 평가, 실제 HTTP 요청까지 재실행합니다. 원본 결과는 [검색 평가](artifacts/retrieval_evaluation.json), [제목 가중치 실험](artifacts/retrieval_field_weight_experiment.json), [인용 답변 평가](artifacts/grounded_answer_evaluation.json), [SQLite 마이그레이션](artifacts/migration_check.json), [실패·복구](artifacts/retail_recovery.json), [공개 거래 DB 적재](artifacts/retail_db_check.json), [SQL 계획 비교](artifacts/retail_query_benchmark.json), [PostgreSQL 통합 검사](artifacts/postgres_integration.json), [demo_report.json](artifacts/demo_report.json), [HTTP 결과](artifacts/http_smoke.json), [검증 기록](docs/validation.md)에 남깁니다.
 
 ## 설계에서 정한 기준
 
@@ -92,15 +95,14 @@ curl 'http://127.0.0.1:8000/v1/orders?source=market_a&status=paid&limit=2&offset
 - 검색 점수는 확률이 아닙니다. 현재 검색은 BM25이며 요약은 규칙 기반입니다. 평가 질문은 실제 사용자 로그가 아니라 수작업한 고정 예제입니다.
 - 최소 점수는 고정 평가와 분리한 개발 질문에서만 선택합니다. API는 `abstained`, `abstention_reason`, `minimum_score`, `top_score`를 함께 반환해 보류와 무검색을 구분합니다.
 - 인용 답변은 수용된 1위 문서 전문을 그대로 반환하고 `answer`와 `citations[0].quote`를 같게 유지합니다. 인용 형식이 완전해도 문서 관련성이 보장되지는 않습니다.
+- 제목 가중치 후보는 개발 질문으로만 선택하고 고정 평가에서 전체 성공률이 현재 설정보다 높을 때만 채택합니다. 이번 후보는 순위 정확도만 오르고 보류까지 포함한 성공률은 낮아져 적용하지 않았습니다.
 
 상세 내용은 [설계 문서](docs/design.md)에서 확인할 수 있습니다.
 
 ## 다음 작업
 
-현재 버전은 **0.10.0**입니다. `POST /v1/knowledge/answer`는 최소 점수를 통과한 1위 문서 전문을 그대로 답변으로 반환하면서 문서 ID·제목·출처·버전·인용문·검색 점수를 함께 제공합니다. 기준 미달이면 답변과 인용을 모두 비우고 사유를 표시합니다.
+현재 버전은 **0.11.0**입니다. 제목 가중치 `1.0`, `1.5`, `2.0`, `3.0`과 각 최소 점수를 고정 평가와 분리된 개발 질문으로 비교했습니다. 개발 자료에서는 제목 `1.5`가 선택됐지만 고정 32문항에서 Top-1은 `0.625 → 0.666667`, Recall@3은 `0.9375 → 0.895833`, 보류까지 포함한 균형 성공률은 `0.75 → 0.729167`이었습니다.
 
-2026-10-26에 고정한 관련 질문 24개·무관 질문 8개에서 답변 23건의 인용 누락과 답변/인용문 불일치는 0건이었습니다. 다만 관련 문서를 인용한 답변은 관련 질문 전체의 15/24, 답변한 관련 질문의 15/22였습니다. 관련 질문 2개는 보류됐고 7개는 다른 문서를 인용했으며 무관 질문 1개에도 답했습니다. 형식 무결성과 답변 정확도를 구분합니다. 다음은 고정 평가를 튜닝에 사용하지 않는 별도 개발 질문으로 제목·본문 가중치를 비교하는 작은 검색 순위 실험입니다.
-
-[PR #10](https://github.com/Ajsjee3/Ajsjee3/pull/10)의 [GitHub Actions](https://github.com/Ajsjee3/Ajsjee3/actions/runs/42605972144)에서 Python 3.12 일반 검사와 PostgreSQL 16.15 통합 검사가 통과했습니다.
+잘못된 답변 가능 질문 수용은 7건에서 5건으로 줄었지만 답변 가능 질문 보류가 2건에서 5건으로 늘었습니다. 사전에 정한 채택 기준을 통과하지 못해 API는 제목·본문 `1.0`, 최소 점수 `3.197979`를 유지합니다. 다음은 배포 환경에서 프로세스 생존과 DB·스키마 준비 상태를 구분하는 작은 readiness 검사입니다.
 
 [작업 목록](docs/automation_and_backlog.md) · [개발 기록](docs/progress.md) · [참고 저장소](docs/references.md) · [기여 안내](CONTRIBUTING.md)
