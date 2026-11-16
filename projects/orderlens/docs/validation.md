@@ -23,6 +23,8 @@ Linux x86_64, Python 3.12.14, SQLite 3.53.1의 기존 `requirements.lock` 환경
 
 제목 가중치가 실제 순위를 바꾸는 작은 합성 문서, 1.0 미만·무한대·NaN 거부, 개발 선택과 고정 평가 분리, 미채택 결정을 테스트했습니다. 이 구현은 제목 토큰 빈도를 조정한 작은 실험이지 완전한 BM25F가 아닙니다. 질문도 수작업이며 실제 사용자 로그나 독립 평가가 아닙니다. 로컬 Docker Compose와 전체 UCI 자료의 PostgreSQL 적재는 이번 변경에서도 실행하지 않았습니다.
 
+[PR #11](https://github.com/Ajsjee3/Ajsjee3/pull/11)의 [GitHub Actions 실행](https://github.com/Ajsjee3/Ajsjee3/actions/runs/43866648143)에서도 `checks`, `postgres-integration` 두 job이 통과했습니다. Python 3.12 일반 검사는 Ruff, pytest 113개와 같은 실험 결과·실제 HTTP를 확인했습니다. PostgreSQL 16 통합 검사는 head `20261019_04`, 모델 일치, 네 리비전 왕복과 기존 주문·공개 거래 복구 흐름을 통과했습니다.
+
 ## 2026-11-09 · 0.10.0 로컬 검증
 
 Linux x86_64, Python 3.12.14, SQLite 3.53.1의 `requirements.lock` 환경에서 `python -m scripts.check`를 실행했습니다. 종료 코드 0, Ruff 통과, pytest 107개 통과, 기존 의존성 경고 2종입니다. Alembic 네 리비전 왕복과 모델 일치, 강제 적재 실패·복구, 주문 재전송, 실제 Uvicorn HTTP 8페이지·고유 주문 120건도 함께 통과했습니다.

@@ -10,6 +10,8 @@
 
 Linux x86_64, Python 3.12.14, SQLite 3.53.1의 기존 `requirements.lock` 환경에서 `python -m scripts.check`를 실행했습니다. 종료 코드 0, Ruff 통과, pytest 113개 통과, 기존 의존성 경고 2종이었습니다. 네 리비전 왕복, 강제 적재 실패·복구, 주문 재전송, 실제 HTTP와 기존 검색·인용 계약도 함께 통과했습니다.
 
+[PR #11](https://github.com/Ajsjee3/Ajsjee3/pull/11)의 [원격 검사](https://github.com/Ajsjee3/Ajsjee3/actions/runs/43866648143)에서도 Python 3.12 일반 검사와 PostgreSQL 16 통합 job이 통과했습니다. 일반 검사는 같은 113개 테스트와 가중치 미채택 결정을, PostgreSQL 검사는 기존 네 리비전 왕복·모델 일치와 주문·공개 거래 복구 흐름을 확인했습니다.
+
 새 참고는 `typesense/typesense`의 README, 필드 가중치 소스·선언, 정상화·입력 검증 테스트와 관련 변경 커밋입니다. 여러 필드를 명시적으로 비교하고 가중치 계약을 회귀 테스트하는 원칙만 적용했으며 Typesense 코드·의존성·수치는 가져오지 않았습니다.
 
 다음: 배포 환경에서 프로세스 생존과 DB 연결·Alembic 리비전 준비 상태를 구분하는 readiness 검사를 작은 범위로 추가합니다.

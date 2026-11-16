@@ -105,4 +105,6 @@ curl 'http://127.0.0.1:8000/v1/orders?source=market_a&status=paid&limit=2&offset
 
 잘못된 답변 가능 질문 수용은 7건에서 5건으로 줄었지만 답변 가능 질문 보류가 2건에서 5건으로 늘었습니다. 사전에 정한 채택 기준을 통과하지 못해 API는 제목·본문 `1.0`, 최소 점수 `3.197979`를 유지합니다. 다음은 배포 환경에서 프로세스 생존과 DB·스키마 준비 상태를 구분하는 작은 readiness 검사입니다.
 
+[PR #11](https://github.com/Ajsjee3/Ajsjee3/pull/11)의 [GitHub Actions](https://github.com/Ajsjee3/Ajsjee3/actions/runs/43866648143)에서 Python 3.12 일반 검사와 PostgreSQL 16 통합 검사가 통과했습니다.
+
 [작업 목록](docs/automation_and_backlog.md) · [개발 기록](docs/progress.md) · [참고 저장소](docs/references.md) · [기여 안내](CONTRIBUTING.md)
