@@ -21,6 +21,7 @@ from orderlens.analytics import attention_orders, metrics, order_page, quality_s
 from orderlens.config import Settings
 from orderlens.db import make_engine
 from orderlens.grounded_answer import ExtractiveGroundedAnswerer
+from orderlens.health import readiness
 from orderlens.ingestion import ingest, run_summary
 from orderlens.migrations import require_current_schema
 from orderlens.models import IngestionRun
@@ -65,7 +66,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     async def lifespan(app):
         engine = make_engine(settings.database_url)
         try:
-            require_current_schema(engine)
+            app.state.schema_revision = require_current_schema(engine)
             app.state.engine = engine
             knowledge = json.loads(
                 files("orderlens.data").joinpath("knowledge.json").read_text("utf-8")
@@ -114,6 +115,16 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     def health(session: Db):
         session.execute(text("SELECT 1"))
         return {"status": "ok", "version": __version__}
+
+    @app.get("/live", tags=["health"])
+    def live():
+        return {"status": "ok", "version": __version__}
+
+    @app.get("/ready", tags=["health"])
+    def ready(request: Request):
+        result = readiness(request.app.state.engine, request.app.state.schema_revision)
+        return JSONResponse(status_code=200 if result["status"] == "ready" else 503,
+                            content=result)
 
     router = APIRouter(prefix="/v1", dependencies=[Depends(require_api_key)])
 

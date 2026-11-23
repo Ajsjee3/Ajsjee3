@@ -3,7 +3,7 @@
   "database": "temporary_sqlite",
   "transport": "in_process_asgi_testclient",
   "first_ingestion": {
-    "run_id": "01e74649-bbd4-44eb-8107-366ce3e2a1e5",
+    "run_id": "ecd33036-2665-460b-8d79-8a07c6bf1171",
     "accepted": 300,
     "duplicates": 5,
     "rejected": 4,
@@ -52,7 +52,7 @@
     ]
   },
   "replay": {
-    "run_id": "1e9417e1-2b10-4a66-8be3-019a74dda721",
+    "run_id": "7280fb87-7889-4edf-926c-95633403eab7",
     "accepted": 0,
     "duplicates": 305,
     "rejected": 4,
@@ -247,7 +247,7 @@
       {
         "document_id": "late-delivery",
         "title": "배송 지연과 미완료 주문 확인",
-        "score": 6.548934,
+        "score": 9.890806,
         "excerpt": "학습용 운영 규칙입니다. 주문 상태가 paid 또는 shipped이고 배송 예정 시각 promised_by가 조회 기준 시각 as_of보다 빠르면 지연 미완료 주문입니다. 판매자는 배송 이력과 운송장 상태를 확인한 후 고객 안내 내용을 검토합니다. 시스템이 고객에게 메시지를 자동 발송하지는 않습니다.",
         "source": "bundled_demo_policy",
         "version": "1"
