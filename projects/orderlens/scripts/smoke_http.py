@@ -104,6 +104,10 @@ def main():
                 if process.poll() is not None or time.monotonic() >= deadline:
                     raise RuntimeError("HTTP 시연 서버가 준비되지 않았습니다.")
                 time.sleep(0.1)
+            for probe_path in ("/live", "/ready"):
+                probe_status, _, _ = request(port, "GET", probe_path, authenticated=False)
+                if probe_status != 200:
+                    raise AssertionError(f"상태 점검 실패: {probe_path}")
             ingest_status, ingestion, _ = request(
                 port, "POST", "/v1/ingestions", {"rows": generate_rows()}
             )
@@ -169,6 +173,8 @@ def main():
                 "transport": "real_loopback_http_to_uvicorn",
                 "database": "temporary_sqlite",
                 "health": status,
+                "live": 200,
+                "ready": 200,
                 "ingest": ingest_status,
                 "metrics": metric_status,
                 "unauthenticated": unauthorized_status,

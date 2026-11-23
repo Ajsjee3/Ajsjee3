@@ -164,6 +164,18 @@ def main() -> None:
     with TestClient(app, headers={"X-API-Key": "orderlens-postgres-ci-key"}) as client:
         health = client.get("/health")
         health.raise_for_status()
+        client.get("/ready").raise_for_status()
+        with app.state.engine.begin() as connection:
+            connection.execute(text("UPDATE alembic_version SET version_num = 'probe_old'"))
+        try:
+            assert client.get("/live").status_code == 200
+            assert client.get("/ready").status_code == 503
+        finally:
+            with app.state.engine.begin() as connection:
+                connection.execute(text("UPDATE alembic_version SET version_num = :revision"),
+                                   {"revision": head_revision()})
+        client.get("/ready").raise_for_status()
+        print("readiness: PostgreSQL healthy -> schema mismatch 503 -> recovered 200; live 200")
         payload = {"rows": generate_rows()}
         first = client.post("/v1/ingestions", json=payload)
         first.raise_for_status()

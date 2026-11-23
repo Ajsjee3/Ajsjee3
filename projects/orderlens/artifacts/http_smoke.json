@@ -2,6 +2,8 @@
   "transport": "real_loopback_http_to_uvicorn",
   "database": "temporary_sqlite",
   "health": 200,
+  "live": 200,
+  "ready": 200,
   "ingest": 200,
   "metrics": 200,
   "unauthenticated": 401,
