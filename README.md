@@ -18,6 +18,12 @@ Python과 FastAPI를 배우며 주문 데이터 처리 프로젝트를 만들고
 
 [코드와 실행 방법](https://github.com/Ajsjee3/Ajsjee3/blob/main/projects/orderlens/README.md) · [설계](https://github.com/Ajsjee3/Ajsjee3/blob/main/projects/orderlens/docs/design.md) · [검증 결과](https://github.com/Ajsjee3/Ajsjee3/blob/main/projects/orderlens/docs/validation.md) · [개발 기록](https://github.com/Ajsjee3/Ajsjee3/blob/main/projects/orderlens/docs/progress.md)
 
+### [GPU 기반 오픈소스 LLM·AI Agent 서비스 개발 PBL](https://github.com/Ajsjee3/Ajsjee3/tree/main/projects/gpu-llm-agent-pbl) — 진행 중
+
+영남대학교의 실무형 AI 교육에서 GPU 기반 Qwen 계열 모델과 RAG를 실습하며, 가상 금융 문서를 대상으로 청킹·임베딩·하이브리드 검색을 비교하고 있습니다. LoRA, AI Agent 및 서비스 개발은 앞으로 진행할 내용입니다.
+
+[학습 과정과 실험 기록](https://github.com/Ajsjee3/Ajsjee3/tree/main/projects/gpu-llm-agent-pbl)
+
 ### 기존 저장소
 
 [LLM-project](https://github.com/Ajsjee3/LLM-project) — Unity 프로젝트와 LangChainServer 코드가 있는 저장소입니다. 실행 방법과 구현 범위를 정리할 예정입니다.
@@ -28,4 +34,3 @@ Python · HTTP와 REST API · 관계형 데이터베이스 · SQL · 테스트
 
 프로젝트에서 사용한 개념을 작은 입력으로 확인하고, [학습 기록](https://github.com/Ajsjee3/Ajsjee3/blob/main/projects/orderlens/docs/learning_log.md)에 정리합니다.
 
-연락: 22110926@yu.ac.kr
