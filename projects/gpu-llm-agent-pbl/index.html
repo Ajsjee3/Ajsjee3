@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FinanceRAG | 삼성전자 재무 분석</title>
+<style>
+:root{color-scheme:light;font:16px/1.65 system-ui,sans-serif;color:#182f32;background:#f3f5f2}
+*{box-sizing:border-box}body{margin:0}header{background:#123536;color:#fff;padding:18px max(5vw,calc((100vw - 960px)/2));display:flex;align-items:center;justify-content:space-between;gap:1rem}header strong{font:600 24px Georgia,serif}header span{font-size:13px;color:#c0e5da}main{max-width:1000px;margin:auto;padding:3rem 20px}h1{font-size:clamp(1.8rem,4vw,2.7rem);letter-spacing:-.055em;margin:0}p{margin:.3rem 0 1.5rem;color:#4d6364}section,form{border:1px solid #cfdbd6;background:white;border-radius:14px;padding:clamp(16px,3vw,28px);margin:18px 0}textarea{display:block;width:100%;padding:12px;border:1px solid #9eafa9;border-radius:7px;font:inherit;margin:8px 0;resize:vertical}button{font:inherit;cursor:pointer;border-radius:7px;border:1px solid #cad6d0;padding:6px 12px;background:#f2f6f3;color:#214942}button:disabled{opacity:.55;cursor:wait}.send{background:#126454;color:white;padding:8px 22px}.bar,.examples{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.bar{justify-content:space-between;margin-top:16px}.examples button{font-size:.85rem}h2{font-size:1.12rem;margin:0}small,summary{color:#3a615a}#answer,details div{white-space:pre-wrap;overflow-wrap:anywhere}details{border-top:1px solid #dce6e0;padding:12px 0}summary{cursor:pointer}#status{min-height:1.4em}#answer{margin-top:14px}
+</style>
+<header><strong>FinanceRAG</strong><span id="mode">연결 중</span></header>
+<main><h1>삼성전자 재무 분석</h1><p>2024년 2·3분기 연결 실적을 삼성전자 공식 발표와 함께 확인하세요.</p>
+<form><label for="question"><b>분석 질문</b></label>
+<textarea rows="3" id="question" maxlength="600" required placeholder="3분기에 매출은 늘었는데 영업이익은 왜 줄었나요?"></textarea>
+<div class="examples"><button type="button">2분기 연결 영업이익은 얼마인가요?</button><button type="button">3분기 영업이익 감소의 배경은 무엇인가요?</button><button type="button">두 분기의 DS 부문 영업이익을 비교해 주세요.</button></div>
+<div class="bar"><label><input type="checkbox" id="lora" disabled> LoRA 적용</label><button class="send" disabled>분석하기</button></div></form>
+<div id="status" role="status"></div><div id="results" hidden><section><div class="bar" style="margin:0"><h2 id="heading">답변</h2><small id="time"></small></div><div id="answer"></div></section>
+<section><h2>근거 문서</h2><div id="sources"></div></section></div></main>
+<script>
+const el = id => document.getElementById(id);
+const send = document.querySelector('.send');
+async function init() {
+  try {
+    const res = await fetch('api/info');
+    if (!res.ok) throw Error();
+    const info = await res.json();
+    el('mode').textContent = info.mode;
+    el('lora').disabled = !info.adapter;
+    el('lora').checked = Boolean(info.adapter);
+    send.disabled = false;
+  } catch { el('status').textContent = '서버에 연결할 수 없습니다. 새로 고침해 주세요.'; }
+}
+document.querySelectorAll('.examples button').forEach(button => {
+  button.onclick = () => { el('question').value = button.textContent; el('question').focus(); };
+});
+document.querySelector('form').onsubmit = async event => {
+  event.preventDefault();
+  const q = el('question').value.trim();
+  if (!q) { el('status').textContent = '질문을 입력해 주세요.'; return; }
+  send.disabled = true;
+  el('results').hidden = true;
+  el('status').textContent = '문서를 확인하고 있습니다…';
+  try {
+    const res = await fetch('api/chat', {method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({q, use_lora:el('lora').checked})});
+    if (!res.ok) {
+      const error = await res.json();
+      throw Error(typeof error.detail === 'string' ? error.detail : '질문 형식을 확인해 주세요.');
+    }
+    const data = await res.json();
+    el('heading').textContent = data.mode.includes('CPU') ? '검색 결과 · 자료 발췌' : '분석 답변';
+    el('answer').textContent = data.answer;
+    el('time').textContent = '서버 응답 ' + data.elapsed_ms + ' ms' + (data.adapter ? ' · LoRA 적용' : '');
+    el('sources').replaceChildren();
+    data.sources.forEach((source, i) => {
+      const item = document.createElement('details');
+      const title = document.createElement('summary');
+      title.textContent = '[' + (i+1) + '] ' + source.title;
+      const body = document.createElement('div');
+      body.textContent = source.text;
+      const link = document.createElement('a');
+      link.href = source.url;
+      link.textContent = '삼성전자 공식 발표 · ' + source.date;
+      item.append(title, body, link);
+      el('sources').append(item);
+    });
+    if (!data.sources.length) el('sources').textContent = '검색된 문서가 없습니다.';
+    el('results').hidden = false;
+    el('status').textContent = '';
+  } catch (err) { el('status').textContent = err.message; }
+  finally { send.disabled = false; }
+};
+init();
+</script></html>
